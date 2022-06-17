@@ -6,9 +6,9 @@ class TemperatureMap
 {
 private:
 	int m_tempGridWidth, m_tempGridHeight;
-	float m_maxNoise = -1000;
-	float m_minNoise = 1000;
+	float m_maxNoise, m_minNoise;
 	float m_frequency = 0, m_amplitude = 0, m_offset = 0;
+	
 	PerlinNoise perlinNoise;
 	struct TemperatureMapType
 	{

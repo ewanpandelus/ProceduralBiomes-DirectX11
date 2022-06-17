@@ -7,6 +7,7 @@
 
 void TemperatureMap::Initialize(int tempGridWidth, int tempGridHeight)
 {
+	std::vector<uint32_t> m_colourBuffers(128 * 128);
 	perlinNoise.Initialize();
 	int index;
 	m_tempGridWidth = tempGridWidth;
@@ -24,6 +25,8 @@ void TemperatureMap::Initialize(int tempGridWidth, int tempGridHeight)
 }
 void TemperatureMap::GenerateTemperatureMap()
 {
+    m_maxNoise = -1000;
+	m_minNoise = 1000;
 	int index = 0;
 	for (int j = 0; j < m_tempGridHeight; j++)
 	{
@@ -31,9 +34,9 @@ void TemperatureMap::GenerateTemperatureMap()
 		{ 
 			index = (m_tempGridHeight * j) + i;
 	
-			float perlinValue = (float)perlinNoise.Noise((i * m_frequency)+m_offset, (j * m_frequency+m_offset), 1)*m_amplitude;
-			m_temperatureMap[index].temperature = perlinValue;
-			AssessMaxAndMinNoiseValues(perlinValue);
+			float perlinValue = (float)perlinNoise.Noise((i * m_frequency)+m_offset, (j * m_frequency+m_offset), 1);
+			m_temperatureMap[index].temperature = perlinValue*m_amplitude;
+			AssessMaxAndMinNoiseValues(perlinValue);  //If the max and min are influenced by ampltude then the range never changes 
 		}
 	}
 }
@@ -41,18 +44,18 @@ void TemperatureMap::GenerateTemperatureMap()
 Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> TemperatureMap::GenerateNoiseTexture(ID3D11Device* device)
 {
 	int width = m_tempGridWidth;
-
+	std::vector<uint32_t> m_colourBuffers(128 * 128);
 
 	int index = 0;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texSRV;
 	{
-		uint32_t m_colourBuffers[128* 128];
+	
 		for (int i = 0; i < 128; i++) {
 			for(int j = 0;j < 128; j++)
 			{
 				index = (128 * j) + i;
-				int rgbValue = InverseLerp(m_minNoise, m_maxNoise, m_temperatureMap[index].temperature) * 255;
-				m_colourBuffers[index] = RGB_TO_UNSIGNED_INT_COLOUR(rgbValue, rgbValue, rgbValue);
+				int rgbValue = (InverseLerp(m_minNoise, m_maxNoise, m_temperatureMap[index].temperature) * 255);
+				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rgbValue, rgbValue, rgbValue);
 
 
 			}
@@ -119,7 +122,12 @@ uint32_t TemperatureMap::RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b)
 }
 float TemperatureMap::InverseLerp(float u, float v, float value)
 {
-	return (value - u) / (v - u);
+	
+	float inverseLerp = (value - u) / (v - u);
+	if (inverseLerp < 0) return 0;
+	if (inverseLerp > 1) return 1;
+	return inverseLerp;   //Compensates for values which end up outside the range as the amplitude is ignored
+	
 }
 void TemperatureMap::AssessMaxAndMinNoiseValues(float noiseVal)
 {
