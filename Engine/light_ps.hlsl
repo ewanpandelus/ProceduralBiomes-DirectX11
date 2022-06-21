@@ -79,7 +79,7 @@ float4 main(InputType input) : SV_TARGET
     float noise = textureColor;
     float4 noiseMap = float4(lerp(float3(0, 0, 1), float3(1, 0, 0), noise),1);
     float4 tempMap = lerp(biome1TextureColor, biome2TextureColor, noise);
-    return color;
+    return color * textureColor;
 
    
 }

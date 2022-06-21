@@ -71,6 +71,9 @@
     <ClInclude Include="PerlinNoise.h" />
     <ClInclude Include="PoissonDiscSampling.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="DepthTexture.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -119,6 +122,9 @@
     <ClCompile Include="TemperatureMap.cpp" />
     <ClCompile Include="PerlinNoise.cpp" />
     <ClCompile Include="PoissonDiscSampling.cpp" />
+    <ClCompile Include="DepthTexture.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -138,7 +144,10 @@
     <Image Include="directx.ico">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="flashPerlin.jpg">
+    <Image Include="TREE_TEX_1.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Colorsheet Tree Normal.png">
       <Filter>Assets</Filter>
     </Image>
   </ItemGroup>

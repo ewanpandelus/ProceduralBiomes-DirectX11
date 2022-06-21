@@ -167,6 +167,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="DepthTexture.h" />
     <ClInclude Include="DeviceResources.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="imconfig.h" />
@@ -192,6 +193,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="DepthTexture.cpp" />
     <ClCompile Include="DeviceResources.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="imgui.cpp" />
@@ -228,8 +230,9 @@
     <None Include="SegoeUI_18.spritefont" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="Colorsheet Tree Normal.png" />
     <Image Include="directx.ico" />
-    <Image Include="flashPerlin.jpg" />
+    <Image Include="TREE_TEX_1.png" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="colour_ps.hlsl">

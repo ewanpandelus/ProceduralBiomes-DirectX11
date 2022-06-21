@@ -14,6 +14,7 @@ Terrain::~Terrain()
 
 bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight)
 {
+
 	perlinNoise.Initialize();
 	int index;
 	float height = 0.0;
@@ -239,6 +240,7 @@ void Terrain::Shutdown()
 
 bool Terrain::InitializeBuffers(ID3D11Device* device)
 {
+
 	VertexType* vertices;
 	unsigned long* indices;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
@@ -414,6 +416,7 @@ void Terrain::RenderBuffers(ID3D11DeviceContext * deviceContext)
 
 bool Terrain::GenerateHeightMap(ID3D11Device* device)
 {
+	Shutdown();
 	bool result;
 
 	int index;
@@ -435,18 +438,18 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 			m_heightMap[index].z = (float)j;
 		}
 	}
-
+	result = true; 
 	result = CalculateNormals();
 	if (!result)
 	{
 		return false;
 	}
-
-	result = InitializeBuffers(device);
+ 	result = InitializeBuffers(device);
 	if (!result)
 	{
 		return false;
 	}
+
 }
 
 bool Terrain::Update()
