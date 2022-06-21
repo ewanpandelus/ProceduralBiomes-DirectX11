@@ -56,8 +56,41 @@ void Input::Update()
 	//space
 	if (kb.Space) m_GameInput.generate = true;
 	else		m_GameInput.generate = false;
+
+
+	float currentX = mouse.x;
+	float currentY = mouse.y;
+
+	if (currentX != prevX)
+	{
+		m_GameInput.rotY = true;
+		deltaX = currentX - prevX;
+	}
+	else
+	{
+		m_GameInput.rotY = false;
+	}
+	if (currentY != prevY)
+	{
+		m_GameInput.rotX = true;
+		deltaY = currentY - prevY;
+	}
+	else
+	{
+		m_GameInput.rotX = false;
+	}
+	prevX = currentX;
+	prevY = currentY;
 }
 
+float Input::GetDeltaX()
+{
+	return deltaX;
+}
+float Input::GetDeltaY()
+{
+	return deltaY;
+}
 bool Input::Quit()
 {
 	return m_quitApp;

@@ -1,7 +1,9 @@
 // Light pixel shader
 // Calculate diffuse lighting for a single directional light(also texturing)
 
-Texture2D shaderTexture : register(t0);
+Texture2D noiseTexture : register(t0);
+Texture2D biome1Texture : register(t1);
+Texture2D biome2Texture : register(t2);
 SamplerState SampleType : register(s0);
 
 
@@ -49,6 +51,9 @@ double Dot(int g[3], double x, double y) {
 float4 main(InputType input) : SV_TARGET
 {
 	float4	textureColor;
+    float4	biome1TextureColor;
+    float4	biome2TextureColor;
+
     float3	lightDir;
     float	lightIntensity;
     float4	color;
@@ -64,14 +69,18 @@ float4 main(InputType input) : SV_TARGET
 	color = saturate(color);
 
 	// Sample the pixel color from the texture using the sampler at this texture coordinate location.
-	textureColor = shaderTexture.Sample(SampleType, input.tex/5);
+	textureColor = noiseTexture.Sample(SampleType, input.tex);
+
+    float depthValue = textureColor.z / textureColor.w;
+    biome1TextureColor = biome1Texture.Sample(SampleType, input.tex);
+    biome2TextureColor = biome2Texture.Sample(SampleType, input.tex);
     float2 pos = float2((input.position3D.z * frequency) + offset, (input.position3D.x * frequency) + offset);
     //float noise = snoise(pos)*amplitude;
     float noise = textureColor;
     float4 noiseMap = float4(lerp(float3(0, 0, 1), float3(1, 0, 0), noise),1);
-    float4 tempMap = float4(lerp(float3(1, 1, 1), float3(0, 0, 1), noise), 1);
- 
-    return textureColor;//(padding == 0 ? textureColor  : tempMap);
+    float4 tempMap = lerp(biome1TextureColor, biome2TextureColor, noise);
+    return color;
+
    
 }
 

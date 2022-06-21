@@ -105,8 +105,8 @@ bool Shader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psF
 	return true;
 }
 
-bool Shader::SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix * world, DirectX::SimpleMath::Matrix * view, DirectX::SimpleMath::Matrix * projection, Light *sceneLight1, 
-	ID3D11ShaderResourceView* texture1, bool flickBetweenMaps, TemperatureMap tempMap)
+bool Shader::SetBiomeShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix * world, DirectX::SimpleMath::Matrix * view, DirectX::SimpleMath::Matrix * projection, Light *sceneLight1, 
+	ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* biome1Texture, ID3D11ShaderResourceView* biome2Texture, bool flickBetweenMaps, TemperatureMap tempMap)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -137,7 +137,7 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleM
 	context->PSSetConstantBuffers(0, 1, &m_lightBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
 
 	//pass the desired texture to the pixel shader.
-	context->PSSetShaderResources(0, 1, &texture1);
+	context->PSSetShaderResources(0, 1, &noiseTemperatureTexture);
 
 	context->Map(m_noiseTextureBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	noisePtr = (NoiseTextureBufferType*)mappedResource.pData;
@@ -149,7 +149,9 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleM
 	context->PSSetConstantBuffers(1, 1, &m_noiseTextureBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
 
 	//pass the desired texture to the pixel shader.
-	context->PSSetShaderResources(0, 1, &texture1);
+	context->PSSetShaderResources(0, 1, &noiseTemperatureTexture);
+	context->PSSetShaderResources(1, 1, &biome1Texture);
+	context->PSSetShaderResources(2, 1, &biome2Texture);
 
 	return false;
 }

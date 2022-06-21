@@ -13,6 +13,7 @@
 #include "RenderTexture.h"
 #include "Terrain.h"
 #include "PoissonDiscSampling.h"
+#include "DepthTexture.h"
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -93,8 +94,14 @@ private:
 	Camera																	m_Camera01;
 
 	//textures 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_texture1;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_texture2;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedNoiseTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desertTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_grassTexture;
+
+
+    //Lighting 
+    float                                                                  m_diffuseLight[3];
+    float                                                                  m_ambientLight[3];
 
 	//Shaders
 	Shader																	m_BasicShaderPair;
@@ -133,10 +140,18 @@ private:
     DirectX::SimpleMath::Matrix                                             m_view;
     DirectX::SimpleMath::Matrix                                             m_projection;
 
-    bool                                                                    m_flickBetweenMaps = false;
-    float                                                                   m_elapsedTime = 0;
+
     TemperatureMap                                                          m_temperatureMap;
     PoissonDiscSampling                                                     m_poissonDiscSampling;
+    DepthTexture                                                            m_depthTexture;
+
+
+    bool                                                                    m_flickBetweenMaps = false;
+    float                                                                   m_elapsedTime = 0;
+
     std::vector<SimpleMath::Vector2>                                        m_poissonPositions;
     int                                                                     m_regionSize;
+
+
+ 
 };

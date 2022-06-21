@@ -32,7 +32,7 @@ Camera::Camera()
 	
 	//
 	m_movespeed = 0.30;
-	m_camRotRate = 3.0;
+	m_camRotRate = 0.08;
 
 	//force update with initial values to generate other camera data correctly for first update. 
 	Update();

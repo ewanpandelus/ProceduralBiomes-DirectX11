@@ -1,0 +1,25 @@
+# Blender MTL File: 'None'
+# Material Count: 2
+
+newmtl 13_-_Default
+Ns 287.999996
+Ka 1.000000 1.000000 1.000000
+Kd 0.070588 0.313726 0.054902
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Bump -bm 1.300000 Map #3
+map_Kd Map #1
+
+newmtl Material_#30
+Ns 18.000005
+Ka 1.000000 1.000000 1.000000
+Kd 0.588235 0.588235 0.588235
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 1
+map_Kd C:\\Users\\Ewan\\Downloads\\fbx_Grass\\PETAL.JPG

@@ -43,17 +43,18 @@ void TemperatureMap::GenerateTemperatureMap()
 
 Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> TemperatureMap::GenerateNoiseTexture(ID3D11Device* device)
 {
-	int width = m_tempGridWidth;
-	std::vector<uint32_t> m_colourBuffers(128 * 128);
+	//int width = m_tempGridWidth;
+	int width = 128;
+	std::vector<uint32_t> m_colourBuffers(width * width);
 
 	int index = 0;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texSRV;
 	{
 	
-		for (int i = 0; i < 128; i++) {
-			for(int j = 0;j < 128; j++)
+		for (int i = 0; i < width; i++) {
+			for(int j = 0;j < width; j++)
 			{
-				index = (128 * j) + i;
+				index = ((width * j) + i);
 				int rgbValue = (InverseLerp(m_minNoise, m_maxNoise, m_temperatureMap[index].temperature) * 255);
 				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rgbValue, rgbValue, rgbValue);
 
@@ -63,8 +64,8 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> TemperatureMap::GenerateNoiseTe
 		}
 	
 		D3D11_TEXTURE2D_DESC textureDesc = {};
-		textureDesc.Width = 128;
-		textureDesc.Height = 128;
+		textureDesc.Width = width;
+		textureDesc.Height = width;
 		textureDesc.MipLevels = 1; /// !!!
 		textureDesc.ArraySize = 1;
 		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -78,7 +79,7 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> TemperatureMap::GenerateNoiseTe
 		D3D11_SUBRESOURCE_DATA tSData = { &m_colourBuffers, sizeof(m_colourBuffers), 0 };
 		tSData.pSysMem = &(m_colourBuffers[0]);
 		 int bpp = 32;
-		size_t rowPitch = (128 * bpp + 7) / 8;
+		size_t rowPitch = (width * bpp + 7) / 8;
 		size_t imageSize = rowPitch * 128;
 		tSData.SysMemPitch = static_cast<UINT>(rowPitch);
 		tSData.SysMemSlicePitch = static_cast<UINT>(imageSize);

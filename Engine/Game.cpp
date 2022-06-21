@@ -70,14 +70,25 @@ void Game::Initialize(HWND window, int width, int height)
 	m_CameraViewRect.bottom = 240;
 
 	//setup light
-	m_Light.setAmbientColour(1.0f, 1.0f, 1.0f, 1.0f);
-	m_Light.setDiffuseColour(0.0f, 0.0f, 0.0f, 0.0f);
-	m_Light.setPosition(2.0f, 1.0f, 1.0f);
-	m_Light.setDirection(-1.0f, -1.0f, 0.0f);
+    m_diffuseLight[0] = 0.5f;
+    m_diffuseLight[1] = 0.5f;
+    m_diffuseLight[2] = 0.5f;
+
+    m_ambientLight[0] = 0.4f;
+    m_ambientLight[1] = 0.4f;
+    m_ambientLight[2] = 0.4f;
+
+    //setup light
+    m_Light.setAmbientColour(m_ambientLight[0], m_ambientLight[1], m_ambientLight[2], 1.0f);
+    m_Light.setDiffuseColour(m_diffuseLight[0], m_diffuseLight[1], m_diffuseLight[2], 1.0f);
+    m_Light.setPosition(2.0f, 1.0f, 1.0f);
+    m_Light.setDirection(-0.8f, -1.0f, 0.0f);
 
 	//setup camera
-	m_Camera01.setPosition(Vector3(0,100.0f, 0));
-	m_Camera01.setRotation(Vector3(180.0f, 0.0f, 0.0f));	//orientation is -90 becuase zero will be looking up at the sky straight up. 
+	/*m_Camera01.setPosition(Vector3(0,100.0f, 0));
+	m_Camera01.setRotation(Vector3(180.0f, 0.0f, 0.0f));*/
+    m_Camera01.setPosition(Vector3(0.0f, 0.0f, 4.0f));
+    m_Camera01.setRotation(Vector3(-90.0f, -180.0f, 0.0f));	//orientation is -90 becuase zero will be looking up at the sky straight up. 
   
 	
 #ifdef DXTK_AUDIO
@@ -140,19 +151,44 @@ void Game::Update(DX::StepTimer const& timer)
 	//this is hacky,  i dont like this here.  
 	auto device = m_deviceResources->GetD3DDevice();
     m_elapsedTime += m_timer.GetElapsedSeconds();
+    Vector3 rotation = m_Camera01.getRotation();
+  
+
+   /* if (m_gameInputCommands.rotX) 
+    {
+        float deltaY = m_input.GetDeltaY();
+        rotation.x = rotation.x -= m_Camera01.getRotationSpeed() * deltaY;
+        if (rotation.x < -170)
+        {
+            rotation.x = -169;
+        }
+        if (rotation.x  >80)
+        {
+            rotation.x = 70;
+        }
+        m_Camera01.setRotation(rotation);
+    }*/
+    if (m_gameInputCommands.rotY)
+    {
+        float deltaX = m_input.GetDeltaX();
+        rotation.y = rotation.y -= m_Camera01.getRotationSpeed() * deltaX;
+        m_Camera01.setRotation(rotation);
+    }
+
+    
 	//note that currently.  Delta-time is not considered in the game object movement. 
-	if (m_gameInputCommands.left)
+	/*if (m_gameInputCommands.left)
 	{
-		Vector3 rotation = m_Camera01.getRotation();
+		
 		rotation.y = rotation.y += m_Camera01.getRotationSpeed();
 		m_Camera01.setRotation(rotation);
 	}
 	if (m_gameInputCommands.right)
 	{
 		Vector3 rotation = m_Camera01.getRotation();
-		rotation.y = rotation.y -= m_Camera01.getRotationSpeed();
+		rotation.x = rotation.x -= m_Camera01.getRotationSpeed();
 		m_Camera01.setRotation(rotation);
-	}
+	}*/
 	if (m_gameInputCommands.forward)
 	{
 		Vector3 position = m_Camera01.getPosition(); //get the position
@@ -172,10 +208,10 @@ void Game::Update(DX::StepTimer const& timer)
         m_flickBetweenMaps = !m_flickBetweenMaps;
         m_poissonPositions = m_poissonDiscSampling.GeneratePoints();
         m_regionSize = *m_poissonDiscSampling.GetSampleRegionSize();
-      //  m_Terrain.GenerateHeightMap(device);
+        m_Terrain.GenerateHeightMap(device);
         m_temperatureMap.GenerateTemperatureMap();
-        m_temperatureMap.GenerateNoiseTexture(device);
-        m_texture1 = m_temperatureMap.GenerateNoiseTexture(device); 
+        //m_generatedNoiseTexture = m_depthTexture.GenerateDepthTexture(device);
+     //   m_generatedNoiseTexture = m_temperatureMap.GenerateNoiseTexture(device); 
 	}
 
 	m_Camera01.Update();	//camera update.
@@ -257,25 +293,32 @@ void Game::Render()
     float x = 0;
     float y = 0;
     float index = 0;
-   /* for each (auto position in m_poissonPositions)
+    SimpleMath::Matrix treeScale = SimpleMath::Matrix::CreateScale(1);
+   for each (auto position in m_poissonPositions)
     {
         m_world = SimpleMath::Matrix::Identity; //set world back to identity
         x = m_poissonPositions[index].x;
         y = m_poissonPositions[index].y;
         treePosition =  SimpleMath::Matrix::CreateTranslation(x- m_regionSize/2, 0.0f, y-m_regionSize/2);
-        m_world = m_world * treePosition;
-        m_BasicShaderPair.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get(), m_flickBetweenMaps, m_temperatureMap);
+        m_world = m_world * treePosition*treeScale;
+        m_BasicShaderPair.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+            m_generatedNoiseTexture.Get(), m_desertTexture.Get(), m_grassTexture.Get(), m_flickBetweenMaps, m_temperatureMap);
       
         m_TreeModel.Render(context);
         index++;
         
-    }*/
+    }
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
     SimpleMath::Matrix newPosition3 = SimpleMath::Matrix::CreateTranslation(-64, -0.6f, -64);
     SimpleMath::Matrix newScale = SimpleMath::Matrix::CreateScale(1);		//scale the terrain down a little. 
     m_world = m_world * newScale * newPosition3;
-	m_BasicShaderPair.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_texture1.Get(), m_flickBetweenMaps, m_temperatureMap);
-    m_Terrain.Render(context);
+	m_BasicShaderPair.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+        m_generatedNoiseTexture.Get(),m_desertTexture.Get(), m_grassTexture.Get(), m_flickBetweenMaps, m_temperatureMap);
+    if (m_poissonPositions.size() == 0) 
+    {
+        m_Terrain.Render(context);
+    }
+
 	//render our GUI
 	ImGui::Render();
 	ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -395,9 +438,13 @@ void Game::CreateDeviceDependentResources()
 	m_BasicShaderPair.InitStandard(device, L"light_vs.cso", L"light_ps.cso");
 
 	//load Textures
-	CreateDDSTextureFromFile(device, L"perlin.dds",		nullptr,	m_texture1.ReleaseAndGetAddressOf());
-	CreateDDSTextureFromFile(device, L"EvilDrone_Diff.dds", nullptr,	m_texture2.ReleaseAndGetAddressOf());
-   
+    m_generatedNoiseTexture = m_temperatureMap.GenerateNoiseTexture(device);
+	CreateDDSTextureFromFile(device, L"desert.dds", nullptr,	m_desertTexture.ReleaseAndGetAddressOf());
+    CreateDDSTextureFromFile(device, L"grass.dds", nullptr, m_grassTexture.ReleaseAndGetAddressOf());
+    CreateDDSTextureFromFile(device, L"tree.dds", nullptr, m_generatedNoiseTexture.ReleaseAndGetAddressOf());
+
+
+ 
    
 	//Initialise Render to texture
 	m_FirstRenderPass = new RenderTexture(device, 800, 600, 1, 2);	//for our rendering, We dont use the last two properties. but.  they cant be zero and they cant be the same. 
@@ -443,7 +490,7 @@ void Game::SetupGUI()
     ImGui::Begin("Poisson Disk Sample Params");
     ImGui::SliderInt("Sample Region Length", m_poissonDiscSampling.GetSampleRegionSize(), 0, 128);
     ImGui::SliderInt("Number of samples before rejection", m_poissonDiscSampling.GetNumSamplesBeforeRejection(), 1, 60);
-    ImGui::SliderFloat("Radius", m_poissonDiscSampling.GetRadius(), 0.0f, 10.0f);
+    ImGui::SliderFloat("Radius", m_poissonDiscSampling.GetRadius(), 0.0f, 30.0f);
     ImGui::End();
  
 }
