@@ -1,23 +1,22 @@
 #include "pch.h"
-#include "Shader.h"
+#include "TerrainShader.h"
 
 
-Shader::Shader()
+TerrainShader::TerrainShader()
 {
 }
 
 
-Shader::~Shader()
+TerrainShader::~TerrainShader()
 {
 }
 
-bool Shader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFilename)
+bool TerrainShader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename)
 {
 	D3D11_BUFFER_DESC	matrixBufferDesc;
 	D3D11_SAMPLER_DESC	samplerDesc;
 	D3D11_BUFFER_DESC	lightBufferDesc;
 	D3D11_BUFFER_DESC   noiseTextureBufferDesc;
-	D3D11_BUFFER_DESC cameraBufferDesc;
 	//LOAD SHADER:	VERTEX
 	auto vertexShaderBuffer = DX::ReadData(vsFilename);
 	HRESULT result = device->CreateVertexShader(vertexShaderBuffer.data(), vertexShaderBuffer.size(), NULL, &m_vertexShader);
@@ -26,7 +25,7 @@ bool Shader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFile
 		//if loading failed.  
 		return false;
 	}
-	
+
 	// Create the vertex input layout description.
 	// This setup needs to match the VertexType stucture in the MeshClass and in the shader.
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[] = {
@@ -41,10 +40,10 @@ bool Shader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFile
 
 	// Create the vertex input layout.
 	device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer.data(), vertexShaderBuffer.size(), &m_layout);
-
+	
 
 	//LOAD SHADER:	PIXEL
-	auto pixelShaderBuffer = DX::ReadData(psFilename);
+	auto pixelShaderBuffer = DX::ReadData(psFilename);	
 	result = device->CreatePixelShader(pixelShaderBuffer.data(), pixelShaderBuffer.size(), NULL, &m_pixelShader);
 	if (result != S_OK)
 	{
@@ -77,16 +76,14 @@ bool Shader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFile
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	device->CreateBuffer(&lightBufferDesc, NULL, &m_lightBuffer);
 
-	cameraBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-	cameraBufferDesc.ByteWidth = sizeof(LightBufferType);
-	cameraBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	cameraBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	cameraBufferDesc.MiscFlags = 0;
-	cameraBufferDesc.StructureByteStride = 0;
+	noiseTextureBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	noiseTextureBufferDesc.ByteWidth = sizeof(LightBufferType);
+	noiseTextureBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	noiseTextureBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	noiseTextureBufferDesc.MiscFlags = 0;
+	noiseTextureBufferDesc.StructureByteStride = 0;
 
-	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
-	device->CreateBuffer(&cameraBufferDesc, NULL, &m_cameraBuffer);
-
+	device->CreateBuffer(&noiseTextureBufferDesc, NULL, &m_noiseTextureBuffer);
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -108,14 +105,13 @@ bool Shader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFile
 	return true;
 }
 
-bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1,
-	ID3D11ShaderResourceView* objTexture, float time, SimpleMath::Vector3 cameraPos)
+bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix * world, DirectX::SimpleMath::Matrix * view, DirectX::SimpleMath::Matrix * projection, Light *sceneLight1,
+	ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* biome1Texture, ID3D11ShaderResourceView* biome2Texture, bool flickBetweenMaps, TemperatureMap tempMap)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	LightBufferType* lightPtr;
-	CameraBufferType* cameraPtr;
-
+	NoiseTextureBufferType* noisePtr;
 	DirectX::SimpleMath::Matrix  tworld, tview, tproj;
 
 	// Transpose the matrices to prepare them for the shader.
@@ -127,48 +123,45 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMa
 	dataPtr->world = tworld;// worldMatrix;
 	dataPtr->view = tview;
 	dataPtr->projection = tproj;
-	dataPtr->time = time;
 	context->Unmap(m_matrixBuffer, 0);
 	context->VSSetConstantBuffers(0, 1, &m_matrixBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the VS
 
 	context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
 	lightPtr->ambient = sceneLight1->getAmbientColour();
-	lightPtr->diffuse = sceneLight1->getDiffuseColour();
-	lightPtr->specularPower = 0.03f;
-	lightPtr->specularColor = SimpleMath::Vector4(0, 0, 0, 0);
-	lightPtr->lightPosition = sceneLight1->getPosition();
+	lightPtr->diffuse = sceneLight1->getDiffuseColour();	
+	lightPtr->position = sceneLight1->getPosition();  
+	float pad = flickBetweenMaps == false ? 0 : 1;
+	lightPtr->padding = pad;
 	context->Unmap(m_lightBuffer, 0);
 	context->PSSetConstantBuffers(0, 1, &m_lightBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
 
-	
+	//pass the desired texture to the pixel shader.
+	context->PSSetShaderResources(0, 1, &noiseTemperatureTexture);
 
-	context->Map(m_cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	cameraPtr = (CameraBufferType*)mappedResource.pData;
-	cameraPtr->cameraPosition = cameraPos;
-	cameraPtr->padding = 0;
-	context->Unmap(m_cameraBuffer, 0);
-	context->VSSetConstantBuffers(1, 1, &m_cameraBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
+	context->Map(m_noiseTextureBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	noisePtr = (NoiseTextureBufferType*)mappedResource.pData;
+	noisePtr->frequency = *tempMap.GetFrequency();
+	noisePtr->amplitude = *tempMap.GetAmplitude();
+	noisePtr->offset = *tempMap.GetOffset();
 
+	context->Unmap(m_noiseTextureBuffer, 0);
+	context->PSSetConstantBuffers(1, 1, &m_noiseTextureBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
 
+	//pass the desired texture to the pixel shader.
+	context->PSSetShaderResources(0, 1, &noiseTemperatureTexture);
+	context->PSSetShaderResources(1, 1, &biome1Texture);
+	context->PSSetShaderResources(2, 1, &biome2Texture);
 
-
-
-
-
-
-	context->PSSetShaderResources(0, 1, &objTexture);
 	return false;
 }
 
-void Shader::EnableShader(ID3D11DeviceContext* context)
+void TerrainShader::EnableShader(ID3D11DeviceContext * context)
 {
 	context->IASetInputLayout(m_layout);							//set the input layout for the shader to match out geometry
 	context->VSSetShader(m_vertexShader.Get(), 0, 0);				//turn on vertex shader
 	context->PSSetShader(m_pixelShader.Get(), 0, 0);				//turn on pixel shader
 	// Set the sampler state in the pixel shader.
 	context->PSSetSamplers(0, 1, &m_sampleState);
-	
-
 
 }

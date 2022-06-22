@@ -72,3 +72,6 @@ Engine/imgui.ini
 *.vcxproj
 *.jpg
 *.ini
+*.db-shm
+*.vcxproj
+*.filters

@@ -51,26 +51,25 @@ void PoissonDiscSampling::InitialiseGrid(int width, int height)
 std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 {
 	std::vector<SimpleMath::Vector2> points;
-	if (m_radius == 0 || m_sampleRegionLength == 0 || m_numSamplesBeforeRejection == 0) return points;
+	
 	float w = m_radius / sqrt(2); 
 	int cols = floor(m_sampleRegionLength / w);
 	int rows = floor(m_sampleRegionLength / w);
-	
+	if (!CheckParametersValid(cols)) 
+	{
+		return points;
+	}
+
+
 	InitialiseGrid(cols, rows);
-
-
 	std::vector<SimpleMath::Vector2> active;
-
-
-
 	float x = m_sampleRegionLength/2;
 	float y = m_sampleRegionLength /2;
-
 	int i = floor(x) / w;
 	int j = floor(y) / w;
 
-	SimpleMath::Vector2 pos = SimpleMath::Vector2((x), (y));
 
+	SimpleMath::Vector2 pos = SimpleMath::Vector2((x), (y));
 	m_grid[i][j] = pos;
 	active.push_back(pos);
 	points.push_back(pos);
@@ -85,37 +84,16 @@ std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 		bool candidateAccepted = false;
 		for (int n = 0; n <m_numSamplesBeforeRejection;n++)
 		{
-			
-			float angle = GenerateRandomFloatWithMaxVal(PI * 2);
-			SimpleMath::Vector2 direction = SimpleMath::Vector2(cos(angle), sin(angle));
-			float magnitude = GenerateRandomFloatWithMaxVal(m_radius) + m_radius;  // between 1-2 r;
-			SimpleMath::Vector2 sample = position + direction * magnitude; //add random vector to point
+			SimpleMath::Vector2 sample = GenerateSample(position);
 			int col = floor(sample.x / w);
 			int row = floor(sample.y / w);
+
+
 			if (col <0 || col > m_grid.size()-1 || row  <0 || row > m_grid.size()-1) {
 				continue;
 			}
-			bool ok = true;
-			for(int i =-1;i<=1;i++)
-			{
-				for (int j = -1;j <= 1;j++)
-				{
-			
-					if (col + i <0 || col + i > m_grid.size()-1 || row + j <0 || row + j > m_grid.size()-1) {
-						continue;
-					}
-					SimpleMath::Vector2 neighbour = m_grid[col+i][row+j];
-					if(neighbour != SimpleMath::Vector2(-1,-1))
-					{
-						float distance = (sample - neighbour).LengthSquared();
-						if(distance < m_radius*m_radius)
-						{
-							ok = false;
-						}
-					}
-				}
-			}
-			if(ok)
+			bool valid = CheckSamplingValid(sample, col, row);
+			if(valid)
 			{
 				m_grid[col][row] = sample;
 				candidateAccepted = true;
@@ -165,41 +143,45 @@ float PoissonDiscSampling::GenerateRandomFloatWithMaxVal(float value)
 	return (static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) * value;
 }
 
+bool PoissonDiscSampling::CheckParametersValid(int cols)
+{
+	return !(m_radius == 0 || m_sampleRegionLength == 0 || m_numSamplesBeforeRejection == 0 || cols == 0);
+}
 
-
-
-/*while(spawnPoints.size()>0)
+bool PoissonDiscSampling::CheckSamplingValid(SimpleMath::Vector2 sample, int col, int row)
+{
+	bool valid = true;
+	for (int i = -1;i <= 1;i++)
 	{
-		int spawnIndex = rand() % spawnPoints.size();
-		SimpleMath::Vector2 spawnCentre = spawnPoints[spawnIndex];
-		bool candidateAccepted = false;
-		for(int i = 0; i < numSamplesBeforeRejection; i++)
+		for (int j = -1;j <= 1;j++)
 		{
-			float random = rand() % 100;
-			float angle = (random/ 100) * PI * 2;
-			SimpleMath::Vector2 direction = SimpleMath::Vector2(Round1DP(sin(angle)), Round1DP(cos(angle)));
-			float randUpToRadius = rand() % 100;
-			randUpToRadius *= (radius/100);
-			randUpToRadius = Round1DP(randUpToRadius);
-			SimpleMath::Vector2 candidate = spawnCentre + direction * (radius + randUpToRadius);
-			candidate = SimpleMath::Vector2(Round1DP(candidate.x), Round1DP(candidate.y));
-			if(IsValid(candidate, sampleRegionSize, cellSize, radius, points))
+
+			if (col + i <0 || col + i > m_grid.size() - 1 || row + j <0 || row + j > m_grid.size() - 1) {
+				continue;
+			}
+			SimpleMath::Vector2 neighbour = m_grid[col + i][row + j];
+			if (neighbour != SimpleMath::Vector2(-1, -1))
 			{
-				points.push_back(candidate);
-				spawnPoints.push_back(candidate);
-				m_grid[(int)(candidate.x / cellSize)][(int)(candidate.y / cellSize)] = points.size();
-				candidateAccepted = true;
-				break;
+				float distance = (sample - neighbour).LengthSquared();
+				if (distance < m_radius * m_radius)
+				{
+					valid = false;
+				}
 			}
 		}
-		if (!candidateAccepted) {
-			spawnPoints.erase(spawnPoints.begin() + spawnIndex);
-		}
 	}
-	m_grid.empty();
-	return points;*/
-	/*for each (auto var in grid)
-	{
-		points.push_back(var);
-	}
-	return points;*/
+	return valid;
+}
+
+SimpleMath::Vector2 PoissonDiscSampling::GenerateSample(SimpleMath::Vector2 position)
+{
+	float angle = GenerateRandomFloatWithMaxVal(PI * 2);
+	SimpleMath::Vector2 direction = SimpleMath::Vector2(cos(angle), sin(angle));
+	float magnitude = GenerateRandomFloatWithMaxVal(m_radius) + m_radius;  // between 1-2 r;
+	return  position + direction * magnitude; //add random vector to point
+}
+
+
+
+
+

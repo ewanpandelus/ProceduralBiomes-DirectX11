@@ -23,6 +23,9 @@ private:
 	int m_sampleRegionLength = 0;
 
 	float GenerateRandomFloatWithMaxVal(float value);
+	bool CheckParametersValid(int cols);
+	bool CheckSamplingValid(SimpleMath::Vector2 sample, int col, int row);
+	SimpleMath::Vector2 GenerateSample(SimpleMath::Vector2 position);
 
 };
 
