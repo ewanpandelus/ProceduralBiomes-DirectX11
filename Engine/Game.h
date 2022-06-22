@@ -13,9 +13,9 @@
 #include "Terrain.h"
 #include "PoissonDiscSampling.h"
 #include "DepthTexture.h"
-#include "TemperatureMap.h"
 #include "TerrainShader.h"
 #include "Shader.h"
+#include "ClimateMap.h"
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -96,7 +96,10 @@ private:
 	Camera																	m_Camera01;
 
 	//textures 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedNoiseTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedTemperatureMapTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedRainfallMapTexture;
+
+
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desertTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_grassTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_treeModel1Texture;
@@ -147,7 +150,7 @@ private:
     DirectX::SimpleMath::Matrix                                             m_projection;
 
 
-    TemperatureMap                                                          m_temperatureMap;
+    ClimateMap                                                              m_climateMap;
     PoissonDiscSampling                                                     m_poissonDiscSampling;
     DepthTexture                                                            m_depthTexture;
 

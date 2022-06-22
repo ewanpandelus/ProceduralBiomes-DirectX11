@@ -1,32 +1,35 @@
 #include "pch.h"
-#include "TemperatureMap.h"
+#include "ClimateMap.h"
 
 
 
 
 
-void TemperatureMap::Initialize(int tempGridWidth, int tempGridHeight)
+void ClimateMap::Initialize(int tempGridWidth, int tempGridHeight)
 {
 	std::vector<uint32_t> m_colourBuffers(128 * 128);
 	perlinNoise.Initialize();
 	int index;
 	m_tempGridWidth = tempGridWidth;
 	m_tempGridHeight = tempGridHeight;
-	m_temperatureMap = new TemperatureMapType[m_tempGridWidth * m_tempGridHeight];
+	m_climateMap = new ClimateMapType[m_tempGridWidth * m_tempGridHeight];
 	for (int j = 0; j < m_tempGridHeight; j++)
 	{
 		for (int i = 0; i < m_tempGridWidth; i++)
 		{
 			index = (m_tempGridHeight * j) + i;
-			m_temperatureMap[index].x = (float)i;
-			m_temperatureMap[index].z = (float)j;
+			m_climateMap[index].x = (float)i;
+			m_climateMap[index].z = (float)j;
 		}
 	}
 }
-void TemperatureMap::GenerateTemperatureMap()
+void ClimateMap::GenerateClimateMap()
 {
-    m_maxNoise = -1000;
-	m_minNoise = 1000;
+    m_maxTemp = -1000;
+	m_minTemp = 1000;
+	m_maxRainfall = -1000;
+	m_minRainfall = 1000;
+
 	int index = 0;
 	for (int j = 0; j < m_tempGridHeight; j++)
 	{
@@ -34,14 +37,21 @@ void TemperatureMap::GenerateTemperatureMap()
 		{ 
 			index = (m_tempGridHeight * j) + i;
 	
-			float perlinValue = (float)perlinNoise.Noise((i * m_frequency)+m_offset, (j * m_frequency+m_offset), 1);
-			m_temperatureMap[index].temperature = perlinValue*m_amplitude;
-			AssessMaxAndMinNoiseValues(perlinValue);  //If the max and min are influenced by ampltude then the range never changes 
+			float tempPerlinVal = (float)perlinNoise.Noise((i * m_temperatureFrequency)+m_temperatureOffset, (j * m_temperatureFrequency+m_temperatureOffset), 1);
+			m_climateMap[index].temperature = tempPerlinVal * m_temperatureAmplitude;
+
+			float rainfallPerlinVal = (float)perlinNoise.Noise((i * m_rainFallFrequency) + m_rainfallOffset, (j * m_rainFallFrequency + m_rainfallOffset), 1);
+			m_climateMap[index].rainfall = rainfallPerlinVal * m_rainfallAmplitude;
+
+
+			AssessMaxAndMinNoiseValues(tempPerlinVal, &m_maxTemp, &m_minTemp);  //If the max and min are influenced by ampltude then the range never changes 
+			AssessMaxAndMinNoiseValues(rainfallPerlinVal, &m_maxRainfall, &m_minRainfall);  //If the max and min are influenced by ampltude then the range never changes 
+
 		}
 	}
 }
 
-Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> TemperatureMap::GenerateNoiseTexture(ID3D11Device* device)
+Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTexture(ID3D11Device* device, char* noiseMap)
 {
 	//int width = m_tempGridWidth;
 	int width = 128;
@@ -55,10 +65,16 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> TemperatureMap::GenerateNoiseTe
 			for(int j = 0;j < width; j++)
 			{
 				index = ((width * j) + i);
-				int rgbValue = (InverseLerp(m_minNoise, m_maxNoise, m_temperatureMap[index].temperature) * 255);
+				int rgbValue = 0;
+				if(noiseMap == "TemperatureMap")
+				{
+					rgbValue = (InverseLerp(m_minTemp, m_maxTemp, m_climateMap[index].temperature) * 255);
+				}
+				else {
+					rgbValue = (InverseLerp(m_minRainfall, m_maxRainfall, m_climateMap[index].rainfall) * 255);
+				}
+				
 				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rgbValue, rgbValue, rgbValue);
-
-
 			}
 
 		}
@@ -108,20 +124,12 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> TemperatureMap::GenerateNoiseTe
 		
 	}
 	return texSRV;
-
-
-
-
-
-	
-
-	
 }
-uint32_t TemperatureMap::RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b)
+uint32_t ClimateMap::RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b)
 {
 	return  r | (g << 8) | (b << 16) | (ALPHA << 24);
 }
-float TemperatureMap::InverseLerp(float u, float v, float value)
+float ClimateMap::InverseLerp(float u, float v, float value)
 {
 	
 	float inverseLerp = (value - u) / (v - u);
@@ -130,26 +138,38 @@ float TemperatureMap::InverseLerp(float u, float v, float value)
 	return inverseLerp;   //Compensates for values which end up outside the range as the amplitude is ignored
 	
 }
-void TemperatureMap::AssessMaxAndMinNoiseValues(float noiseVal)
+void ClimateMap::AssessMaxAndMinNoiseValues(float noiseVal, float* maxNoise, float* minNoise)
 {
-	if (noiseVal > m_maxNoise) {
-		m_maxNoise = noiseVal;
+	if (noiseVal > *maxNoise) {
+		*maxNoise = noiseVal;
 		return;
 	}
-	if (noiseVal < m_minNoise) {
-		m_minNoise = noiseVal;
+	if (noiseVal < *minNoise) {
+		*minNoise = noiseVal;
 	}
 }
-float* TemperatureMap::GetAmplitude()
+float* ClimateMap::GetTemperatureAmplitude()
 {
-	return &m_amplitude;
+	return &m_temperatureAmplitude;
 }
-float* TemperatureMap::GetFrequency()
+float* ClimateMap::GetTemperatureFrequency()
 {
-	return &m_frequency;
+	return &m_temperatureFrequency;
 }
-float* TemperatureMap::GetOffset()
+float* ClimateMap::GetTemperatureOffset()
 {
-	return &m_offset;
+	return &m_temperatureOffset;
+}
+float* ClimateMap::GetRainfallAmplitude()
+{
+	return &m_rainfallAmplitude;
+}
+float* ClimateMap::GetRainfallFrequency()
+{
+	return &m_rainFallFrequency;
+}
+float* ClimateMap::GetRainfallOffset()
+{
+	return &m_rainfallOffset;
 }
 

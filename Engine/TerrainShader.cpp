@@ -106,7 +106,7 @@ bool TerrainShader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHA
 }
 
 bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix * world, DirectX::SimpleMath::Matrix * view, DirectX::SimpleMath::Matrix * projection, Light *sceneLight1,
-	ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* biome1Texture, ID3D11ShaderResourceView* biome2Texture, bool flickBetweenMaps, TemperatureMap tempMap)
+	ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* biome1Texture, ID3D11ShaderResourceView* biome2Texture, bool flickBetweenMaps, ClimateMap climateMap)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -141,9 +141,9 @@ bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext * context, Dire
 
 	context->Map(m_noiseTextureBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	noisePtr = (NoiseTextureBufferType*)mappedResource.pData;
-	noisePtr->frequency = *tempMap.GetFrequency();
-	noisePtr->amplitude = *tempMap.GetAmplitude();
-	noisePtr->offset = *tempMap.GetOffset();
+	noisePtr->frequency = *climateMap.GetTemperatureFrequency();
+	noisePtr->amplitude = *climateMap.GetTemperatureAmplitude();
+	noisePtr->offset = *climateMap.GetTemperatureOffset();
 
 	context->Unmap(m_noiseTextureBuffer, 0);
 	context->PSSetConstantBuffers(1, 1, &m_noiseTextureBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS

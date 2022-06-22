@@ -2,7 +2,7 @@
 
 #include "DeviceResources.h"
 #include "Light.h"
-#include "TemperatureMap.h"
+#include "ClimateMap.h"
 
 //Class from which we create all shader objects used by the framework
 //This single class can be expanded to accomodate shaders of all different types with different parameters
@@ -16,7 +16,7 @@ public:
 	//All the methods here simply create new versions corresponding to your needs
 	bool InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename);		//Loads the Vert / pixel Shader pair
 	bool SetBiomeShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix  *world, DirectX::SimpleMath::Matrix  *view, DirectX::SimpleMath::Matrix  *projection, Light *sceneLight1, 
-		 ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* biome1Texture, ID3D11ShaderResourceView* biome2Texture, bool flickBetweenMaps, TemperatureMap tempMap);
+		 ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* biome1Texture, ID3D11ShaderResourceView* biome2Texture, bool flickBetweenMaps, ClimateMap climateMap);
 	void EnableShader(ID3D11DeviceContext * context);
 
 private:

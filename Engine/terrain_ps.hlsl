@@ -72,14 +72,17 @@ float4 main(InputType input) : SV_TARGET
 	textureColor = noiseTexture.Sample(SampleType, input.tex/5);
 
     float depthValue = textureColor.z / textureColor.w;
-    biome1TextureColor = lerp(float4(0.2, 0.8, 0.2,1), biome1Texture.Sample(SampleType, input.tex),0.2);
-    biome2TextureColor = lerp(float4(1, 1, 0.2, 1), biome2Texture.Sample(SampleType, input.tex), 0.2);
+  //  biome1TextureColor = lerp(float4(0.2, 0.8, 0.2,1), biome1Texture.Sample(SampleType, input.tex),0.2);
+    //biome2TextureColor = lerp(float4(1, 1, 0.2, 1), biome2Texture.Sample(SampleType, input.tex), 0.2);
     float2 pos = float2((input.position3D.z * frequency) + offset, (input.position3D.x * frequency) + offset);
     //float noise = snoise(pos)*amplitude;
     float noise = textureColor;
-    float4 noiseMap = float4(lerp(float3(0, 0, 1), float3(1, 0, 0), noise),1);
-    float4 tempMap = lerp(biome1TextureColor, biome2TextureColor, noise);
-    return color * tempMap;
+    float rain = biome1Texture.Sample(SampleType, input.tex);
+    //float4 noiseMap = float4(lerp(float3(0, 0, 1), float3(1, 0, 0), noise),1);
+//float4 tempMap = lerp(biome1TextureColor, biome2TextureColor, noise);
+
+    
+    return padding == 1 ? noise : rain;// color * tempMap;
 
    
 }

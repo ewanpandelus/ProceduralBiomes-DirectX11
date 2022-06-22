@@ -39,7 +39,7 @@ void Game::Initialize(HWND window, int width, int height)
 
     m_regionSize = 80;
 	m_input.Initialise(window);
-    m_temperatureMap.Initialize(128, 128);
+    m_climateMap.Initialize(128, 128);
 
 
     m_deviceResources->SetWindow(window, width, height);
@@ -211,8 +211,10 @@ void Game::Update(DX::StepTimer const& timer)
         m_poissonPositions = m_poissonDiscSampling.GeneratePoints();
         m_regionSize = *m_poissonDiscSampling.GetSampleRegionSize();
         m_Terrain.GenerateHeightMap(device);
-        m_temperatureMap.GenerateTemperatureMap(); 
-        m_generatedNoiseTexture = m_temperatureMap.GenerateNoiseTexture(device); 
+        m_climateMap.GenerateClimateMap(); 
+        m_generatedTemperatureMapTexture = m_climateMap.GenerateNoiseTexture(device, "TemperatureMap"); 
+        m_generatedRainfallMapTexture = m_climateMap.GenerateNoiseTexture(device, "RainfallMap");
+
 	}
 
 	m_Camera01.Update();	//camera update.
@@ -316,7 +318,7 @@ void Game::Render()
     SimpleMath::Matrix newScale = SimpleMath::Matrix::CreateScale(1);		//scale the terrain down a little. 
     m_world = m_world *  positionAccountedFor;
 	m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-        m_generatedNoiseTexture.Get(),m_desertTexture.Get(), m_grassTexture.Get(), m_flickBetweenMaps, m_temperatureMap);
+        m_generatedTemperatureMapTexture.Get(),m_generatedRainfallMapTexture.Get(), m_grassTexture.Get(), m_flickBetweenMaps, m_climateMap);
     m_Terrain.Render(context);
 
 	//render our GUI
@@ -438,7 +440,7 @@ void Game::CreateDeviceDependentResources()
 	m_terrainShader.InitStandard(device, L"terrain_vs.cso", L"terrain_ps.cso");
     m_standardShader.InitStandard(device, L"standard_vs.cso", L"standard_ps.cso");
 	//load Textures
-    m_generatedNoiseTexture = m_temperatureMap.GenerateNoiseTexture(device);
+    m_generatedTemperatureMapTexture = m_climateMap.GenerateNoiseTexture(device, "TemperatureMap");
 	CreateDDSTextureFromFile(device, L"desert.dds", nullptr,	m_desertTexture.ReleaseAndGetAddressOf());
     CreateDDSTextureFromFile(device, L"grass.dds", nullptr, m_grassTexture.ReleaseAndGetAddressOf());
     CreateDDSTextureFromFile(device, L"tree.dds", nullptr, m_treeModel1Texture.ReleaseAndGetAddressOf());
@@ -482,9 +484,15 @@ void Game::SetupGUI()
 	ImGui::NewFrame();
 
 	ImGui::Begin("Noise Texture Param");
-		ImGui::SliderFloat("Amplitude", m_temperatureMap.GetAmplitude(), 0.0f, 10.0f);
-		ImGui::SliderFloat("Frequency",		m_temperatureMap.GetFrequency(), 0.0f, 1.0f);
-        ImGui::SliderFloat("Offset", m_temperatureMap.GetOffset(), 0.0f, 1000.f);
+		ImGui::SliderFloat("Temp Amplitude", m_climateMap.GetTemperatureAmplitude(), 0.0f, 10.0f);
+		ImGui::SliderFloat("Temp Frequency",		m_climateMap.GetTemperatureFrequency(), 0.0f, 1.0f);
+        ImGui::SliderFloat("Temp Offset", m_climateMap.GetTemperatureOffset(), 0.0f, 1000.f);
+
+        ImGui::SliderFloat("Rainfall Amplitude", m_climateMap.GetRainfallAmplitude(), 0.0f, 10.0f);
+        ImGui::SliderFloat("Rainfall Frequency", m_climateMap.GetRainfallFrequency(), 0.0f, 1.0f);
+        ImGui::SliderFloat("Rainfall Offset", m_climateMap.GetRainfallOffset(), 0.0f, 1000.f);
+
+
         ImGui::ColorEdit3("Diffuse Light Colour", m_diffuseLight);
         ImGui::ColorEdit3("Ambient Light Colour", m_ambientLight);
 	ImGui::End();

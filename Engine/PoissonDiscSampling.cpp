@@ -17,37 +17,6 @@ void PoissonDiscSampling::InitialiseGrid(int width, int height)
 }
 
 
-
-//bool PoissonDiscSampling::IsValid(SimpleMath::Vector2 candidate, SimpleMath::Vector2 sampleRegionSize, float cellSize, float radius, std::vector<SimpleMath::Vector2> points)
-//{
-//	if(candidate.x >= 0 && candidate.x < sampleRegionSize.x && candidate.y >=0 && candidate.y < sampleRegionSize.y)
-//	{
-//		int cellX = (int)(candidate.x / cellSize);
-//		int cellY = (int)(candidate.y / cellSize);
-//		int searchStartX = std::max(0, cellX - 2);
-//		int searchEndX = std::min(cellX + 2, (int)(m_grid[0].size() - 1));
-//		int searchStartY = std::max(0, cellY - 2);
-//		int searchEndY = std::min(cellY + 2, (int)(m_grid.at(0).size() - 1));
-//		for(int x = searchStartX; x<=searchEndX; x++)
-//		{
-//			for (int y = searchStartY; x <= searchEndY; x++)
-//			{
-//				int pointIndex = m_grid[x][y] - 1;
-//				if(pointIndex!=-1)
-//				{
-//					float distance = (candidate - points[pointIndex]).LengthSquared();
-//					SimpleMath::Vector2 difference = candidate - points[pointIndex];
-//					if(distance<(radius*radius))
-//					{
-//						return false;
-//					}
-//				}
-//			}
-//		}
-//		return true;
-//	}
-//	return false;
-//}
 std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 {
 	std::vector<SimpleMath::Vector2> points;
@@ -77,8 +46,8 @@ std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 
 	while(active.size()>0)
 	{
-		int x = active.size();
-		int r = rand() % x;
+	
+		int r = rand() % active.size();
 		
 		SimpleMath::Vector2 position = active[r];
 		bool candidateAccepted = false;

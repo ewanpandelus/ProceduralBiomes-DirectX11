@@ -2,7 +2,7 @@
 
 #include "DeviceResources.h"
 #include "Light.h"
-#include "TemperatureMap.h"
+
 
 //Class from which we create all shader objects used by the framework
 //This single class can be expanded to accomodate shaders of all different types with different parameters
