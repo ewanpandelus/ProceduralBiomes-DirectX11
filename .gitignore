@@ -75,3 +75,6 @@ Engine/imgui.ini
 *.db-shm
 *.vcxproj
 *.filters
+Engine/DirectXTKSimpleSample_2015.vcxproj.filters
+Engine/.vs/DirectXTKSimpleSample_2015/v16/Browse.VC.db-shm
+Engine/DirectXTKSimpleSample_2015.vcxproj
