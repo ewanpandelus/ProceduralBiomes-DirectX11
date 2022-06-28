@@ -1,5 +1,6 @@
 #pragma once
 #include "PerlinNoise.h"
+#include "BiomeClassifier.h"
 using namespace DirectX;
 
 class ClimateMap
@@ -12,13 +13,14 @@ private:
 	float m_temperatureAmplitude = 0, m_temperatureFrequency = 0, m_temperatureOffset = 0;
 	float m_rainfallAmplitude = 0, m_rainFallFrequency = 0, m_rainfallOffset= 0;
 
-	
-	PerlinNoise perlinNoise;
+	BiomeClassifier m_biomeClassifier;
+	PerlinNoise m_perlinNoise;
 	struct ClimateMapType
 	{
 		float x, z;
 		float temperature;
 		float rainfall;
+		SimpleMath::Vector2 climateClassification;
 	};
 	ClimateMapType* m_climateMap;
 
@@ -35,7 +37,7 @@ public:
 	float* GetRainfallFrequency();
 	float* GetRainfallAmplitude
 ();
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>  GenerateNoiseTexture(ID3D11Device* device, char* noiseMap);
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>  GenerateNoiseTexture(ID3D11Device* device);
 	uint32_t RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b);
 
 	

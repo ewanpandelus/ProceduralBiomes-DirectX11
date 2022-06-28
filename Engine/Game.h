@@ -96,7 +96,7 @@ private:
 	Camera																	m_Camera01;
 
 	//textures 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedTemperatureMapTexture;
+	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedClimateMapTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedRainfallMapTexture;
 
 

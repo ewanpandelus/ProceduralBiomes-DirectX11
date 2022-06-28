@@ -33,13 +33,14 @@ public:
 	ModelClass();
 	~ModelClass();
 
-	bool InitializeModel(ID3D11Device *device, char* filename);
+	bool InitializeModel(ID3D11Device* device, char* filename);
 	bool InitializeTeapot(ID3D11Device*);
 	bool InitializeSphere(ID3D11Device*);
 	bool InitializeBox(ID3D11Device*, float xwidth, float yheight, float zdepth);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
-	
+	void IndexRender(ID3D11DeviceContext*);
+
 	int GetIndexCount();
 
 
@@ -52,8 +53,8 @@ private:
 	void ReleaseModel();
 
 private:
-	ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-	int m_vertexCount, m_indexCount;
+	ID3D11Buffer* m_vertexBuffer, * m_indexBuffer;
+	int m_vertexCount, m_indexCount, m_faceSize;
 
 	//arrays for our generated objects Made by directX
 	std::vector<VertexPositionNormalTexture> preFabVertices;

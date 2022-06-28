@@ -8,7 +8,8 @@
 void ClimateMap::Initialize(int tempGridWidth, int tempGridHeight)
 {
 	std::vector<uint32_t> m_colourBuffers(128 * 128);
-	perlinNoise.Initialize();
+	m_perlinNoise.Initialize();
+	m_biomeClassifier.Initialise();
 	int index;
 	m_tempGridWidth = tempGridWidth;
 	m_tempGridHeight = tempGridHeight;
@@ -37,52 +38,60 @@ void ClimateMap::GenerateClimateMap()
 		{ 
 			index = (m_tempGridHeight * j) + i;
 	
-			float tempPerlinVal = (float)perlinNoise.Noise((i * m_temperatureFrequency)+m_temperatureOffset, (j * m_temperatureFrequency+m_temperatureOffset), 1);
+			float tempPerlinVal = (float)m_perlinNoise.Noise((i * m_temperatureFrequency)+m_temperatureOffset, (j * m_temperatureFrequency+m_temperatureOffset), 1);
 			m_climateMap[index].temperature = tempPerlinVal * m_temperatureAmplitude;
 
-			float rainfallPerlinVal = (float)perlinNoise.Noise((i * m_rainFallFrequency) + m_rainfallOffset, (j * m_rainFallFrequency + m_rainfallOffset), 1);
+			float rainfallPerlinVal = (float)m_perlinNoise.Noise((i * m_rainFallFrequency) + m_rainfallOffset, (j * m_rainFallFrequency + m_rainfallOffset), 1);
 			m_climateMap[index].rainfall = rainfallPerlinVal * m_rainfallAmplitude;
 
 
 			AssessMaxAndMinNoiseValues(tempPerlinVal, &m_maxTemp, &m_minTemp);  //If the max and min are influenced by ampltude then the range never changes 
-			AssessMaxAndMinNoiseValues(rainfallPerlinVal, &m_maxRainfall, &m_minRainfall);  //If the max and min are influenced by ampltude then the range never changes 
+			AssessMaxAndMinNoiseValues(rainfallPerlinVal, &m_maxRainfall, &m_minRainfall);  
 
 		}
 	}
 }
 
-Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTexture(ID3D11Device* device, char* noiseMap)
+Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTexture(ID3D11Device* device)
 {
 	//int width = m_tempGridWidth;
-	int width = 128;
-	std::vector<uint32_t> m_colourBuffers(width * width);
+	int resolution = 128;
+	std::vector<uint32_t> m_colourBuffers(resolution * resolution);
 
 	int index = 0;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texSRV;
 	{
 	
-		for (int i = 0; i < width; i++) {
-			for(int j = 0;j < width; j++)
+		for (int i = 0; i < resolution; i++) {
+			for(int j = 0;j < resolution; j++)
 			{
-				index = ((width * j) + i);
-				int rgbValue = 0;
-				if(noiseMap == "TemperatureMap")
-				{
-					rgbValue = (InverseLerp(m_minTemp, m_maxTemp, m_climateMap[index].temperature) * 255);
+				index = ((resolution * j) + i);
+		
+
+				m_climateMap[index].temperature = (InverseLerp(m_minTemp, m_maxTemp, m_climateMap[index].temperature));
+				float temperature = m_climateMap[index].temperature;
+		
+
+				m_climateMap[index].rainfall = (InverseLerp(m_minRainfall, m_maxRainfall, m_climateMap[index].rainfall));
+				float rainfall = m_climateMap[index].rainfall;
+		
+			   
+				m_climateMap[index].climateClassification = m_biomeClassifier.CalculateDistanceToAllBiomes(temperature, rainfall);
+				int rValue = m_climateMap[index].climateClassification.x * 255;
+				int bValue = m_climateMap[index].climateClassification.y * 255;
+				if (rValue > 255 || bValue > 255) {
+					int x = 5;
 				}
-				else {
-					rgbValue = (InverseLerp(m_minRainfall, m_maxRainfall, m_climateMap[index].rainfall) * 255);
-				}
-				
-				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rgbValue, rgbValue, rgbValue);
+				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rValue, bValue, 0);
+
 			}
 
 		}
 	
 		D3D11_TEXTURE2D_DESC textureDesc = {};
-		textureDesc.Width = width;
-		textureDesc.Height = width;
-		textureDesc.MipLevels = 1; /// !!!
+		textureDesc.Width = resolution;
+		textureDesc.Height = resolution;
+		textureDesc.MipLevels = 1; 
 		textureDesc.ArraySize = 1;
 		textureDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
 		textureDesc.SampleDesc.Count = 1;
@@ -95,7 +104,7 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTextur
 		D3D11_SUBRESOURCE_DATA tSData = { &m_colourBuffers, sizeof(m_colourBuffers), 0 };
 		tSData.pSysMem = &(m_colourBuffers[0]);
 		 int bpp = 32;
-		size_t rowPitch = (width * bpp + 7) / 8;
+		size_t rowPitch = (resolution * bpp + 7) / 8;
 		size_t imageSize = rowPitch * 128;
 		tSData.SysMemPitch = static_cast<UINT>(rowPitch);
 		tSData.SysMemSlicePitch = static_cast<UINT>(imageSize);
