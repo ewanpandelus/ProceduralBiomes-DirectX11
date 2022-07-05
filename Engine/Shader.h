@@ -15,7 +15,8 @@ public:
 	//All the methods here simply create new versions corresponding to your needs
 	virtual bool InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFilename);		//Loads the Vert / pixel Shader pair
 	void InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* gsFilename, WCHAR* psFilename);
-	bool SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1, ID3D11ShaderResourceView* texture1);
+	bool SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view,
+		DirectX::SimpleMath::Matrix* projection, Light* sceneLight1, ID3D11ShaderResourceView* texture1, float time);
 	virtual bool SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection);
 	void EnableShader(ID3D11DeviceContext* context);
 	void LoadGeometryShader(ID3D11Device* device, WCHAR* filename);
@@ -26,6 +27,7 @@ protected:
 		DirectX::XMMATRIX world;
 		DirectX::XMMATRIX view;
 		DirectX::XMMATRIX projection;
+		float padding;
 	};
 
 	//buffer for information of a single light
