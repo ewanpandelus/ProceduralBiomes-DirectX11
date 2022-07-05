@@ -3,25 +3,31 @@
 
 void BiomeClassifier::Initialise()
 {
-    temperatureMax = rainfallMax = 40;
+    temperatureMax = rainfallMax = 60;
 
 
 
-    m_desert.maxTemp = 40;
-    m_desert.minTemp = 30;
-    m_desert.maxRainfall = 10;
+    m_desert.maxTemp = 60;
+    m_desert.minTemp = 40;
+    m_desert.maxRainfall = 17;
     m_desert.minRainfall = 0;
 
 
 
     m_forest.maxTemp = 30;
     m_forest.minTemp = 10;
-    m_forest.maxRainfall = 30;
-    m_forest.minRainfall = 15;
+    m_forest.maxRainfall = 35;
+    m_forest.minRainfall = 20;
    
+
+    m_snow.maxTemp = 10;
+    m_snow.minTemp = 0;
+    m_snow.minRainfall = 45;
+    m_snow.maxRainfall = 60;
 
     m_biomes[0] = m_desert;
     m_biomes[1] = m_forest;
+    m_biomes[2] = m_snow;
 }
 
 
@@ -85,7 +91,7 @@ SimpleMath::Vector2 BiomeClassifier::CalculateDistanceToAllBiomes(float temp, fl
      for(int i = 0; i<2 ;i++)
      {
          distances[i] = CalculateDistanceToBiome(temp, rainfall, m_biomes[i]);
-         if (distances[i] == 0) {
+         if (distances[i] <= 0) {
              distances[i] = 1;
              indexClassified = i;
              break;
@@ -98,16 +104,28 @@ SimpleMath::Vector2 BiomeClassifier::CalculateDistanceToAllBiomes(float temp, fl
          return SimpleMath::Vector2(distances[0], distances[1]);
      }
      distances = ClassifyBasedOnDistance(distances);
-     SimpleMath::Vector2 biomeDistances = SimpleMath::Vector2(distances[0], distances[1]);
-     return biomeDistances;
+     return SimpleMath::Vector2(distances[0], distances[1]);
 }
 std::vector<float> BiomeClassifier::CalculateFractionOfClosestBiomes(std::vector<float> sortedDistances)
 {
     std::vector<float> fractions(2);
-    float total = sortedDistances[0] + sortedDistances[1];
-    fractions[0] = sortedDistances[1] / total;                         //Must be opposite fraction if closer to biome (i.e. distance to forest 4, distance to desert 2, then 4/6 desert, 66.66% desert
-    fractions[1] = sortedDistances[0] / total;
+    float frac1 = sortedDistances[0];
+    float frac2 = sortedDistances[1];
+
+
+    frac1 = ExponentialFraction(frac1);
+    frac2 = ExponentialFraction(frac2);
+
+    float total = frac1 + frac2;
+    fractions[0] = frac2 / total;                         //Must be opposite fraction if closer to biome (i.e. distance to forest 4, distance to desert 2, then 4/6 desert, 66.66% desert
+    fractions[1] = frac1 / total;
+
+
+  //  fractions[2] = 0;
     return fractions;
+}
+float  BiomeClassifier::ExponentialFraction(float expFrac) {
+    return pow((expFrac * 10), 3);
 }
 
 

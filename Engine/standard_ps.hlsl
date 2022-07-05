@@ -1,5 +1,5 @@
-// Light pixel shader
-// Calculate diffuse lighting for a single directional light(also texturing)
+
+
 
 Texture2D meshTexture : register(t0);
 SamplerState SampleType : register(s0);
@@ -44,7 +44,7 @@ float4 main(InputType input) : SV_TARGET
     // Invert the light direction for calculations.
     textureColor = meshTexture.Sample(SampleType, input.tex);
     lightDir = normalize(input.position3D - lightPosition);
- 
+
     // Calculate the amount of light on this pixel.
     lightIntensity = saturate(dot(input.normal, -lightDir));
 
@@ -56,10 +56,10 @@ float4 main(InputType input) : SV_TARGET
     textureColor = meshTexture.Sample(SampleType, input.tex);
     reflection = normalize(2 * lightIntensity * input.normal - lightDir);
 
-        // Determine the amount of specular light based on the reflection vector, viewing direction, and specular power.
+    // Determine the amount of specular light based on the reflection vector, viewing direction, and specular power.
     specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
     color = color * textureColor;
-    color = saturate(color+(specular/3));
+    color = saturate(color + (specular / 3));
     return color;
 
 

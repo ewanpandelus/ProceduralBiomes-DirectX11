@@ -27,9 +27,6 @@
     <ClInclude Include="Camera.h">
       <Filter>Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="Shader.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="modelclass.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -67,11 +64,22 @@
     <ClInclude Include="imgui_impl_win32.h">
       <Filter>Imgui</Filter>
     </ClInclude>
-    <ClInclude Include="TemperatureMap.h" />
     <ClInclude Include="PerlinNoise.h" />
     <ClInclude Include="PoissonDiscSampling.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="DepthTexture.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="TerrainShader.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="BiomeClassifier.h" />
+    <ClInclude Include="ClimateMap.h" />
+    <ClInclude Include="BiomeObjects.h" />
+    <ClInclude Include="StandardShader.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
   </ItemGroup>
@@ -83,9 +91,6 @@
       <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="modelclass.cpp">
@@ -119,10 +124,21 @@
     <ClCompile Include="imgui_impl_win32.cpp">
       <Filter>Imgui</Filter>
     </ClCompile>
-    <ClCompile Include="TemperatureMap.cpp" />
     <ClCompile Include="PerlinNoise.cpp" />
     <ClCompile Include="PoissonDiscSampling.cpp" />
     <ClCompile Include="DepthTexture.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainShader.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="BiomeClassifier.cpp" />
+    <ClCompile Include="ClimateMap.cpp" />
+    <ClCompile Include="BiomeObjects.cpp" />
+    <ClCompile Include="StandardShader.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>
@@ -144,24 +160,33 @@
     <Image Include="directx.ico">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="TREE_TEX_1.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Colorsheet Tree Normal.png">
-      <Filter>Assets</Filter>
-    </Image>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="colour_ps.hlsl">
+    <FxCompile Include="standard_ps.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
-    <FxCompile Include="colour_vs.hlsl">
+    <FxCompile Include="standard_vs.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
-    <FxCompile Include="light_ps.hlsl">
+    <FxCompile Include="terrain_ps.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
-    <FxCompile Include="light_vs.hlsl">
+    <FxCompile Include="terrain_vs.hlsl">
+      <Filter>Assets</Filter>
+    </FxCompile>
+    <FxCompile Include="triangle_gs.hlsl">
+      <Filter>Assets</Filter>
+    </FxCompile>
+    <FxCompile Include="triangle_ps.hlsl">
+      <Filter>Assets</Filter>
+    </FxCompile>
+    <FxCompile Include="triangle_vs.hlsl">
+      <Filter>Assets</Filter>
+    </FxCompile>
+    <FxCompile Include="object_ps.hlsl">
+      <Filter>Assets</Filter>
+    </FxCompile>
+    <FxCompile Include="object_vs.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
   </ItemGroup>

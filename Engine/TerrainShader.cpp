@@ -11,7 +11,7 @@ TerrainShader::~TerrainShader()
 {
 }
 
-bool TerrainShader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename)
+bool TerrainShader::InitialiseShader(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename)
 {
 	D3D11_BUFFER_DESC	matrixBufferDesc;
 	D3D11_SAMPLER_DESC	samplerDesc;
@@ -106,7 +106,8 @@ bool TerrainShader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHA
 }
 
 bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix * world, DirectX::SimpleMath::Matrix * view, DirectX::SimpleMath::Matrix * projection, Light *sceneLight1,
-	ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* biome1Texture, ID3D11ShaderResourceView* biome2Texture, bool flickBetweenMaps, ClimateMap climateMap)
+	ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* desertTexture, ID3D11ShaderResourceView* desert2Texture, ID3D11ShaderResourceView* biome2Texture,
+	ID3D11ShaderResourceView* biome3Texture, ID3D11ShaderResourceView* noiseTexture)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -131,27 +132,26 @@ bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext * context, Dire
 	lightPtr->ambient = sceneLight1->getAmbientColour();
 	lightPtr->diffuse = sceneLight1->getDiffuseColour();	
 	lightPtr->position = sceneLight1->getPosition();  
-	float pad = flickBetweenMaps == false ? 0 : 1;
-	lightPtr->padding = pad;
+
+
 	context->Unmap(m_lightBuffer, 0);
 	context->PSSetConstantBuffers(0, 1, &m_lightBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
 
 	//pass the desired texture to the pixel shader.
 	context->PSSetShaderResources(0, 1, &noiseTemperatureTexture);
 
-	context->Map(m_noiseTextureBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	noisePtr = (NoiseTextureBufferType*)mappedResource.pData;
-	noisePtr->frequency = *climateMap.GetTemperatureFrequency();
-	noisePtr->amplitude = *climateMap.GetTemperatureAmplitude();
-	noisePtr->offset = *climateMap.GetTemperatureOffset();
 
-	context->Unmap(m_noiseTextureBuffer, 0);
-	context->PSSetConstantBuffers(1, 1, &m_noiseTextureBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
+
 
 	//pass the desired texture to the pixel shader.
 	context->PSSetShaderResources(0, 1, &noiseTemperatureTexture);
-	context->PSSetShaderResources(1, 1, &biome1Texture);
+	context->PSSetShaderResources(1, 1, &desertTexture);
 	context->PSSetShaderResources(2, 1, &biome2Texture);
+	context->PSSetShaderResources(3, 1, &biome3Texture);
+	context->PSSetShaderResources(4, 1, &desert2Texture);
+	context->PSSetShaderResources(5, 1, &noiseTexture);
+
+
 
 	return false;
 }

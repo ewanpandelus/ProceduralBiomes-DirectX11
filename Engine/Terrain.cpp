@@ -76,10 +76,13 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 
 void Terrain::Render(ID3D11DeviceContext * deviceContext)
 {
+	deviceContext->GSSetShader(NULL, NULL, 0);
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
 	deviceContext->DrawIndexed(m_indexCount, 0, 0);
-
+	
+	
+	
 	return;
 }
 

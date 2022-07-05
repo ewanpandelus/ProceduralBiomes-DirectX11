@@ -40,7 +40,7 @@ void Game::Initialize(HWND window, int width, int height)
     m_regionSize = 80;
     m_input.Initialise(window);
     m_climateMap.Initialize(128, 128);
-
+    m_poissonDiscSampling  =  PoissonDiscSampling(m_biomeObjects);
 
     m_deviceResources->SetWindow(window, width, height);
     m_deviceResources->CreateDeviceResources();
@@ -208,11 +208,18 @@ void Game::Update(DX::StepTimer const& timer)
     {
         m_elapsedTime = 0;
         m_flickBetweenMaps = !m_flickBetweenMaps;
+        m_poissonPositions.clear();
         m_poissonPositions = m_poissonDiscSampling.GeneratePoints();
         m_regionSize = *m_poissonDiscSampling.GetSampleRegionSize();
-        m_Terrain.GenerateHeightMap(device);
-        m_climateMap.GenerateClimateMap();
-        m_generatedClimateMapTexture = m_climateMap.GenerateNoiseTexture(device);
+       // m_Terrain.GenerateHeightMap(device);
+
+        m_objectMap.clear();
+        m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
+        m_biomeObjects.SetCellWidth(m_poissonDiscSampling.GetCellWidth());
+        m_objectMap =  m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositions);
+        
+        
+        m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
 
 
     }
@@ -290,25 +297,25 @@ void Game::Render()
         //prepare transform for floor object. 
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
 
-    SimpleMath::Matrix treePosition = SimpleMath::Matrix::CreateTranslation(0, 0, 0);
-    m_standardShader.EnableShader(context);
-
+    SimpleMath::Matrix objectPosition = SimpleMath::Matrix::CreateTranslation(0, 0, 0);
+   // m_standardShader.EnableShader(context);
+    geometryShader.EnableShader(context);
     float x = 0;
     float y = 0;
     float index = 0;
-    SimpleMath::Matrix treeScale = SimpleMath::Matrix::CreateScale(1);
+    SimpleMath::Matrix objectScale = SimpleMath::Matrix::CreateScale(1);
     float time = m_timer.GetTotalSeconds();
-    for each (auto position in m_poissonPositions)
+    for each (auto position in m_objectMap)
     {
         m_world = SimpleMath::Matrix::Identity; //set world back to identity
-        x = m_poissonPositions[index].x;
-        y = m_poissonPositions[index].y;
-        treePosition = SimpleMath::Matrix::CreateTranslation(x - m_regionSize / 2, 0.0f, y - m_regionSize / 2);
-        m_world = m_world * treePosition * treeScale;
+        x = m_objectMap[index].x;
+        y = m_objectMap[index].z;
+        objectPosition = SimpleMath::Matrix::CreateTranslation(x - m_regionSize / 2, 0.0f, y - m_regionSize / 2);
+        m_world = m_world * objectPosition * objectScale;
         m_standardShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-            m_treeModel1Texture.Get(), time, m_Camera01.getPosition());
+            m_objectMap[index].texture.Get());
 
-        m_TreeModel.Render(context);
+        m_objectMap[index].model.Render(context);
         index++;
 
     }
@@ -318,8 +325,14 @@ void Game::Render()
     SimpleMath::Matrix newScale = SimpleMath::Matrix::CreateScale(1);		//scale the terrain down a little. 
     m_world = m_world * positionAccountedFor;
     m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-        m_generatedClimateMapTexture.Get(), m_desertTexture.Get(), m_grassTexture.Get(), m_flickBetweenMaps, m_climateMap);
+        m_generatedClimateMapTexture.Get(), m_desertTexture.Get(),m_desert2Texture.Get(),  m_grassTexture.Get(),m_snowTexture.Get(), m_noiseTexture.Get());
     m_Terrain.Render(context);
+
+
+    //mesh->sendData(context);
+   
+    //geometryShader->render(context, mesh->getIndexCount());
+
 
     //render our GUI
     ImGui::Render();
@@ -432,20 +445,36 @@ void Game::CreateDeviceDependentResources()
 
     //setup our test model
     m_BasicModel.InitializeSphere(device);
-    //m_BasicModel2.InitializeModel(device,"drone.obj");
-    m_TreeModel.InitializeModel(device, "tree.obj");
+    m_desertModel.InitializeModel(device,"drone.obj");
+
+    
+
     m_BasicModel3.InitializeBox(device, 10.0f, 0.1f, 10.0f);	//box includes dimensions
-
+    
     //load and set up our Vertex and Pixel Shaders
-    m_terrainShader.InitStandard(device, L"terrain_vs.cso", L"terrain_ps.cso");
-    m_standardShader.InitStandard(device, L"standard_vs.cso", L"standard_ps.cso");
+    m_terrainShader.InitialiseShader(device, L"terrain_vs.cso", L"terrain_ps.cso");
+    geometryShader.InitStandard(device, L"triangle_vs.cso", L"triangle_gs.cso", L"triangle_ps.cso");
+    m_standardShader.InitStandard(device, L"object_vs.cso", L"object_ps.cso");
     //load Textures
-    m_generatedClimateMapTexture = m_climateMap.GenerateNoiseTexture(device);
+    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+    m_noiseTexture = m_climateMap.GenerateNoiseTexture(device);
+    //DesertBiome    
+
     CreateDDSTextureFromFile(device, L"desert.dds", nullptr, m_desertTexture.ReleaseAndGetAddressOf());
+    CreateDDSTextureFromFile(device, L"desert2.dds", nullptr, m_desert2Texture.ReleaseAndGetAddressOf());
+
+    //Forest Biome 
     CreateDDSTextureFromFile(device, L"grass.dds", nullptr, m_grassTexture.ReleaseAndGetAddressOf());
-    CreateDDSTextureFromFile(device, L"tree.dds", nullptr, m_treeModel1Texture.ReleaseAndGetAddressOf());
+    CreateDDSTextureFromFile(device, L"tree.dds", nullptr, m_forestTreeTexture.ReleaseAndGetAddressOf());
+    m_forestTreeModel.InitializeModel(device, "tree.obj");
 
+    //Snow Biome 
+    CreateDDSTextureFromFile(device, L"snowTreeTex.dds", nullptr, m_snowTreeTextures.ReleaseAndGetAddressOf());
+    CreateDDSTextureFromFile(device, L"snow.dds", nullptr, m_snowTexture.ReleaseAndGetAddressOf());
+    m_snowTreeModel.InitializeModel(device, "snowTree.obj");
 
+    m_biomeObjects.SetLargeModels(m_desertModel, m_forestTreeModel, m_snowTreeModel);
+    m_biomeObjects.SetLargeModelsTextures(m_desertTexture, m_forestTreeTexture,m_snowTexture);
 
 
     //Initialise Render to texture
@@ -472,7 +501,7 @@ void Game::CreateWindowSizeDependentResources()
         fovAngleY,
         aspectRatio,
         0.01f,
-        150.0f
+        500.0f
     );
 }
 
@@ -484,13 +513,13 @@ void Game::SetupGUI()
     ImGui::NewFrame();
 
     ImGui::Begin("Noise Texture Param");
-    ImGui::SliderFloat("Temp Amplitude", m_climateMap.GetTemperatureAmplitude(), 0.0f, 10.0f);
-    ImGui::SliderFloat("Temp Frequency", m_climateMap.GetTemperatureFrequency(), 0.0f, 1.0f);
-    ImGui::SliderFloat("Temp Offset", m_climateMap.GetTemperatureOffset(), 0.0f, 1000.f);
+    ImGui::SliderFloat("Temp Amplitude", m_climateMap.GetTemperatureAmplitude(), 0.0f, 1.f);
+    ImGui::SliderFloat("Temp Frequency", m_climateMap.GetTemperatureFrequency(), 0.0f, 0.25f);
+    ImGui::SliderFloat("Temp Offset", m_climateMap.GetTemperatureOffset(), 0.0f, 100.f);
 
-    ImGui::SliderFloat("Rainfall Amplitude", m_climateMap.GetRainfallAmplitude(), 0.0f, 10.0f);
-    ImGui::SliderFloat("Rainfall Frequency", m_climateMap.GetRainfallFrequency(), 0.0f, 1.0f);
-    ImGui::SliderFloat("Rainfall Offset", m_climateMap.GetRainfallOffset(), 0.0f, 1000.f);
+    ImGui::SliderFloat("Rainfall Amplitude", m_climateMap.GetRainfallAmplitude(), 0.0f, 1.f);
+    ImGui::SliderFloat("Rainfall Frequency", m_climateMap.GetRainfallFrequency(), 0.0f, 0.25f);
+    ImGui::SliderFloat("Rainfall Offset", m_climateMap.GetRainfallOffset(), 0.0f, 100.f);
 
 
     ImGui::ColorEdit3("Diffuse Light Colour", m_diffuseLight);

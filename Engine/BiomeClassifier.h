@@ -15,14 +15,16 @@ private:
 		
 	};
 
-	BiomeType m_biomes[2];
+	BiomeType m_biomes[3];
 
 	BiomeType m_desert;
 	BiomeType m_forest;
+	BiomeType m_snow;
+
 
 	std::vector<float> ClassifyBasedOnDistance(std::vector<float> distances);
 	std::vector<float> RemoveDistanceFromUnclassifiedElements(std::vector<float> distances, int indexClassified);
-
+	float ExponentialFraction(float expFrac); 
 	std::vector<float> CalculateFractionOfClosestBiomes(std::vector<float> sortedDistances);
 public:
 	void Initialise();

@@ -21,9 +21,10 @@ std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 {
 	std::vector<SimpleMath::Vector2> points;
 	
-	float w = m_radius / sqrt(2); 
-	int cols = floor(m_sampleRegionLength / w);
-	int rows = floor(m_sampleRegionLength / w);
+	cellWidth = m_radius / sqrt(2); 
+	m_biomeObjects.SetCellWidth(cellWidth);
+	int cols = floor(m_sampleRegionLength / cellWidth);
+	int rows = floor(m_sampleRegionLength / cellWidth);
 	if (!CheckParametersValid(cols)) 
 	{
 		return points;
@@ -34,8 +35,8 @@ std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 	std::vector<SimpleMath::Vector2> active;
 	float x = m_sampleRegionLength/2;
 	float y = m_sampleRegionLength /2;
-	int i = floor(x) / w;
-	int j = floor(y) / w;
+	int i = floor(x) / cellWidth;
+	int j = floor(y) / cellWidth;
 
 
 	SimpleMath::Vector2 pos = SimpleMath::Vector2((x), (y));
@@ -54,8 +55,8 @@ std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 		for (int n = 0; n <m_numSamplesBeforeRejection;n++)
 		{
 			SimpleMath::Vector2 sample = GenerateSample(position);
-			int col = floor(sample.x / w);
-			int row = floor(sample.y / w);
+			int col = floor(sample.x / cellWidth);
+			int row = floor(sample.y / cellWidth);
 
 
 			if (col <0 || col > m_grid.size()-1 || row  <0 || row > m_grid.size()-1) {
@@ -95,6 +96,11 @@ int* PoissonDiscSampling::GetNumSamplesBeforeRejection()
 float* PoissonDiscSampling::GetRadius()
 {
 	return &m_radius;
+}
+
+float PoissonDiscSampling::GetCellWidth()
+{
+	return cellWidth;
 }
 
 float PoissonDiscSampling::SquaredMagnitude(SimpleMath::Vector2 v)
@@ -149,6 +155,8 @@ SimpleMath::Vector2 PoissonDiscSampling::GenerateSample(SimpleMath::Vector2 posi
 	float magnitude = GenerateRandomFloatWithMaxVal(m_radius) + m_radius;  // between 1-2 r;
 	return  position + direction * magnitude; //add random vector to point
 }
+
+
 
 
 

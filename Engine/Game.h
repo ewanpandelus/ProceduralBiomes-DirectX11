@@ -16,6 +16,9 @@
 #include "TerrainShader.h"
 #include "Shader.h"
 #include "ClimateMap.h"
+#include "BiomeObjects.h"
+
+
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -98,11 +101,19 @@ private:
 	//textures 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedClimateMapTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedRainfallMapTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_noiseTexture;
 
 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desertTexture;
+
+
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_grassTexture;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_treeModel1Texture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestTreeTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTreeTextures;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTexture;
+
+    //Desert
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desertTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desert2Texture;
 
 
 
@@ -112,14 +123,19 @@ private:
 
 	//Shaders
 	TerrainShader														    m_terrainShader;
-    Shader																	m_standardShader;
+    Shader														            m_standardShader;
+
+    Shader geometryShader;
+  
 
 
 	//Scene. 
 	Terrain																	m_Terrain;
-    ModelClass																m_TreeModel;
+    ModelClass																m_forestTreeModel;
+    ModelClass																m_snowTreeModel;
+
 	ModelClass																m_BasicModel;
-	ModelClass																m_BasicModel2;
+	ModelClass																m_desertModel;
 	ModelClass																m_BasicModel3;
 
 	//RenderTextures
@@ -149,10 +165,12 @@ private:
     DirectX::SimpleMath::Matrix                                             m_view;
     DirectX::SimpleMath::Matrix                                             m_projection;
 
-
+    BiomeObjects                                                            m_biomeObjects;
+    std::vector<BiomeObjects::BiomeObjectType>                              m_objectMap;
+    DepthTexture                                                            m_depthTexture;
     ClimateMap                                                              m_climateMap;
     PoissonDiscSampling                                                     m_poissonDiscSampling;
-    DepthTexture                                                            m_depthTexture;
+
 
 
     bool                                                                    m_flickBetweenMaps = false;
