@@ -11,7 +11,7 @@ TerrainShader::~TerrainShader()
 {
 }
 
-bool TerrainShader::InitialiseShader(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename)
+bool TerrainShader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename)
 {
 	D3D11_BUFFER_DESC	matrixBufferDesc;
 	D3D11_SAMPLER_DESC	samplerDesc;

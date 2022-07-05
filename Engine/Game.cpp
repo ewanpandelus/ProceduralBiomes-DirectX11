@@ -452,7 +452,7 @@ void Game::CreateDeviceDependentResources()
     m_BasicModel3.InitializeBox(device, 10.0f, 0.1f, 10.0f);	//box includes dimensions
     
     //load and set up our Vertex and Pixel Shaders
-    m_terrainShader.InitialiseShader(device, L"terrain_vs.cso", L"terrain_ps.cso");
+    m_terrainShader.InitStandard(device, L"terrain_vs.cso", L"terrain_ps.cso");
     geometryShader.InitStandard(device, L"triangle_vs.cso", L"triangle_gs.cso", L"triangle_ps.cso");
     m_standardShader.InitStandard(device, L"object_vs.cso", L"object_ps.cso");
     //load Textures
