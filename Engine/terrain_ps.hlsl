@@ -78,7 +78,7 @@ float4 main(InputType input) : SV_TARGET
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
 
     textureColor = biomesTexture.Sample(SampleType, input.tex / 5);
-    desertTex1 = desertTexture.Sample(SampleType, input.tex*2);
+    desertColor = desertTexture.Sample(SampleType, input.tex*2);
     desertTex2 = desert2Texture.Sample(SampleType, input.tex * 2);
     noiseTex = noiseTexture.Sample(SampleType, input.tex / 5);
 
@@ -94,7 +94,7 @@ float4 main(InputType input) : SV_TARGET
 
     snowColor = snowTexture.Sample(SampleType, input.tex);
    // snowColor = lerp(snowColor, float4(1, 1, 1, 1), .4);
-    desertColor = lerp(desertTex1, snowColor, noiseTex.r);
+ 
 
     desertColor = textureColor.r * desertColor;
     forestColor = textureColor.g * forestColor;

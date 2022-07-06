@@ -23,7 +23,7 @@ struct OutputType
     float3 normal : NORMAL;
 };
 
-[maxvertexcount(6)]
+[maxvertexcount(3)]
 void main(triangle InputType input[3], inout TriangleStream<OutputType> triStream)
 {
     OutputType output;
@@ -69,33 +69,4 @@ void main(triangle InputType input[3], inout TriangleStream<OutputType> triStrea
 
 
 
-    output.position = input[0].position + float4(0, 10, 0, 0);
-    output.position = mul(output.position, worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
-    output.tex = input[0].tex;
-    output.normal = mul(input[0].normal, (float3x3) worldMatrix);
-    output.normal = normalize(output.normal);
-    triStream.Append(output);
-
-    output.position = input[1].position + float4(0, 10, 0, 0);
-    output.position = mul(output.position, worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
-    output.tex = input[1].tex;
-    output.normal = mul(input[1].normal, (float3x3) worldMatrix);
-    output.normal = normalize(output.normal);
-    triStream.Append(output);
-
-
-    output.position = input[2].position + float4(0, 10, 0, 0);
-    output.position = mul(output.position, worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
-    output.tex = input[2].tex;
-    output.normal = mul(input[1].normal, (float3x3) worldMatrix);
-    output.normal = normalize(output.normal);
-    triStream.Append(output);
-
-    triStream.RestartStrip();
 }

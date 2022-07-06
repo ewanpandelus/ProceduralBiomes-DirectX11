@@ -26,7 +26,7 @@ SimpleMath::Vector2 BiomeObjects::ConvertPointToTerrainPosition(int x, int y)
 std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions)
 {
 	std::vector<BiomeObjects::BiomeObjectType> m_objectMap;
-    int index = 0;
+	int index = 0;
 	for each (auto pos in gridPositions)
 	{
 		SimpleMath::Vector2 positionOnClimateMap = ConvertPointToTerrainPosition(pos.x, pos.y);

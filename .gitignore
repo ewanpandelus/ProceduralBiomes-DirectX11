@@ -81,3 +81,7 @@ Engine/DirectXTKSimpleSample_2015.vcxproj
 *.p7s
 *.targets
 *.md
+*.filters
+*.vcxproj
+*.db-shm
+*.ini

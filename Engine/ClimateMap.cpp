@@ -79,12 +79,14 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapT
 				m_climateMap[index].rainfall = (InverseLerp(m_minRainfall, m_maxRainfall, m_climateMap[index].rainfall));
 				float rainfall = m_climateMap[index].rainfall;
 		
-		
-				int gValue = 0;
-				m_climateMap[index].climateClassification = m_biomeClassifier.CalculateDistanceToAllBiomes(temperature, rainfall);
+			
+				m_climateMap[index].climateClassification =  m_biomeClassifier.CalculateDistanceToAllBiomes(temperature, rainfall);
+				
+				
 			
 				int rValue = m_climateMap[index].climateClassification.x * 255;
 			 	int bValue = m_climateMap[index].climateClassification.y * 255;
+				int gValue = 0;
 				if (rValue > 255 || bValue > 255) {
 					int x = 5;
 				}

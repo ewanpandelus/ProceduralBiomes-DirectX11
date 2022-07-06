@@ -312,7 +312,7 @@ void Game::Render()
         y = m_objectMap[index].z;
         objectPosition = SimpleMath::Matrix::CreateTranslation(x - m_regionSize / 2, 0.0f, y - m_regionSize / 2);
         m_world = m_world * objectPosition * objectScale;
-        m_standardShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+        geometryShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
             m_objectMap[index].texture.Get(), m_timer.GetTotalSeconds());
 
         m_objectMap[index].model.Render(context);
@@ -527,7 +527,7 @@ void Game::SetupGUI()
     ImGui::End();
 
     ImGui::Begin("Poisson Disk Sample Params");
-    ImGui::SliderInt("Sample Region Length", m_poissonDiscSampling.GetSampleRegionSize(), 0, 256);
+
     ImGui::SliderInt("Number of samples before rejection", m_poissonDiscSampling.GetNumSamplesBeforeRejection(), 1, 60);
     ImGui::SliderFloat("Radius", m_poissonDiscSampling.GetRadius(), 0.0f, 30.0f);
     ImGui::End();

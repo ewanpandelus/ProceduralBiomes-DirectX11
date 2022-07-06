@@ -26,7 +26,7 @@ private:
 	std::vector<std::vector<SimpleMath::Vector2>> m_grid;
 	float m_radius = 0;
 	int m_numSamplesBeforeRejection = 0;
-	int m_sampleRegionLength = 0;
+	int m_sampleRegionLength = 128;
 
 	float GenerateRandomFloatWithMaxVal(float value);
 	bool CheckParametersValid(int cols);
