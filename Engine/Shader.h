@@ -19,9 +19,11 @@ public:
 		DirectX::SimpleMath::Matrix* projection, Light* sceneLight1, ID3D11ShaderResourceView* texture1, float time);
 	virtual bool SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection);
 	void EnableShader(ID3D11DeviceContext* context);
-	void LoadGeometryShader(ID3D11Device* device, WCHAR* filename);
+
 protected:
 	//standard matrix buffer supplied to all shaders
+	void LoadGeometryShader(ID3D11Device* device, WCHAR* filename);
+
 	struct MatrixBufferType
 	{
 		DirectX::XMMATRIX world;
@@ -49,7 +51,7 @@ protected:
 	//Shaders
 	Microsoft::WRL::ComPtr<ID3D11VertexShader>								m_vertexShader;
 	Microsoft::WRL::ComPtr<ID3D11PixelShader>								m_pixelShader;
-	Microsoft::WRL::ComPtr<ID3D11GeometryShader>	m_geometryShader;
+	Microsoft::WRL::ComPtr<ID3D11GeometryShader>							m_geometryShader;
 	ID3D11InputLayout* m_layout;
 	ID3D11Buffer* m_matrixBuffer;
 	ID3D11SamplerState* m_sampleState;

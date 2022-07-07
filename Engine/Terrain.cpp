@@ -38,14 +38,14 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	//this is how we calculate the texture coordinates first calculate the step size there will be between vertices. 
 	float textureCoordinatesStep = 5.0f / m_terrainWidth;  //tile 5 times across the terrain. 
 	// Initialise the data in the height map (flat).
-	for (int j = 0; j<m_terrainHeight; j++)
+	for (int j = 0; j < m_terrainHeight; j++)
 	{
-		for (int i = 0; i<m_terrainWidth; i++)
+		for (int i = 0; i < m_terrainWidth; i++)
 		{
 			index = (m_terrainHeight * j) + i;
 
 			m_heightMap[index].x = (float)i;
-			m_heightMap[index].y = (float)height;
+			m_heightMap[index].y = (float)0;//perlinNoise.SimplexNoise(i * 0.1f, j * 0.1f) *2.f;
 			m_heightMap[index].z = (float)j;
 
 			//and use this step to calculate the texture coordinates for this point on the terrain.
@@ -70,19 +70,19 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 		return false;
 	}
 
-	
+
 	return true;
 }
 
-void Terrain::Render(ID3D11DeviceContext * deviceContext)
+void Terrain::Render(ID3D11DeviceContext* deviceContext)
 {
 	deviceContext->GSSetShader(NULL, NULL, 0);
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
 	deviceContext->DrawIndexed(m_indexCount, 0, 0);
-	
-	
-	
+
+
+
 	return;
 }
 
@@ -91,7 +91,7 @@ bool Terrain::CalculateNormals()
 	int i, j, index1, index2, index3, index, count;
 	float vertex1[3], vertex2[3], vertex3[3], vector1[3], vector2[3], sum[3], length;
 	DirectX::SimpleMath::Vector3* normals;
-	
+
 
 	// Create a temporary array to hold the un-normalized normal vectors.
 	normals = new DirectX::SimpleMath::Vector3[(m_terrainHeight - 1) * (m_terrainWidth - 1)];
@@ -101,9 +101,9 @@ bool Terrain::CalculateNormals()
 	}
 
 	// Go through all the faces in the mesh and calculate their normals.
-	for (j = 0; j<(m_terrainHeight - 1); j++)
+	for (j = 0; j < (m_terrainHeight - 1); j++)
 	{
-		for (i = 0; i<(m_terrainWidth - 1); i++)
+		for (i = 0; i < (m_terrainWidth - 1); i++)
 		{
 			index1 = (j * m_terrainHeight) + i;
 			index2 = (j * m_terrainHeight) + (i + 1);
@@ -141,9 +141,9 @@ bool Terrain::CalculateNormals()
 
 	// Now go through all the vertices and take an average of each face normal 	
 	// that the vertex touches to get the averaged normal for that vertex.
-	for (j = 0; j<m_terrainHeight; j++)
+	for (j = 0; j < m_terrainHeight; j++)
 	{
-		for (i = 0; i<m_terrainWidth; i++)
+		for (i = 0; i < m_terrainWidth; i++)
 		{
 			// Initialize the sum.
 			sum[0] = 0.0f;
@@ -303,7 +303,7 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			indices[index] = index;
 			index++;
 
-		
+
 
 			// Upper right.
 			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
@@ -312,7 +312,7 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			indices[index] = index;
 			index++;
 
-			
+
 			// Bottom left.
 			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
 			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index1].nx, m_heightMap[index1].ny, m_heightMap[index1].nz);
@@ -396,7 +396,7 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 	return true;
 }
 
-void Terrain::RenderBuffers(ID3D11DeviceContext * deviceContext)
+void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
 	unsigned int stride;
 	unsigned int offset;
@@ -425,39 +425,45 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 	int index;
 	float height = 0.0;
 
-	m_frequency = (6.283/m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
+	m_frequency = (6.283 / m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
 
 	//loop through the terrain and set the hieghts how we want. This is where we generate the terrain
 	//in this case I will run a sin-wave through the terrain in one axis.
 
-	for (int j = 0; j<m_terrainHeight; j++)
+	for (int j = 0; j < m_terrainHeight; j++)
 	{
-		for (int i = 0; i<m_terrainWidth; i++)
+		for (int i = 0; i < m_terrainWidth; i++)
 		{
 			index = (m_terrainHeight * j) + i;
 
 			m_heightMap[index].x = (float)i;
-			m_heightMap[index].y = 0;//;(float)perlinNoise.Noise(i *0.1f, j *0.1f, 1)*10;
+			m_heightMap[index].y = (float)perlinNoise.Noise(i * 0.2f, j * 0.2f, 1)*3;
 			m_heightMap[index].z = (float)j;
 		}
 	}
-	result = true; 
+	result = true;
 	result = CalculateNormals();
 	if (!result)
 	{
 		return false;
 	}
- 	result = InitializeBuffers(device);
+	result = InitializeBuffers(device);
 	if (!result)
 	{
 		return false;
 	}
 
 }
-
+float Terrain::Redistribution(float x, float y, float exponent) {
+	float e0 = 1 * perlinNoise.Noise(x * 0.1f, y * 0.1f, 1);
+	float e1 = 0.5 * perlinNoise.Noise(2* x * 0.1f, 2*y * 0.1f, 1) * e0;
+	float e2 = 0.25 * perlinNoise.Noise(4 * x * 0.1f, 4 * y * 0.1f, 1) * (e0 + e1);
+	float e = (e0 + e1 + e2) / (1 + 0.5 + 0.25);
+	return round(e * exponent) / exponent;
+}
 bool Terrain::Update()
 {
-	return true; 
+	return true;
 }
 
 float* Terrain::GetWavelength()

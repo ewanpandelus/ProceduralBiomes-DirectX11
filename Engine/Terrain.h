@@ -36,6 +36,7 @@ private:
 	void ShutdownBuffers();
 	bool InitializeBuffers(ID3D11Device*);
 	void RenderBuffers(ID3D11DeviceContext*);
+	float Redistribution(float nx, float ny, float exp);
 	
 
 private:

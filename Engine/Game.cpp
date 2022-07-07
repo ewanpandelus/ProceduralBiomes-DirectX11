@@ -37,10 +37,10 @@ Game::~Game()
 void Game::Initialize(HWND window, int width, int height)
 {
 
-    m_regionSize = 80;
+
     m_input.Initialise(window);
-    m_climateMap.Initialize(128, 128);
     m_poissonDiscSampling  =  PoissonDiscSampling(m_biomeObjects);
+    m_regionSize = *m_poissonDiscSampling.GetSampleRegionSize();
 
     m_deviceResources->SetWindow(window, width, height);
     m_deviceResources->CreateDeviceResources();
@@ -206,26 +206,20 @@ void Game::Update(DX::StepTimer const& timer)
 
     if (m_gameInputCommands.generate && m_elapsedTime > 0.1f)
     {
-        m_elapsedTime = 0;
-        m_flickBetweenMaps = !m_flickBetweenMaps;
+
         m_poissonPositions.clear();
         m_poissonPositions = m_poissonDiscSampling.GeneratePoints();
-        m_regionSize = *m_poissonDiscSampling.GetSampleRegionSize();
-       // m_Terrain.GenerateHeightMap(device);
-
+        m_terrain.GenerateHeightMap(device);
         m_objectMap.clear();
         m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
-        m_biomeObjects.SetCellWidth(m_poissonDiscSampling.GetCellWidth());
         m_objectMap =  m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositions);
-        
-        
         m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
 
 
     }
 
     m_Camera01.Update();	//camera update.
-    m_Terrain.Update();		//terrain update.  doesnt do anything at the moment. 
+    m_terrain.Update();		//terrain update.  doesnt do anything at the moment. 
 
     m_view = m_Camera01.getCameraMatrix();
     m_world = Matrix::Identity;
@@ -289,17 +283,17 @@ void Game::Render()
     m_sprites->End();
 
     //Set Rendering states. 
-    context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
+ 
     context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
     context->RSSetState(m_states->CullClockwise());
-    //	context->RSSetState(m_states->Wireframe());
+    context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
+    //context->RSSetState(m_states->Wireframe());
 
         //prepare transform for floor object. 
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
 
     SimpleMath::Matrix objectPosition = SimpleMath::Matrix::CreateTranslation(0, 0, 0);
-   // m_standardShader.EnableShader(context);
-    geometryShader.EnableShader(context);
+    m_geometryShader.EnableShader(context);
     float x = 0;
     float y = 0;
     float index = 0;
@@ -307,18 +301,20 @@ void Game::Render()
     float time = m_timer.GetTotalSeconds();
     for each (auto position in m_objectMap)
     {
+ 
         m_world = SimpleMath::Matrix::Identity; //set world back to identity
         x = m_objectMap[index].x;
         y = m_objectMap[index].z;
         objectPosition = SimpleMath::Matrix::CreateTranslation(x - m_regionSize / 2, 0.0f, y - m_regionSize / 2);
         m_world = m_world * objectPosition * objectScale;
-        geometryShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+        m_geometryShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
             m_objectMap[index].texture.Get(), m_timer.GetTotalSeconds());
 
         m_objectMap[index].model.Render(context);
         index++;
 
     }
+   
     m_terrainShader.EnableShader(context);
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
     SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-64, 0.f, -64);
@@ -326,12 +322,10 @@ void Game::Render()
     m_world = m_world * positionAccountedFor;
     m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_generatedClimateMapTexture.Get(), m_desertTexture.Get(),m_desert2Texture.Get(),  m_grassTexture.Get(),m_snowTexture.Get(), m_noiseTexture.Get());
-    m_Terrain.Render(context);
+    m_terrain.Render(context);
 
 
-    //mesh->sendData(context);
-   
-    //geometryShader->render(context, mesh->getIndexCount());
+ 
 
 
     //render our GUI
@@ -441,7 +435,12 @@ void Game::CreateDeviceDependentResources()
     m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
 
     //setup our terrain
-    m_Terrain.Initialize(device, 128, 128);
+    m_terrain.Initialize(device, 128, 128);
+
+
+    //setup map of climate over the terrain
+    m_climateMap.Initialize(128, 128);
+
 
     //setup our test model
     m_BasicModel.InitializeSphere(device);
@@ -453,7 +452,7 @@ void Game::CreateDeviceDependentResources()
     
     //load and set up our Vertex and Pixel Shaders
     m_terrainShader.InitStandard(device, L"terrain_vs.cso", L"terrain_ps.cso");
-    geometryShader.InitStandard(device, L"triangle_vs.cso", L"triangle_gs.cso", L"triangle_ps.cso");
+    m_geometryShader.InitStandard(device, L"triangle_vs.cso", L"triangle_gs.cso", L"triangle_ps.cso");
     m_standardShader.InitStandard(device, L"object_vs.cso", L"object_ps.cso");
     //load Textures
     m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
@@ -478,7 +477,7 @@ void Game::CreateDeviceDependentResources()
 
 
     //Initialise Render to texture
-    m_FirstRenderPass = new RenderTexture(device, 800, 600, 1, 2);	//for our rendering, We dont use the last two properties. but.  they cant be zero and they cant be the same. 
+   // m_FirstRenderPass = new RenderTexture(device, 800, 600, 1, 2);	//for our rendering, We dont use the last two properties. but.  they cant be zero and they cant be the same. 
 
 }
 

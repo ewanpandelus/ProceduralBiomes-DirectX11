@@ -1,6 +1,3 @@
-// Light pixel shader
-// Calculate diffuse lighting for a single directional light(also texturing)
-
 Texture2D biomesTexture : register(t0);
 Texture2D desertTexture : register(t1);
 Texture2D forestTexture : register(t2);
@@ -18,45 +15,45 @@ cbuffer LightBuffer : register(b0)
     float3 lightPosition;
     float padding;
 };
+cbuffer ColourBuffer : register(b1)
+{
+    float4 desertColour;
+    float4 forestColour;
+    float3 snowColour;
+    float excess;
+};
 
 struct InputType
 {
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
+    nointerpolation  float3 normal : NORMAL;
     float3 position3D : TEXCOORD2;
 };
-int FastFloor(double x)
-{
-    return x > 0 ? (int)x : (int)x - 1;
-}
-double Dot(int g[3], double x, double y, double z)
-{
-    return g[0] * x + g[1] * y + g[2] * z;
-}
-double Mix(double a, double b, double t)
-{
-    return (1 - t) * a + t * b;
-}
-double Fade(double t)
-{
-    return t * t * t * (t * (t * 6 - 15) + 10);
-}
-double Dot(int g[3], double x, double y) {
-    return g[0] * x + g[1] * y;
-}
+
 
 float4 main(InputType input) : SV_TARGET
 {
     float4	textureColor;
-    float4	desertColor;
+
     float4	desertTex1;
     float4	desertTex2;
+    float4	forestTex;
+
     float4 noiseTex;
 
-    float4	forestColor;
+
     float4	snowColor;
 
+    float4 desertCol1 = float4(0.886, 0.733, 0.007, 1);
+    float4 desertCol2 = float4(0.941, 0.965, 0.176,1);
+    float4 desertCol;
+
+
+
+    float4 forestCol1 = float4(0, 0.69, 0.35, 1);
+    float4 forestCol2 = float4(0, 0.769, 0.024, 1);
+    float4 forestCol;
 
 
     float desertValue;
@@ -78,36 +75,31 @@ float4 main(InputType input) : SV_TARGET
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
 
     textureColor = biomesTexture.Sample(SampleType, input.tex / 5);
-    desertColor = desertTexture.Sample(SampleType, input.tex*2);
-    desertTex2 = desert2Texture.Sample(SampleType, input.tex * 2);
+    desertTex1 = desertTexture.Sample(SampleType, input.tex*5);
+    forestTex = forestTexture.Sample(SampleType, input.tex*5);
+
+    desertTex2 = desert2Texture.Sample(SampleType, input.tex);
     noiseTex = noiseTexture.Sample(SampleType, input.tex / 5);
 
 
-     
-
- //   desertColor = lerp(desertColor, float4(1, 0.8, 0.5, 1), .4);
 
 
+    desertCol = lerp(desertCol1, desertCol2, noiseTex.r);
+    forestCol = lerp(forestCol1, forestCol2, noiseTex.r);
+    desertCol = lerp(desertCol, desertTex1, 0.2);
+    forestCol = lerp(forestCol, forestTex, 0.2);
 
-    forestColor = forestTexture.Sample(SampleType, input.tex);
-  //forestColor  = lerp(desertColor, float4(0, 1, 0, 1), .4);
+;
+//forestColor  = lerp(desertColor, float4(0, 1, 0, 1), .4);
 
-    snowColor = snowTexture.Sample(SampleType, input.tex);
-   // snowColor = lerp(snowColor, float4(1, 1, 1, 1), .4);
- 
-
-    desertColor = textureColor.r * desertColor;
-    forestColor = textureColor.g * forestColor;
-    snowColor = textureColor.b * snowColor;
+snowColor = snowTexture.Sample(SampleType, input.tex);
 
 
 
-
-
-
-
-    return saturate(desertColor + forestColor+snowColor);
+desertCol = textureColor.r * desertCol;
+forestCol = textureColor.g * forestCol;
+snowColor = textureColor.b * snowColor;
+return color * saturate(desertCol + forestCol + snowColor);
 
 
 }
-

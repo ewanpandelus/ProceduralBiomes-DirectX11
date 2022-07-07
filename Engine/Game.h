@@ -125,12 +125,12 @@ private:
 	TerrainShader														    m_terrainShader;
     Shader														            m_standardShader;
 
-    Shader geometryShader;
+    Shader                                                                  m_geometryShader;
   
 
 
 	//Scene. 
-	Terrain																	m_Terrain;
+	Terrain																	m_terrain;
     ModelClass																m_forestTreeModel;
     ModelClass																m_snowTreeModel;
 

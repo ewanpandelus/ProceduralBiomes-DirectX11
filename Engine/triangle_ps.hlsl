@@ -15,5 +15,5 @@ float4 main(InputType input) : SV_TARGET
 {
 	float4 textureColor;
 	textureColor = texture0.Sample(SampleType, input.tex);
-	return textureColor;
+	return float4(1,1,1,0.1)*textureColor;
 }

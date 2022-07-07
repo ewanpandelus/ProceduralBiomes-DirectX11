@@ -158,7 +158,7 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTextur
 				index = ((resolution * j) + i);
 
 
-				float tempPerlinVal = (float)m_perlinNoise.Noise((i * 0.1), (j * 0.1), 1);
+				float tempPerlinVal = (float)m_perlinNoise.Noise((i * 0.4), (j * 0.4), 1);
 				int bwValue = abs(tempPerlinVal * 255);
 				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(bwValue, 0, 0);
 

@@ -85,3 +85,6 @@ Engine/DirectXTKSimpleSample_2015.vcxproj
 *.vcxproj
 *.db-shm
 *.ini
+*.filters
+*.vcxproj
+*.db-shm
