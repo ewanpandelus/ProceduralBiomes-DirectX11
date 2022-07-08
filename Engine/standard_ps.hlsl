@@ -52,8 +52,7 @@ float4 main(InputType input) : SV_TARGET
     color = ambientColor + (diffuseColor * lightIntensity); //adding ambient
     color = saturate(color);
 
-    // Sample the pixel color from the texture using the sampler at this texture coordinate location.
-    textureColor = meshTexture.Sample(SampleType, input.tex);
+
     reflection = normalize(2 * lightIntensity * input.normal - lightDir);
 
     // Determine the amount of specular light based on the reflection vector, viewing direction, and specular power.

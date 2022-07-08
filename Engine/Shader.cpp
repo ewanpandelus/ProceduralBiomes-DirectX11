@@ -128,6 +128,7 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMa
 	dataPtr->padding = time;
 	context->Unmap(m_matrixBuffer, 0);
 	context->GSSetConstantBuffers(0, 1, &m_matrixBuffer);
+	context->PSSetConstantBuffers(0, 1, &m_matrixBuffer);
 	context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
 	lightPtr->ambient = sceneLight1->getAmbientColour();
@@ -135,7 +136,7 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMa
 	lightPtr->position = sceneLight1->getPosition();
 	lightPtr->padding = 0.0f;
 	context->Unmap(m_lightBuffer, 0);
-	context->PSSetConstantBuffers(0, 1, &m_lightBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
+	context->PSSetConstantBuffers(1, 1, &m_lightBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
 
 
 	//pass the desired texture to the pixel shader.

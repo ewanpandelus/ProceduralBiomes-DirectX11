@@ -444,7 +444,7 @@ void Game::CreateDeviceDependentResources()
 
     //setup our test model
     m_BasicModel.InitializeSphere(device);
-    m_desertModel.InitializeModel(device,"drone.obj");
+
 
     
 
@@ -459,8 +459,9 @@ void Game::CreateDeviceDependentResources()
     m_noiseTexture = m_climateMap.GenerateNoiseTexture(device);
     //DesertBiome    
 
-    CreateDDSTextureFromFile(device, L"desert.dds", nullptr, m_desertTexture.ReleaseAndGetAddressOf());
+    CreateDDSTextureFromFile(device, L"cactus.dds", nullptr, m_desertTexture.ReleaseAndGetAddressOf());
     CreateDDSTextureFromFile(device, L"desert2.dds", nullptr, m_desert2Texture.ReleaseAndGetAddressOf());
+    m_desertModel.InitializeModel(device, "cactus2.obj");
 
     //Forest Biome 
     CreateDDSTextureFromFile(device, L"grass.dds", nullptr, m_grassTexture.ReleaseAndGetAddressOf());

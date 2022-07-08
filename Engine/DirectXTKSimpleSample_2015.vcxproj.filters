@@ -76,9 +76,6 @@
     <ClInclude Include="BiomeClassifier.h" />
     <ClInclude Include="ClimateMap.h" />
     <ClInclude Include="BiomeObjects.h" />
-    <ClInclude Include="StandardShader.h">
-      <Filter>Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="Shader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
@@ -135,9 +132,6 @@
     <ClCompile Include="BiomeClassifier.cpp" />
     <ClCompile Include="ClimateMap.cpp" />
     <ClCompile Include="BiomeObjects.cpp" />
-    <ClCompile Include="StandardShader.cpp">
-      <Filter>Rendering</Filter>
-    </ClCompile>
     <ClCompile Include="Shader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
@@ -158,6 +152,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="directx.ico">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="Colors.png">
       <Filter>Assets</Filter>
     </Image>
   </ItemGroup>
@@ -183,10 +180,7 @@
     <FxCompile Include="triangle_vs.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
-    <FxCompile Include="object_ps.hlsl">
-      <Filter>Assets</Filter>
-    </FxCompile>
-    <FxCompile Include="object_vs.hlsl">
+    <FxCompile Include="terrain_gs.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
   </ItemGroup>
