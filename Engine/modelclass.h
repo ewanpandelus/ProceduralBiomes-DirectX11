@@ -28,7 +28,10 @@ private:
 		DirectX::SimpleMath::Vector2 texture;
 		DirectX::SimpleMath::Vector3 normal;
 	};
-
+	struct InstanceType
+	{
+		DirectX::SimpleMath::Vector3 position;
+	};
 public:
 	ModelClass();
 	~ModelClass();
@@ -42,7 +45,8 @@ public:
 	void IndexRender(ID3D11DeviceContext*);
 
 	int GetIndexCount();
-
+	int GetVertexCount();
+	int GetInstanceCount();
 
 private:
 	bool InitializeBuffers(ID3D11Device*);
@@ -54,8 +58,9 @@ private:
 
 private:
 	ID3D11Buffer* m_vertexBuffer, * m_indexBuffer;
+	ID3D11Buffer* m_instanceBuffer;
 	int m_vertexCount, m_indexCount, m_faceSize;
-
+	int m_instanceCount;
 	//arrays for our generated objects Made by directX
 	std::vector<VertexPositionNormalTexture> preFabVertices;
 	std::vector<uint16_t> preFabIndices;

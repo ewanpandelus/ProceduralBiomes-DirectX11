@@ -6,7 +6,7 @@ using namespace DirectX;
 
 class ClimateMap
 {
-	
+
 public:
 
 	void Initialize(int tempGridWidth, int tempGridHeight);
@@ -39,7 +39,7 @@ private:
 	float m_rainfallAmplitude = 0, m_rainFallFrequency = 0, m_rainfallOffset = 0;
 
 	BiomeClassifier m_biomeClassifier;
-	
+
 	PerlinNoise m_perlinNoise;
 
 	ClimateMapType* m_climateMap;

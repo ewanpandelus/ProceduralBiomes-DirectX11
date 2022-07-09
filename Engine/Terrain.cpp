@@ -437,7 +437,7 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 			index = (m_terrainHeight * j) + i;
 
 			m_heightMap[index].x = (float)i;
-	
+
 			m_heightMap[index].z = (float)j;
 			float noiseHeight = 0;
 
@@ -470,7 +470,7 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 }
 float Terrain::Redistribution(float x, float y, float exponent) {
 	float e0 = 1 * perlinNoise.Noise(x * 0.1f, y * 0.1f, 1);
-	float e1 = 0.5 * perlinNoise.Noise(2* x * 0.1f, 2*y * 0.1f, 1) * e0;
+	float e1 = 0.5 * perlinNoise.Noise(2 * x * 0.1f, 2 * y * 0.1f, 1) * e0;
 	float e2 = 0.25 * perlinNoise.Noise(4 * x * 0.1f, 4 * y * 0.1f, 1) * (e0 + e1);
 	float e = (e0 + e1 + e2) / (1 + 0.5 + 0.25);
 	return round(e * exponent) / exponent;

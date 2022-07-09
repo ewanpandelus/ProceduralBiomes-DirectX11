@@ -19,11 +19,11 @@ private:
 		DirectX::SimpleMath::Vector2 texture;
 		DirectX::SimpleMath::Vector3 normal;
 	};
-	
+
 public:
 	Terrain();
 	~Terrain();
-	
+
 	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight);
 	void Render(ID3D11DeviceContext*);
 	bool GenerateHeightMap(ID3D11Device*);
@@ -43,12 +43,12 @@ private:
 	bool InitializeBuffers(ID3D11Device*);
 	void RenderBuffers(ID3D11DeviceContext*);
 	float Redistribution(float nx, float ny, float exp);
-	
+
 
 private:
 	bool m_terrainGeneratedToggle;
 	int m_terrainWidth, m_terrainHeight;
-	ID3D11Buffer * m_vertexBuffer, *m_indexBuffer;
+	ID3D11Buffer* m_vertexBuffer, * m_indexBuffer;
 	int m_vertexCount, m_indexCount;
 	float m_frequency, m_amplitude, m_lacunarity, m_persistance, m_offset;
 	int m_octaves = 0;

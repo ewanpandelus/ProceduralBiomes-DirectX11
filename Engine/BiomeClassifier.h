@@ -12,7 +12,7 @@ private:
 		float minTemp;
 		float maxRainfall;
 		float minRainfall;
-		
+
 	};
 
 	BiomeType m_biomes[3];
@@ -24,7 +24,7 @@ private:
 
 	std::vector<float> ClassifyBasedOnDistance(std::vector<float> distances);
 	std::vector<float> RemoveDistanceFromUnclassifiedElements(std::vector<float> distances, int indexClassified);
-	float ExponentialFraction(float expFrac); 
+	float ExponentialFraction(float expFrac);
 	std::vector<float> CalculateFractionOfClosestBiomes(std::vector<float> sortedDistances);
 public:
 	void Initialise();

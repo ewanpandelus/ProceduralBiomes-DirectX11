@@ -24,9 +24,9 @@ public:
 	};
 	std::vector<BiomeObjectType> SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions);
 private:
-	
+
 	bool PickFirstChoice(float percentage, float firstPercentage);
-	
+
 	ModelClass snowModel, forestModel, desertModel;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture, forestTexture, snowTexture;
 	float currentCellWidth = 0;
@@ -34,10 +34,10 @@ private:
 	Terrain::HeightMapType* m_heightMap;
 
 
-	BiomeObjectType AssignModelBasedOnClimate(SimpleMath::Vector3 position,  SimpleMath::Vector3 climateClassification);
+	BiomeObjectType AssignModelBasedOnClimate(SimpleMath::Vector3 position, SimpleMath::Vector3 climateClassification);
 	BiomeObjectType SetupObject(ModelClass specificModel, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> associatedTexture, SimpleMath::Vector3 position);
 
 
-	
+
 };
 

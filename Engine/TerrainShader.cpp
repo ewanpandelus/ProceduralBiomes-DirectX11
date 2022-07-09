@@ -11,7 +11,7 @@ TerrainShader::~TerrainShader()
 {
 }
 
-bool TerrainShader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename)
+bool TerrainShader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFilename)
 {
 	D3D11_BUFFER_DESC	matrixBufferDesc;
 	D3D11_SAMPLER_DESC	samplerDesc;
@@ -40,10 +40,10 @@ bool TerrainShader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHA
 
 	// Create the vertex input layout.
 	device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer.data(), vertexShaderBuffer.size(), &m_layout);
-	
+
 
 	//LOAD SHADER:	PIXEL
-	auto pixelShaderBuffer = DX::ReadData(psFilename);	
+	auto pixelShaderBuffer = DX::ReadData(psFilename);
 	result = device->CreatePixelShader(pixelShaderBuffer.data(), pixelShaderBuffer.size(), NULL, &m_pixelShader);
 	if (result != S_OK)
 	{
@@ -105,7 +105,7 @@ bool TerrainShader::InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHA
 	return true;
 }
 
-bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix * world, DirectX::SimpleMath::Matrix * view, DirectX::SimpleMath::Matrix * projection, Light *sceneLight1,
+bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1,
 	ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* desertTexture, ID3D11ShaderResourceView* desert2Texture, ID3D11ShaderResourceView* biome2Texture,
 	ID3D11ShaderResourceView* biome3Texture, ID3D11ShaderResourceView* noiseTexture)
 {
@@ -130,8 +130,8 @@ bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext * context, Dire
 	context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
 	lightPtr->ambient = sceneLight1->getAmbientColour();
-	lightPtr->diffuse = sceneLight1->getDiffuseColour();	
-	lightPtr->position = sceneLight1->getPosition();  
+	lightPtr->diffuse = sceneLight1->getDiffuseColour();
+	lightPtr->position = sceneLight1->getPosition();
 
 
 	context->Unmap(m_lightBuffer, 0);
@@ -156,7 +156,7 @@ bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext * context, Dire
 	return false;
 }
 
-void TerrainShader::EnableShader(ID3D11DeviceContext * context)
+void TerrainShader::EnableShader(ID3D11DeviceContext* context)
 {
 	context->IASetInputLayout(m_layout);							//set the input layout for the shader to match out geometry
 	context->VSSetShader(m_vertexShader.Get(), 0, 0);				//turn on vertex shader

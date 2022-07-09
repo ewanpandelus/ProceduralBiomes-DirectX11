@@ -12,14 +12,14 @@ Shader::~Shader()
 {
 }
 void Shader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* gsFilename, WCHAR* psFilename) {
-	
 
-		// InitShader must be overwritten and it will load both vertex and pixel shaders + setup buffers
-		InitStandard(device, vsFilename, psFilename);
 
-		// Load other required shaders.
-		LoadGeometryShader(device, gsFilename);
-	
+	// InitShader must be overwritten and it will load both vertex and pixel shaders + setup buffers
+	InitStandard(device, vsFilename, psFilename);
+
+	// Load other required shaders.
+	LoadGeometryShader(device, gsFilename);
+
 }
 bool Shader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFilename)
 {
@@ -108,7 +108,7 @@ bool Shader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFile
 	return true;
 }
 
-bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, 
+bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view,
 	DirectX::SimpleMath::Matrix* projection, Light* sceneLight1, ID3D11ShaderResourceView* texture1, float time)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
@@ -187,7 +187,7 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMa
 	bufferNumber = 0;
 	context->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
 
-	
+
 	return false;
 }
 
@@ -195,8 +195,8 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMa
 void Shader::EnableShader(ID3D11DeviceContext* context)
 {
 	context->IASetInputLayout(m_layout);							//set the input layout for the shader to match out geometry
-	context->VSSetShader(m_vertexShader.Get(), 0, 0);			
-	context->GSSetShader(m_geometryShader.Get(), 0, 0);	
+	context->VSSetShader(m_vertexShader.Get(), 0, 0);
+	context->GSSetShader(m_geometryShader.Get(), 0, 0);
 	context->PSSetShader(m_pixelShader.Get(), 0, 0);				//turn on pixel shader
 	// Set the sampler state in the pixel shader.
 	context->PSSetSamplers(0, 1, &m_sampleState);
@@ -243,5 +243,5 @@ void Shader::LoadGeometryShader(ID3D11Device* device, WCHAR* filename)
 
 	geometryShaderBuffer->Release();
 	geometryShaderBuffer = 0;
-	
+
 }

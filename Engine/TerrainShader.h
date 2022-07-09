@@ -15,14 +15,21 @@ public:
 
 	//we could extend this to load in only a vertex shader, only a pixel shader etc.  or specialised init for Geometry or domain shader. 
 	//All the methods here simply create new versions corresponding to your needs
-    bool InitStandard(ID3D11Device * device, WCHAR * vsFilename, WCHAR * psFilename);		//Loads the Vert / pixel Shader pair
-	bool SetBiomeShaderParameters(ID3D11DeviceContext * context, DirectX::SimpleMath::Matrix  *world, DirectX::SimpleMath::Matrix  *view, DirectX::SimpleMath::Matrix  *projection, Light *sceneLight1, 
-		 ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* desertTexture, ID3D11ShaderResourceView* desert2Texture, ID3D11ShaderResourceView* biome2Texture, ID3D11ShaderResourceView* biome3Texture, ID3D11ShaderResourceView* noiseTexture);
-	void EnableShader(ID3D11DeviceContext * context);
+	void InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* gsFilename, WCHAR* psFilename);
+
+	bool InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFilename);		//Loads the Vert / pixel Shader pair
+	bool SetBiomeShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1,
+		ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* desertTexture, ID3D11ShaderResourceView* desert2Texture, ID3D11ShaderResourceView* biome2Texture, ID3D11ShaderResourceView* biome3Texture, ID3D11ShaderResourceView* noiseTexture);
+	void EnableShader(ID3D11DeviceContext* context);
+	float* SetDesertColour();
+	float* SetForestColour();
+
+
+
 
 private:
-	//standard matrix buffer supplied to all shaders
 
+	float m_desertColour[3], m_forestColour[3];
 
 	//buffer to pass in camera world Position
 	struct CameraBufferType
@@ -37,7 +44,16 @@ private:
 		float offset;
 		float excess1;
 	};
+	struct BiomeColourBufferType
+	{
+		DirectX::SimpleMath::Vector4 desertColour;
+		DirectX::SimpleMath::Vector4 forestColour;
+		DirectX::SimpleMath::Vector3 snowColour;
+		float excess2;
+	};
+
 	//Shaders
-	ID3D11Buffer*															m_noiseTextureBuffer;
+	ID3D11Buffer* m_noiseTextureBuffer;
+	ID3D11Buffer* m_biomeColourBuffer;
 };
 
