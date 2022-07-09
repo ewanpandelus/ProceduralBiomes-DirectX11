@@ -204,18 +204,9 @@ void Game::Update(DX::StepTimer const& timer)
         m_Camera01.setPosition(position);
     }
 
-    if (m_gameInputCommands.generate && m_elapsedTime > 0.1f)
+    if (m_gameInputCommands.generate)
     {
-
-        m_poissonPositions.clear();
-        m_poissonPositions = m_poissonDiscSampling.GeneratePoints();
-        m_terrain.GenerateHeightMap(device);
-        m_objectMap.clear();
-        m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
-        m_objectMap =  m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositions);
-        m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
-
-
+        GenerateBiomes(device);
     }
 
     m_Camera01.Update();	//camera update.
@@ -294,8 +285,6 @@ void Game::Render()
 
     SimpleMath::Matrix objectPosition = SimpleMath::Matrix::CreateTranslation(0, 0, 0);
     m_geometryShader.EnableShader(context);
-    float x = 0;
-    float y = 0;
     float index = 0;
     SimpleMath::Matrix objectScale = SimpleMath::Matrix::CreateScale(1);
     float time = m_timer.GetTotalSeconds();
@@ -303,9 +292,8 @@ void Game::Render()
     {
  
         m_world = SimpleMath::Matrix::Identity; //set world back to identity
-        x = m_objectMap[index].x;
-        y = m_objectMap[index].z;
-        objectPosition = SimpleMath::Matrix::CreateTranslation(x - m_regionSize / 2, 0.0f, y - m_regionSize / 2);
+        SimpleMath::Vector3 objPos = m_objectMap[index].position;
+        objectPosition = SimpleMath::Matrix::CreateTranslation(objPos.x - m_regionSize / 2, objPos.y, objPos.z - m_regionSize / 2);
         m_world = m_world * objectPosition * objectScale;
         m_geometryShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
             m_objectMap[index].texture.Get(), m_timer.GetTotalSeconds());
@@ -452,7 +440,7 @@ void Game::CreateDeviceDependentResources()
     
     //load and set up our Vertex and Pixel Shaders
     m_terrainShader.InitStandard(device, L"terrain_vs.cso", L"terrain_ps.cso");
-    m_geometryShader.InitStandard(device, L"triangle_vs.cso", L"triangle_gs.cso", L"triangle_ps.cso");
+    m_geometryShader.InitStandard(device, L"environmentObject_vs.cso", L"environmentObject_gs.cso", L"environmentObject_ps.cso");
     m_standardShader.InitStandard(device, L"object_vs.cso", L"object_ps.cso");
     //load Textures
     m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
@@ -505,6 +493,19 @@ void Game::CreateWindowSizeDependentResources()
     );
 }
 
+void Game::GenerateBiomes(ID3D11Device* device)
+{
+
+    m_poissonPositions.clear();
+    m_poissonPositions = m_poissonDiscSampling.GeneratePoints();
+    m_terrain.GenerateHeightMap(device);
+    m_biomeObjects.SetHeightMap(m_terrain.GetHeightMap());
+    m_objectMap.clear();
+    m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
+    m_objectMap = m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositions);
+    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+}
+
 void Game::SetupGUI()
 {
 
@@ -514,11 +515,11 @@ void Game::SetupGUI()
 
     ImGui::Begin("Noise Texture Param");
     ImGui::SliderFloat("Temp Amplitude", m_climateMap.GetTemperatureAmplitude(), 0.0f, 1.f);
-    ImGui::SliderFloat("Temp Frequency", m_climateMap.GetTemperatureFrequency(), 0.0f, 0.25f);
+    ImGui::SliderFloat("Temp Frequency", m_climateMap.GetTemperatureFrequency(), 0.0f, 0.05f);
     ImGui::SliderFloat("Temp Offset", m_climateMap.GetTemperatureOffset(), 0.0f, 100.f);
 
     ImGui::SliderFloat("Rainfall Amplitude", m_climateMap.GetRainfallAmplitude(), 0.0f, 1.f);
-    ImGui::SliderFloat("Rainfall Frequency", m_climateMap.GetRainfallFrequency(), 0.0f, 0.25f);
+    ImGui::SliderFloat("Rainfall Frequency", m_climateMap.GetRainfallFrequency(), 0.0f, 0.05f);
     ImGui::SliderFloat("Rainfall Offset", m_climateMap.GetRainfallOffset(), 0.0f, 100.f);
 
 
@@ -532,6 +533,14 @@ void Game::SetupGUI()
     ImGui::SliderFloat("Radius", m_poissonDiscSampling.GetRadius(), 0.0f, 30.0f);
     ImGui::End();
 
+    ImGui::SetNextWindowSize(ImVec2(450, 320));
+    ImGui::Begin("Procedural Terrain Parameters");
+    ImGui::SliderFloat("Amplitude", m_terrain.GetAmplitude(), 0.0f, 10.0f);
+    ImGui::SliderFloat("Frequency", m_terrain.GetFrequency(), 0.0f, 2.0f);
+    ImGui::SliderFloat("Lacunarity", m_terrain.GetLacunarity(), 0.0f, 1.0f);
+    ImGui::SliderFloat("Persistance", m_terrain.GetPersistance(), 0.0f, 2.5f);
+    ImGui::SliderInt("Octaves", m_terrain.GetOctaves(), 1.0f, 10.0f);
+    ImGui::End();
 }
 
 

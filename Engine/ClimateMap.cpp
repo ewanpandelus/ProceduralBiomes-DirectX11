@@ -86,9 +86,9 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapT
 			
 				int rValue = m_climateMap[index].climateClassification.x * 255;
 			 	int bValue = m_climateMap[index].climateClassification.y * 255;
-				int gValue = 0;
-				if (rValue > 255 || bValue > 255) {
-					int x = 5;
+				int gValue = m_climateMap[index].climateClassification.z * 255;
+				if (gValue > 255) {
+					int x = 4;
 				}
 				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rValue, bValue, gValue);
 
@@ -158,7 +158,7 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTextur
 				index = ((resolution * j) + i);
 
 
-				float tempPerlinVal = (float)m_perlinNoise.Noise((i * 0.4), (j * 0.4), 1);
+				float tempPerlinVal = (float)m_perlinNoise.Noise((i * 0.05), (j * 0.05), 1);
 				int bwValue = abs(tempPerlinVal * 255);
 				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(bwValue, 0, 0);
 

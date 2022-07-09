@@ -30,8 +30,10 @@ std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingTo
 	for each (auto pos in gridPositions)
 	{
 		SimpleMath::Vector2 positionOnClimateMap = ConvertPointToTerrainPosition(pos.x, pos.y);
+
 		index = (128 * positionOnClimateMap.y) + positionOnClimateMap.x;  //128 is width
-		m_objectMap.push_back(AssignModelBasedOnClimate(pos.x,  pos.y, m_climateMap[index].climateClassification));
+		SimpleMath::Vector3 position = SimpleMath::Vector3 (pos.x, m_heightMap[index].y, pos.y);
+		m_objectMap.push_back(AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification));
 	}
 	return m_objectMap;
 }
@@ -62,7 +64,7 @@ bool BiomeObjects::PickFirstChoice(float percentage, float firstPercentage)
 //
 //
 //}
-BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(float x, float z, SimpleMath::Vector2 climateClassification)
+BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(SimpleMath::Vector3 position, SimpleMath::Vector3 climateClassification)
 {
 	
 	int percentage = rand() % 101;
@@ -70,10 +72,10 @@ BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(float x, f
 	float forestPercent = climateClassification.y * 100;  
 	
 	if (desertPercent > 50) {
-		return SetupObject(desertModel, desertTexture, x, z, 2);
+		return SetupObject(desertModel, desertTexture, position);
 	}
 	else  {
-		return SetupObject(forestModel, forestTexture, x, z, 1);
+		return SetupObject(forestModel, forestTexture, position);
 	}
 	//else  return PickFirstChoice(percentage, forestPercent) ? SetupObject(forestModel, forestTexture, x , z, 1) : SetupObject(desertModel, desertTexture, x, z, 2);
 
@@ -81,13 +83,12 @@ BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(float x, f
 	//https://nbertoa.wordpress.com/2016/02/02/instancing-vs-geometry-shader-vs-vertex-shader/
 
 }
-BiomeObjects::BiomeObjectType BiomeObjects::SetupObject(ModelClass associatedModel, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> associatedTexture, float x, float z, int id)
+BiomeObjects::BiomeObjectType BiomeObjects::SetupObject(ModelClass associatedModel, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> associatedTexture, SimpleMath::Vector3 position)
 {
 	BiomeObjectType biomeObject;
 	biomeObject.model = associatedModel;
 	biomeObject.texture = associatedTexture;
-	biomeObject.x = x;
-	biomeObject.z = z;
+	biomeObject.position = position;
 	return biomeObject;
 }
 void BiomeObjects::SetCellWidth(float cellSize)
@@ -98,4 +99,9 @@ void BiomeObjects::SetCellWidth(float cellSize)
 void BiomeObjects::SetClimateMap(ClimateMap::ClimateMapType* m_climateMap)
 {
 	this->m_climateMap = m_climateMap;
+}
+
+void BiomeObjects::SetHeightMap(Terrain::HeightMapType* m_heightMap)
+{
+	this->m_heightMap = m_heightMap;
 }

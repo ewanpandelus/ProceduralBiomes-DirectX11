@@ -29,7 +29,7 @@ private:
 public:
 	void Initialise();
 	float CalculateDistanceToBiome(float temp, float rainfall, BiomeType biome);
-	SimpleMath::Vector2  CalculateDistanceToAllBiomes(float temp, float rainfall);
+	SimpleMath::Vector3  CalculateDistanceToAllBiomes(float temp, float rainfall);
 
 };
 

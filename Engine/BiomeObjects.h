@@ -2,6 +2,7 @@
 #include "Model.h"
 #include "modelclass.h"
 #include "ClimateMap.h"
+#include "Terrain.h" 
 class BiomeObjects
 {
 public:
@@ -13,9 +14,11 @@ public:
 
 	void SetCellWidth(float cellWidth);
 	void SetClimateMap(ClimateMap::ClimateMapType* m_climateMap);
+	void SetHeightMap(Terrain::HeightMapType* m_heightMap);
+
 	struct BiomeObjectType
 	{
-		float x, z;
+		SimpleMath::Vector3 position;
 		ModelClass model;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture;
 	};
@@ -28,8 +31,11 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture, forestTexture, snowTexture;
 	float currentCellWidth = 0;
 	ClimateMap::ClimateMapType* m_climateMap;
-	BiomeObjectType AssignModelBasedOnClimate(float x, float z, SimpleMath::Vector2 climateClassification);
-	BiomeObjectType SetupObject(ModelClass specificModel, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> associatedTexture,float x,float z, int id);
+	Terrain::HeightMapType* m_heightMap;
+
+
+	BiomeObjectType AssignModelBasedOnClimate(SimpleMath::Vector3 position,  SimpleMath::Vector3 climateClassification);
+	BiomeObjectType SetupObject(ModelClass specificModel, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> associatedTexture, SimpleMath::Vector3 position);
 
 
 	

@@ -24,9 +24,12 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	m_terrainWidth = terrainWidth;
 	m_terrainHeight = terrainHeight;
 
-	m_frequency = m_terrainWidth / 20;
-	m_amplitude = 3.0;
-	m_wavelength = 1;
+	m_frequency = .2f;
+	m_amplitude = 0.5;
+	m_lacunarity = 0.5;
+	m_octaves = 3;
+	m_offset = 0.01;
+	m_persistance = 1.25f;
 
 	// Create the structure to hold the terrain data.
 	m_heightMap = new HeightMapType[m_terrainWidth * m_terrainHeight];
@@ -423,13 +426,10 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 	bool result;
 
 	int index;
-	float height = 0.0;
 
-	m_frequency = (6.283 / m_terrainHeight) / m_wavelength; //we want a wavelength of 1 to be a single wave over the whole terrain.  A single wave is 2 pi which is about 6.283
 
-	//loop through the terrain and set the hieghts how we want. This is where we generate the terrain
-	//in this case I will run a sin-wave through the terrain in one axis.
-
+	float initialAmp = m_amplitude;
+	float initialFrequency = m_frequency;
 	for (int j = 0; j < m_terrainHeight; j++)
 	{
 		for (int i = 0; i < m_terrainWidth; i++)
@@ -437,10 +437,24 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 			index = (m_terrainHeight * j) + i;
 
 			m_heightMap[index].x = (float)i;
-			m_heightMap[index].y = (float)perlinNoise.Noise(i * 0.2f, j * 0.2f, 1)*3;
+	
 			m_heightMap[index].z = (float)j;
+			float noiseHeight = 0;
+
+			m_amplitude = initialAmp;
+			m_frequency = initialFrequency;
+			for (int octave = 0; octave < m_octaves; octave++) {
+				float perlinValue = (float)perlinNoise.Noise(i * m_frequency, j * m_frequency, 1);
+				noiseHeight += perlinValue * m_amplitude;
+				m_amplitude *= m_persistance;
+				m_frequency *= m_lacunarity;
+			}
+			m_heightMap[index].y = noiseHeight;
+
 		}
 	}
+	m_amplitude = initialAmp;
+	m_frequency = initialFrequency;
 	result = true;
 	result = CalculateNormals();
 	if (!result)
@@ -466,12 +480,38 @@ bool Terrain::Update()
 	return true;
 }
 
-float* Terrain::GetWavelength()
-{
-	return &m_wavelength;
-}
 
 float* Terrain::GetAmplitude()
 {
 	return &m_amplitude;
 }
+Terrain::HeightMapType* Terrain::GetHeightMap()
+{
+	return m_heightMap;
+}
+float* Terrain::GetFrequency()
+{
+	return &m_frequency;
+}
+int* Terrain::GetOctaves()
+{
+	return &m_octaves;
+
+}
+float* Terrain::GetLacunarity()
+{
+	return &m_lacunarity;
+
+}
+float* Terrain::GetOffset()
+{
+
+	return &m_offset;
+
+}
+
+float* Terrain::GetPersistance()
+{
+	return &m_persistance;
+}
+

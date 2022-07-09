@@ -68,6 +68,7 @@ private:
     void Clear();
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
+    void GenerateBiomes(ID3D11Device* device);
 	void SetupGUI();
 
     // Device resources.

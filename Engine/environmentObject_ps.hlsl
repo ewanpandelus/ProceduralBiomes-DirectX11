@@ -40,7 +40,7 @@ float4 main(InputType input) : SV_TARGET
     float3 position3D = (float3)mul(input.position, worldMatrix);
     // Invert the light direction for calculations.
 
-    lightDir = normalize(position3D - lightPosition);
+    lightDir = float3(0.5, -0.5, 0.5);// normalize(position3D - lightPosition);
 
     // Calculate the amount of light on this pixel.
     lightIntensity = saturate(dot(input.normal, -lightDir));

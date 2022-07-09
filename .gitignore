@@ -88,3 +88,8 @@ Engine/DirectXTKSimpleSample_2015.vcxproj
 *.filters
 *.vcxproj
 *.db-shm
+*.db-shm
+*.vcxproj
+*.filters
+Engine/DirectXTKSimpleSample_2015.vcxproj
+Engine/DirectXTKSimpleSample_2015.vcxproj.filters

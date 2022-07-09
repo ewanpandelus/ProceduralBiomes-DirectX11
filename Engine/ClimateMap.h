@@ -22,7 +22,7 @@ public:
 		float x, z;
 		float temperature;
 		float rainfall;
-		SimpleMath::Vector2 climateClassification;
+		SimpleMath::Vector3 climateClassification;
 	};
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>  GenerateClimateMapTexture(ID3D11Device* device);

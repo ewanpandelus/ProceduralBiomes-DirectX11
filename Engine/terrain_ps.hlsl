@@ -45,14 +45,14 @@ float4 main(InputType input) : SV_TARGET
 
     float4	snowColor;
 
-    float4 desertCol1 = float4(0.886, 0.733, 0.007, 1);
-    float4 desertCol2 = float4(0.941, 0.965, 0.176,1);
+    float4 desertCol1 = float4(0.95, 0.77, 0.5, 1);
+    float4 desertCol2 = float4(1, 0.8, 0.6,1);
     float4 desertCol;
 
 
 
-    float4 forestCol1 = float4(0, 0.69, 0.35, 1);
-    float4 forestCol2 = float4(0, 0.769, 0.024, 1);
+    float4 forestCol1 = float4(0.2, 0.67, 0.335, 1);
+    float4 forestCol2 = float4(0, 0.67, 0.032, 1);
     float4 forestCol;
 
 
@@ -63,7 +63,7 @@ float4 main(InputType input) : SV_TARGET
     float4	color;
 
     // Invert the light direction for calculations.
-    lightDir = normalize(input.position3D - lightPosition);
+    lightDir = float3(0.5, -0.5, 0.5);// lightDir = normalize(input.position3D - lightPosition);
 
     // Calculate the amount of light on this pixel.
     lightIntensity = saturate(dot(input.normal, -lightDir));
@@ -85,21 +85,21 @@ float4 main(InputType input) : SV_TARGET
 
 
     desertCol = lerp(desertCol1, desertCol2, noiseTex.r);
+ //   desertCol = lerp(float4(1, 1, 1, 1), float4(0.7, 0.7, 0.9, 1), noiseTex.r);
     forestCol = lerp(forestCol1, forestCol2, noiseTex.r);
-    desertCol = lerp(desertCol, desertTex1, 0.2);
-    forestCol = lerp(forestCol, forestTex, 0.2);
+    forestCol = lerp(forestCol, forestTex, 0.1);
 
 ;
 //forestColor  = lerp(desertColor, float4(0, 1, 0, 1), .4);
 
-snowColor = snowTexture.Sample(SampleType, input.tex);
+    snowColor = lerp(float4(1,1,1,1),snowTexture.Sample(SampleType, input.tex),0.02);
 
 
 
-desertCol = textureColor.r * desertCol;
-forestCol = textureColor.g * forestCol;
-snowColor = textureColor.b * snowColor;
-return color * saturate(desertCol + forestCol + snowColor);
+    desertCol = textureColor.r * desertCol;
+    forestCol = textureColor.g * forestCol;
+    snowColor = textureColor.b * snowColor;
+    return color * saturate(desertCol + forestCol + snowColor);
 
 
 }
