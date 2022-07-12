@@ -1,8 +1,4 @@
 Texture2D biomesTexture : register(t0);
-Texture2D desertTexture : register(t1);
-Texture2D forestTexture : register(t2);
-Texture2D snowTexture : register(t3);
-Texture2D desert2Texture : register(t4);
 Texture2D noiseTexture : register(t5);
 
 SamplerState SampleType : register(s0);
@@ -75,24 +71,21 @@ float4 main(InputType input) : SV_TARGET
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
 
     textureColor = biomesTexture.Sample(SampleType, input.tex / 5);
-    desertTex1 = desertTexture.Sample(SampleType, input.tex * 5);
-    forestTex = forestTexture.Sample(SampleType, input.tex * 5);
-
-    desertTex2 = desert2Texture.Sample(SampleType, input.tex);
+   
     noiseTex = noiseTexture.Sample(SampleType, input.tex / 5);
 
 
 
 
-    desertCol = lerp(desertCol1, desertCol2, noiseTex.r);
+      desertCol = lerp(desertCol1, desertCol2, noiseTex.r);
     //   desertCol = lerp(float4(1, 1, 1, 1), float4(0.7, 0.7, 0.9, 1), noiseTex.r);
        forestCol = lerp(forestCol1, forestCol2, noiseTex.r);
-       forestCol = lerp(forestCol, forestTex, 0.1);
+   
 
    ;
    //forestColor  = lerp(desertColor, float4(0, 1, 0, 1), .4);
 
-       snowColor = lerp(float4(1,1,1,1),snowTexture.Sample(SampleType, input.tex),0.02);
+      snowColor = float4(1, 1, 1, 1);
 
 
 

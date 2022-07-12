@@ -19,7 +19,7 @@ public:
 
 	bool InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFilename);		//Loads the Vert / pixel Shader pair
 	bool SetBiomeShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1,
-		ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* desertTexture, ID3D11ShaderResourceView* desert2Texture, ID3D11ShaderResourceView* biome2Texture, ID3D11ShaderResourceView* biome3Texture, ID3D11ShaderResourceView* noiseTexture);
+		ID3D11ShaderResourceView* noiseTemperatureTexture,  ID3D11ShaderResourceView* noiseTexture);
 	void EnableShader(ID3D11DeviceContext* context);
 	float* SetDesertColour();
 	float* SetForestColour();

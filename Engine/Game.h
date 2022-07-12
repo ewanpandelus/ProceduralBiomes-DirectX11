@@ -107,14 +107,15 @@ private:
 
 
 
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_grassTexture;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestTreeTexture;
+
+
+
+
+    //Snow
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTreeTextures;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTexture;
 
-    //Desert
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desertTexture;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desert2Texture;
+
 
 
 
@@ -132,12 +133,55 @@ private:
 
 	//Scene. 
 	Terrain																	m_terrain;
-    ModelClass																m_forestTreeModel;
-    ModelClass																m_snowTreeModel;
+ 
 
-	ModelClass																m_BasicModel;
-	ModelClass																m_desertModel;
-	ModelClass																m_BasicModel3;
+
+
+
+    //Desert Models
+	ModelClass																m_cactusModel;
+    ModelClass																m_cactusModel2;
+    ModelClass																m_cactusModel3;
+    ModelClass																m_cactusModel4;
+    ModelClass																m_aloe;
+
+
+
+    ModelClass																m_rockModel;
+
+    //Desert Textures
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desertTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desertTexture2;
+
+
+
+
+    //Forest Models
+    ModelClass																m_forestTreeModel;
+    ModelClass																m_forestGrassModel;
+    ModelClass																m_forestGrassModel2;
+    ModelClass																m_forestGrassModel3;
+    ModelClass																m_forestGrassRockModel;
+
+
+
+
+    ModelClass																m_forestFlowerModel;
+
+    //Forest Textures
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestTreeColdTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestTreeColdTexture2;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestGrassTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestDetailsTexture;
+
+
+
+
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestColourPalletTexture;
+
+
+    //Snow Biome 
+    ModelClass																m_snowTreeModel;
 
 	//RenderTextures
 	RenderTexture*															m_FirstRenderPass;

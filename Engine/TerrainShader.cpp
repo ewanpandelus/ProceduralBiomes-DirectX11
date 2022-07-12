@@ -106,8 +106,7 @@ bool TerrainShader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR*
 }
 
 bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1,
-	ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* desertTexture, ID3D11ShaderResourceView* desert2Texture, ID3D11ShaderResourceView* biome2Texture,
-	ID3D11ShaderResourceView* biome3Texture, ID3D11ShaderResourceView* noiseTexture)
+	ID3D11ShaderResourceView* noiseTemperatureTexture, ID3D11ShaderResourceView* noiseTexture)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
@@ -145,11 +144,7 @@ bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext* context, Direc
 
 	//pass the desired texture to the pixel shader.
 	context->PSSetShaderResources(0, 1, &noiseTemperatureTexture);
-	context->PSSetShaderResources(1, 1, &desertTexture);
-	context->PSSetShaderResources(2, 1, &biome2Texture);
-	context->PSSetShaderResources(3, 1, &biome3Texture);
-	context->PSSetShaderResources(4, 1, &desert2Texture);
-	context->PSSetShaderResources(5, 1, &noiseTexture);
+	context->PSSetShaderResources(1, 1, &noiseTexture);
 
 
 

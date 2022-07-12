@@ -154,7 +154,13 @@
     <Image Include="directx.ico">
       <Filter>Assets</Filter>
     </Image>
-    <Image Include="desert.jpg">
+    <Image Include="Texture.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="details.png">
+      <Filter>Assets</Filter>
+    </Image>
+    <Image Include="polydesert_atlas.png">
       <Filter>Assets</Filter>
     </Image>
   </ItemGroup>

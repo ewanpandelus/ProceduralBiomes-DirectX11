@@ -236,8 +236,10 @@
     <None Include="SegoeUI_18.spritefont" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="desert.jpg" />
+    <Image Include="details.png" />
     <Image Include="directx.ico" />
+    <Image Include="polydesert_atlas.png" />
+    <Image Include="Texture.png" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="environmentObject_gs.hlsl">
