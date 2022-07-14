@@ -11,13 +11,14 @@
 #include "Camera.h"
 #include "RenderTexture.h"
 #include "Terrain.h"
+#include "Water.h"
 #include "PoissonDiscSampling.h"
 #include "DepthTexture.h"
 #include "TerrainShader.h"
 #include "Shader.h"
 #include "ClimateMap.h"
 #include "BiomeObjects.h"
-
+#include "WaterShader.h"
 
 
 
@@ -70,6 +71,10 @@ private:
     void CreateWindowSizeDependentResources();
     void GenerateBiomes(ID3D11Device* device);
 	void SetupGUI();
+    void SetupDesertBiome(ID3D11Device* device);
+    void SetupForestBiome(ID3D11Device* device);
+    void SetupSnowBiome(ID3D11Device* device);
+
 
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
@@ -103,6 +108,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedClimateMapTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedRainfallMapTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_noiseTexture;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_depthTexture;
 
 
 
@@ -126,28 +132,29 @@ private:
 	//Shaders
 	TerrainShader														    m_terrainShader;
     Shader														            m_standardShader;
-
+    WaterShader														        m_waterShader;
     Shader                                                                  m_geometryShader;
   
 
 
 	//Scene. 
-	Terrain																	m_terrain;
+    Terrain																	m_terrain;
+    Water																	m_water;;
  
 
 
 
 
     //Desert Models
-	ModelClass																m_cactusModel;
-    ModelClass																m_cactusModel2;
-    ModelClass																m_cactusModel3;
-    ModelClass																m_cactusModel4;
-    ModelClass																m_aloe;
+	ModelClass																m_desertCactus;
+    ModelClass																m_desesrtCactus2;
+    ModelClass																m_desertCactus3;
+    ModelClass																m_desertCactus4;
+    ModelClass																m_desertAloe;
 
 
 
-    ModelClass																m_rockModel;
+    ModelClass																m_desertRock;
 
     //Desert Textures
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_desertTexture;
@@ -212,18 +219,19 @@ private:
 
     BiomeObjects                                                            m_biomeObjects;
     std::vector<BiomeObjects::BiomeObjectType>                              m_objectMap;
-    DepthTexture                                                            m_depthTexture;
+    DepthTexture                                                            m_depthTextureClass;
     ClimateMap                                                              m_climateMap;
     PoissonDiscSampling                                                     m_poissonDiscSampling;
 
 
 
-    bool                                                                    m_flickBetweenMaps = false;
     float                                                                   m_elapsedTime = 0;
 
     std::vector<SimpleMath::Vector2>                                        m_poissonPositions;
     int                                                                     m_regionSize;
+    int                                                                     m_terrainWidth = 64;
 
-
+    float xOffset = -63.4f;
+    float zOffset = -63.0f;
  
 };

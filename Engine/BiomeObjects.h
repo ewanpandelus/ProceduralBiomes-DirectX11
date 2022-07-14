@@ -9,7 +9,7 @@ public:
 	void SetLargeModels(ModelClass desertModel, ModelClass forestModel, ModelClass snowModel);
 	void SetLargeModelsTextures(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> forestTexture,
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> snowTexture);
-	SimpleMath::Vector2 ConvertPointToTerrainPosition(int x, int y);
+
 
 
 	void SetCellWidth(float cellWidth);
@@ -28,7 +28,7 @@ public:
 		ModelClass model;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture;
 	};
-	std::vector<BiomeObjectType> SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions);
+	std::vector<BiomeObjectType> SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions, int terrainWidth);
 
 	void AddToObjects(ModelClass model, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture, int biomeType);
 	

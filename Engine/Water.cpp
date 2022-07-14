@@ -1,18 +1,18 @@
 #include "pch.h"
-#include "Terrain.h"
+#include "Water.h"
 
 
-Terrain::Terrain()
+Water::Water()
 {
 	m_terrainGeneratedToggle = false;
 }
 
 
-Terrain::~Terrain()
+Water::~Water()
 {
 }
 
-bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight)
+bool Water::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight)
 {
 
 	perlinNoise.Initialize();
@@ -47,9 +47,9 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 		{
 			index = (m_terrainHeight * j) + i;
 
-			m_heightMap[index].x = (float)i*2;
+			m_heightMap[index].x = (float)i;
 			m_heightMap[index].y = (float)0;//perlinNoise.SimplexNoise(i * 0.1f, j * 0.1f) *2.f;
-			m_heightMap[index].z = (float)j*2;
+			m_heightMap[index].z = (float)j;
 
 			//and use this step to calculate the texture coordinates for this point on the terrain.
 			m_heightMap[index].u = (float)i * textureCoordinatesStep;
@@ -77,7 +77,7 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 	return true;
 }
 
-void Terrain::Render(ID3D11DeviceContext* deviceContext)
+void Water::Render(ID3D11DeviceContext* deviceContext)
 {
 	deviceContext->GSSetShader(NULL, NULL, 0);
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
@@ -89,7 +89,7 @@ void Terrain::Render(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
-bool Terrain::CalculateNormals()
+bool Water::CalculateNormals()
 {
 	int i, j, index1, index2, index3, index, count;
 	float vertex1[3], vertex2[3], vertex3[3], vector1[3], vector2[3], sum[3], length;
@@ -225,7 +225,7 @@ bool Terrain::CalculateNormals()
 	return true;
 }
 
-void Terrain::Shutdown()
+void Water::Shutdown()
 {
 	// Release the index buffer.
 	if (m_indexBuffer)
@@ -244,9 +244,8 @@ void Terrain::Shutdown()
 	return;
 }
 
-bool Terrain::InitializeBuffers(ID3D11Device* device)
+bool Water::InitializeBuffers(ID3D11Device* device)
 {
-
 	VertexType* vertices;
 	unsigned long* indices;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
@@ -302,6 +301,7 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 
 			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index3].x, m_heightMap[index3].y, m_heightMap[index3].z);
 			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index3].nx, m_heightMap[index3].ny, m_heightMap[index3].nz);
+			vertices[index].normal = DirectX::SimpleMath::Vector3(m_terrainHeightMap[index3].x, m_terrainHeightMap[index3].y, m_terrainHeightMap[index3].z);
 			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index3].u, m_heightMap[index3].v);
 			indices[index] = index;
 			index++;
@@ -311,6 +311,8 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			// Upper right.
 			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
 			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index4].nx, m_heightMap[index4].ny, m_heightMap[index4].nz);
+			vertices[index].normal = DirectX::SimpleMath::Vector3(m_terrainHeightMap[index4].x, m_terrainHeightMap[index4].y, m_terrainHeightMap[index4].z);
+
 			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index4].u, m_heightMap[index4].v);
 			indices[index] = index;
 			index++;
@@ -318,8 +320,10 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 
 			// Bottom left.
 			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
-			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index1].nx, m_heightMap[index1].ny, m_heightMap[index1].nz);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index1].u, m_heightMap[index1].v);
+	        vertices[index].normal = DirectX::SimpleMath::Vector3(m_terrainHeightMap[index1].x, m_terrainHeightMap[index1].y, m_terrainHeightMap[index1].z);
+
+
+			//vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index1].u, m_heightMap[index1].v);
 			indices[index] = index;
 			index++;
 
@@ -328,6 +332,8 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
 			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index1].nx, m_heightMap[index1].ny, m_heightMap[index1].nz);
 			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index1].u, m_heightMap[index1].v);
+			vertices[index].normal = DirectX::SimpleMath::Vector3(m_terrainHeightMap[index1].x, m_terrainHeightMap[index1].y, m_terrainHeightMap[index1].z);
+
 			indices[index] = index;
 			index++;
 
@@ -336,6 +342,9 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
 			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index4].nx, m_heightMap[index4].ny, m_heightMap[index4].nz);
 			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index4].u, m_heightMap[index4].v);
+			vertices[index].normal = DirectX::SimpleMath::Vector3(m_terrainHeightMap[index4].x, m_terrainHeightMap[index4].y, m_terrainHeightMap[index4].z);
+
+
 			indices[index] = index;
 			index++;
 
@@ -344,6 +353,10 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index2].x, m_heightMap[index2].y, m_heightMap[index2].z);
 			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index2].nx, m_heightMap[index2].ny, m_heightMap[index2].nz);
 			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index2].u, m_heightMap[index2].v);
+			vertices[index].normal = DirectX::SimpleMath::Vector3(m_terrainHeightMap[index2].x, m_terrainHeightMap[index2].y, m_terrainHeightMap[index4].z);
+
+
+
 			indices[index] = index;
 			index++;
 		}
@@ -399,7 +412,7 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 	return true;
 }
 
-void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
+void Water::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
 	unsigned int stride;
 	unsigned int offset;
@@ -420,11 +433,11 @@ void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
-bool Terrain::GenerateHeightMap(ID3D11Device* device)
+bool Water::GenerateHeightMap(ID3D11Device* device)
 {
 	Shutdown();
 	bool result;
-	float maxDepth = 1000;
+
 	int index;
 
 
@@ -436,29 +449,25 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 		{
 			index = (m_terrainHeight * j) + i;
 
-			m_heightMap[index].x = (float)i*2;
+			m_heightMap[index].x = (float)i;
 
-			m_heightMap[index].z = (float)j*2;
+			m_heightMap[index].z = (float)j;
 			float noiseHeight = 0;
 
 			m_amplitude = initialAmp;
 			m_frequency = initialFrequency;
 			for (int octave = 0; octave < m_octaves; octave++) {
-				float perlinValue = (float)perlinNoise.Noise(i * m_frequency, j * m_frequency, 1);
+				float perlinValue = 0;
 				noiseHeight += perlinValue * m_amplitude;
 				m_amplitude *= m_persistance;
 				m_frequency *= m_lacunarity;
 			}
 			m_heightMap[index].y = noiseHeight;
-			if (noiseHeight < 0 && noiseHeight < maxDepth) {
-				maxDepth = noiseHeight;
-			}
 
 		}
 	}
 	m_amplitude = initialAmp;
 	m_frequency = initialFrequency;
-	m_maxDepth = maxDepth;
 	result = true;
 	result = CalculateNormals();
 	if (!result)
@@ -472,51 +481,47 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 	}
 
 }
-float Terrain::Redistribution(float x, float y, float exponent) {
-	float e0 = 1 * perlinNoise.Noise(x * 0.1f, y * 0.1f, 1);
-	float e1 = 0.5 * perlinNoise.Noise(2 * x * 0.1f, 2 * y * 0.1f, 1) * e0;
-	float e2 = 0.25 * perlinNoise.Noise(4 * x * 0.1f, 4 * y * 0.1f, 1) * (e0 + e1);
-	float e = (e0 + e1 + e2) / (1 + 0.5 + 0.25);
-	return round(e * exponent) / exponent;
-}
-bool Terrain::Update()
+
+bool Water::Update()
 {
 	return true;
 }
 
-float Terrain:: GetMaxDepth() {
-	return m_maxDepth;
-}
-float* Terrain::GetAmplitude()
+
+float* Water::GetAmplitude()
 {
 	return &m_amplitude;
 }
-Terrain::HeightMapType* Terrain::GetHeightMap()
+Water::HeightMapType* Water::GetHeightMap()
 {
 	return m_heightMap;
 }
-float* Terrain::GetFrequency()
+void Water::SetTerrainHeightMap(Terrain terrain)
+{
+	m_terrainHeightMap = terrain.GetHeightMap();
+}
+float* Water::GetFrequency()
 {
 	return &m_frequency;
 }
-int* Terrain::GetOctaves()
+int* Water::GetOctaves()
 {
 	return &m_octaves;
 
 }
-float* Terrain::GetLacunarity()
+float* Water::GetLacunarity()
 {
 	return &m_lacunarity;
 
 }
-float* Terrain::GetOffset()
+float* Water::GetOffset()
 {
 
 	return &m_offset;
 
 }
 
-float* Terrain::GetPersistance()
+float* Water::GetPersistance()
 {
 	return &m_persistance;
 }

@@ -29,7 +29,8 @@ std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 	{
 		return points;
 	}
-
+	float min = 1000;
+	float maximum = -1000;
 
 	InitialiseGrid(cols, rows);
 	std::vector<SimpleMath::Vector2> active;
@@ -67,6 +68,12 @@ std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 			{
 				m_grid[col][row] = sample;
 				candidateAccepted = true;
+				if (sample.x > maximum || sample.y > maximum) {
+					maximum = std::max(sample.x, sample.y);
+				}
+				if (sample.x < min || sample.y < min) {
+					min = std::min(sample.x, sample.y);
+				}
 				active.push_back(sample);
 				points.push_back(sample);
 				break;

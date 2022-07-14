@@ -18,20 +18,16 @@ void BiomeObjects::SetLargeModelsTextures(Microsoft::WRL::ComPtr<ID3D11ShaderRes
 	this->snowTexture = snowTexture;
 }
 
-SimpleMath::Vector2 BiomeObjects::ConvertPointToTerrainPosition(int x, int y)
-{
-	return SimpleMath::Vector2((int)(x), (int)(y));
-}
 
-std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions)
+std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions, int terrainWidth)
 {
 	std::vector<BiomeObjects::BiomeObjectType> m_objectMap;
 	int index = 0;
 	for each (auto pos in gridPositions)
 	{
-		SimpleMath::Vector2 positionOnClimateMap = ConvertPointToTerrainPosition(pos.x, pos.y);
+		SimpleMath::Vector2 positionOnClimateMap =SimpleMath::Vector2((int)pos.x, (int)pos.y);
 
-		index = (128 * positionOnClimateMap.y) + positionOnClimateMap.x;  //128 is width
+		index = (terrainWidth * positionOnClimateMap.y) + positionOnClimateMap.x;  
 		SimpleMath::Vector3 position = SimpleMath::Vector3(pos.x, m_heightMap[index].y, pos.y);
 		m_objectMap.push_back(AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification));
 	}
@@ -88,15 +84,15 @@ BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(SimpleMath
 	float desertPercent = climateClassification.x * 100;
 	float forestPercent = climateClassification.y * 100;
 	float snowPercent = climateClassification.z * 100;
-	if (desertPercent > 60 || percentage < desertPercent) {
+	if (desertPercent > 55 || percentage < desertPercent) {
 		BiomeObjects::ObjectType obj = GetRandomObjectFromBiome(0);
 		return SetupObject(obj.model, obj.texture, position);
 	}
-	if (forestPercent > 60 || (percentage < desertPercent + forestPercent)) {
+	if (forestPercent > 55 || (percentage < desertPercent + forestPercent)) {
 		BiomeObjects::ObjectType obj = GetRandomObjectFromBiome(1);
 		return SetupObject(obj.model, obj.texture, position);
 	}
-	if (snowPercent > 60 || percentage <= (desertPercent + forestPercent + snowPercent+0.01f)) {
+	if (snowPercent > 55 || percentage <= (desertPercent + forestPercent + snowPercent+0.01f)) {
 		BiomeObjects::ObjectType obj = GetRandomObjectFromBiome(2);
 		return SetupObject(obj.model, obj.texture, position);
 	}

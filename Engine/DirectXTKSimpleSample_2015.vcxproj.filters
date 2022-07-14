@@ -79,6 +79,12 @@
     <ClInclude Include="Shader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Water.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterShader.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -135,6 +141,12 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="Water.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="WaterShader.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -152,15 +164,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="directx.ico">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="Texture.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="details.png">
-      <Filter>Assets</Filter>
-    </Image>
-    <Image Include="polydesert_atlas.png">
       <Filter>Assets</Filter>
     </Image>
   </ItemGroup>
@@ -184,6 +187,12 @@
       <Filter>Assets</Filter>
     </FxCompile>
     <FxCompile Include="environmentObject_gs.hlsl">
+      <Filter>Assets</Filter>
+    </FxCompile>
+    <FxCompile Include="water_vs.hlsl">
+      <Filter>Assets</Filter>
+    </FxCompile>
+    <FxCompile Include="water_ps.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
   </ItemGroup>

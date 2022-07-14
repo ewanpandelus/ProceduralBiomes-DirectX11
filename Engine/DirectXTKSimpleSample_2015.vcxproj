@@ -193,6 +193,8 @@
     <ClInclude Include="StepTimer.h" />
     <ClInclude Include="ClimateMap.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="Water.h" />
+    <ClInclude Include="WaterShader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BiomeClassifier.cpp" />
@@ -224,6 +226,8 @@
     <ClCompile Include="TerrainShader.cpp" />
     <ClCompile Include="ClimateMap.cpp" />
     <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="Water.cpp" />
+    <ClCompile Include="WaterShader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />
@@ -236,10 +240,7 @@
     <None Include="SegoeUI_18.spritefont" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="details.png" />
     <Image Include="directx.ico" />
-    <Image Include="polydesert_atlas.png" />
-    <Image Include="Texture.png" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="environmentObject_gs.hlsl">
@@ -272,6 +273,18 @@
     </FxCompile>
     <FxCompile Include="terrain_vs.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    </FxCompile>
+    <FxCompile Include="water_ps.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+    </FxCompile>
+    <FxCompile Include="water_vs.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

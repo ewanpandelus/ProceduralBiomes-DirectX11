@@ -1,9 +1,10 @@
 #pragma once
 #include "PerlinNoise.h"
+#include "Terrain.h"
 
 using namespace DirectX;
 
-class Terrain
+class Water
 {
 public:
 	struct HeightMapType
@@ -21,22 +22,23 @@ private:
 	};
 
 public:
-	Terrain();
-	~Terrain();
+	Water();
+	~Water();
 
 	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight);
 	void Render(ID3D11DeviceContext*);
 	bool GenerateHeightMap(ID3D11Device*);
 	bool Update();
-
+	float pressed = -0.1f;
 	float* GetPersistance();
 	int* GetOctaves();
 	float* GetLacunarity();
 	float* GetOffset();
 	float* GetFrequency();
 	float* GetAmplitude();
-	float GetMaxDepth();
 	HeightMapType* GetHeightMap();
+
+	void SetTerrainHeightMap(Terrain terrain);
 
 private:
 	bool CalculateNormals();
@@ -44,11 +46,9 @@ private:
 	bool InitializeBuffers(ID3D11Device*);
 	void RenderBuffers(ID3D11DeviceContext*);
 	float Redistribution(float nx, float ny, float exp);
-
-
+	Terrain::HeightMapType* m_terrainHeightMap;
 private:
 	bool m_terrainGeneratedToggle;
-	float m_maxDepth;
 	int m_terrainWidth, m_terrainHeight;
 	ID3D11Buffer* m_vertexBuffer, * m_indexBuffer;
 	int m_vertexCount, m_indexCount;
@@ -63,4 +63,5 @@ private:
 
 
 };
+
 
