@@ -24,9 +24,9 @@ public:
 	Terrain();
 	~Terrain();
 
-	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight);
+	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight, int scaleIncrease);
 	void Render(ID3D11DeviceContext*);
-	bool GenerateHeightMap(ID3D11Device*);
+	bool GenerateHeightMap(ID3D11Device*, int scaleIncrease);
 	bool Update();
 
 	float* GetPersistance();

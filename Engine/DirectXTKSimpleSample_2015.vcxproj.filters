@@ -85,6 +85,9 @@
     <ClInclude Include="WaterShader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="TerrainLoader.h">
+      <Filter>Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -145,6 +148,9 @@
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="WaterShader.cpp">
+      <Filter>Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="TerrainLoader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
   </ItemGroup>

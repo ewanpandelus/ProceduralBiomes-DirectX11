@@ -278,7 +278,7 @@ void Game::Render()
 
         m_world = SimpleMath::Matrix::Identity; //set world back to identity
         SimpleMath::Vector3 objPos = m_objectMap[index].position;
-        objectPosition = SimpleMath::Matrix::CreateTranslation((objPos.x*2) + xOffset, objPos.y, (objPos.z*2) + zOffset);
+        objectPosition = SimpleMath::Matrix::CreateTranslation((objPos.x*m_terrainScale)-m_terrainWidth + xOffset, objPos.y, (objPos.z*m_terrainScale)-m_terrainWidth + zOffset);
 
 
         m_world = m_world * objectPosition;
@@ -289,8 +289,7 @@ void Game::Render()
         index++;
     }
 
-
-
+    
 
 
 
@@ -322,13 +321,13 @@ void Game::GenerateBiomes(ID3D11Device* device)
 
     m_poissonPositions.clear();
     m_poissonPositions = m_poissonDiscSampling.GeneratePoints();
-    m_terrain.GenerateHeightMap(device);
+    m_terrain.GenerateHeightMap(device, m_terrainScale);
     m_biomeObjects.SetHeightMap(m_terrain.GetHeightMap());
     m_objectMap.clear();
     m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
     m_objectMap = m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositions, m_terrainWidth);
-    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device, m_terrainWidth);
-    m_water.GenerateHeightMap(device);
+    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+   // m_water.GenerateHeightMap(device);
 }
 
 // Helper method to clear the back buffers.
@@ -428,7 +427,12 @@ void Game::CreateDeviceDependentResources()
     m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
 
     //setup our terrain
-    m_terrain.Initialize(device, m_terrainWidth, m_terrainWidth);
+    m_terrain.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
+   // m_terrainLoader.Initialise(device, m_terrainWidth);
+    m_terrainMap = m_terrainLoader.GetTerrainMap();
+
+    *m_poissonDiscSampling.GetSampleRegionSize() = m_terrainWidth - 1;
+
     m_water.SetTerrainHeightMap(m_terrain);
     m_water.Initialize(device, m_terrainWidth, m_terrainWidth);
 
@@ -448,7 +452,7 @@ void Game::CreateDeviceDependentResources()
 
 
     //load Textures
-    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device, m_terrainWidth);
+    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
     m_noiseTexture = m_climateMap.GenerateNoiseTexture(device);
     //DesertBiome    
     SetupDesertBiome(device);

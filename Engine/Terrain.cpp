@@ -12,7 +12,7 @@ Terrain::~Terrain()
 {
 }
 
-bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight)
+bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight, int scaleIncrease)
 {
 
 	perlinNoise.Initialize();
@@ -47,9 +47,9 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 		{
 			index = (m_terrainHeight * j) + i;
 
-			m_heightMap[index].x = (float)i*2;
-			m_heightMap[index].y = (float)0;//perlinNoise.SimplexNoise(i * 0.1f, j * 0.1f) *2.f;
-			m_heightMap[index].z = (float)j*2;
+			m_heightMap[index].x = (float)i*scaleIncrease;
+			m_heightMap[index].y = (float)0;
+			m_heightMap[index].z = (float)j*scaleIncrease;
 
 			//and use this step to calculate the texture coordinates for this point on the terrain.
 			m_heightMap[index].u = (float)i * textureCoordinatesStep;
@@ -420,7 +420,7 @@ void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
-bool Terrain::GenerateHeightMap(ID3D11Device* device)
+bool Terrain::GenerateHeightMap(ID3D11Device* device, int scaleIncrease)
 {
 	Shutdown();
 	bool result;
@@ -436,9 +436,9 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device)
 		{
 			index = (m_terrainHeight * j) + i;
 
-			m_heightMap[index].x = (float)i*2;
+			m_heightMap[index].x = (float)i * scaleIncrease;
 
-			m_heightMap[index].z = (float)j*2;
+			m_heightMap[index].z = (float)j * scaleIncrease;
 			float noiseHeight = 0;
 
 			m_amplitude = initialAmp;

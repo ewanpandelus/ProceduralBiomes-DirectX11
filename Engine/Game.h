@@ -15,6 +15,7 @@
 #include "PoissonDiscSampling.h"
 #include "DepthTexture.h"
 #include "TerrainShader.h"
+#include "TerrainLoader.h"
 #include "Shader.h"
 #include "ClimateMap.h"
 #include "BiomeObjects.h"
@@ -139,7 +140,9 @@ private:
 
 	//Scene. 
     Terrain																	m_terrain;
-    Water																	m_water;;
+    TerrainLoader                                                           m_terrainLoader;
+    std::vector<TerrainLoader::TerrainType>                                *m_terrainMap;
+    Water																	m_water;
  
 
 
@@ -229,8 +232,8 @@ private:
 
     std::vector<SimpleMath::Vector2>                                        m_poissonPositions;
     int                                                                     m_regionSize;
-    int                                                                     m_terrainWidth = 64;
-
+    int                                                                     m_terrainWidth = 128;
+    int                                                                     m_terrainScale = 1;
     float xOffset = -63.4f;
     float zOffset = -63.0f;
  

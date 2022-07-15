@@ -9,7 +9,7 @@
 void ClimateMap::Initialize(int tempGridWidth, int tempGridHeight)
 {
 
-	std::vector<uint32_t> m_colourBuffers(64 *64);
+	std::vector<uint32_t> m_colourBuffers(tempGridWidth * tempGridHeight);
 	m_perlinNoise.Initialize();
 	m_biomeClassifier.Initialise();
 	int index;
@@ -56,10 +56,10 @@ ClimateMap::ClimateMapType* ClimateMap::GenerateClimateMap()
 	return m_climateMap;
 }
 
-Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapTexture(ID3D11Device* device, int resolution)
+Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapTexture(ID3D11Device* device)
 {
 	//int width = m_tempGridWidth;
-
+	int resolution = 128;
 	std::vector<uint32_t> m_colourBuffers(resolution * resolution);
 
 	int index = 0;
@@ -87,6 +87,9 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapT
 				int rValue = m_climateMap[index].climateClassification.x * 255;
 				int bValue = m_climateMap[index].climateClassification.y * 255;
 				int gValue = m_climateMap[index].climateClassification.z * 255;
+				if (gValue > 255) {
+					int x = 4;
+				}
 				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rValue, bValue, gValue);
 
 			}
@@ -110,7 +113,7 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapT
 		tSData.pSysMem = &(m_colourBuffers[0]);
 		int bpp = 32;
 		size_t rowPitch = (resolution * bpp + 7) / 8;
-		size_t imageSize = rowPitch * 64;
+		size_t imageSize = rowPitch * 128;
 		tSData.SysMemPitch = static_cast<UINT>(rowPitch);
 		tSData.SysMemSlicePitch = static_cast<UINT>(imageSize);
 
