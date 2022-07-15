@@ -20,58 +20,70 @@ ModelClass::~ModelClass()
 bool ModelClass::InitializeModel(ID3D11Device* device, char* filename)
 {
 	LoadModel(filename);
-	InitializeBuffers(device);
+
+
+	std::vector<XMFLOAT3> positions;
+
+	int instanceCount = 0;
+	//Create two crossing sine waves and only draw the cubes that are under the "height" value
+	for (int i = 0; i < 20000; i++) {
+	
+		positions.push_back(XMFLOAT3(0, i, 0));
+		instanceCount++;
+	}
+	
+	InitializeBuffers(device, &(positions.front()),instanceCount);
 	return false;
 }
 
-bool ModelClass::InitializeTeapot(ID3D11Device* device)
-{
-	GeometricPrimitive::CreateTeapot(preFabVertices, preFabIndices, 1, 8, false);
-	m_vertexCount = preFabVertices.size();
-	m_indexCount = preFabIndices.size();
+//bool ModelClass::InitializeTeapot(ID3D11Device* device)
+//{
+//	GeometricPrimitive::CreateTeapot(preFabVertices, preFabIndices, 1, 8, false);
+//	m_vertexCount = preFabVertices.size();
+//	m_indexCount = preFabIndices.size();
+//
+//	bool result;
+//	// Initialize the vertex and index buffers.
+//	result = InitializeBuffers(device);
+//	if (!result)
+//	{
+//		return false;
+//	}
+//	return true;
+//}
 
-	bool result;
-	// Initialize the vertex and index buffers.
-	result = InitializeBuffers(device);
-	if (!result)
-	{
-		return false;
-	}
-	return true;
-}
+//bool ModelClass::InitializeSphere(ID3D11Device* device)
+//{
+//	GeometricPrimitive::CreateSphere(preFabVertices, preFabIndices, 1, 8, false);
+//	m_vertexCount = preFabVertices.size();
+//	m_indexCount = preFabIndices.size();
+//
+//	bool result;
+//	// Initialize the vertex and index buffers.
+//	result = InitializeBuffers(device);
+//	if (!result)
+//	{
+//		return false;
+//	}
+//	return true;
+//}
 
-bool ModelClass::InitializeSphere(ID3D11Device* device)
-{
-	GeometricPrimitive::CreateSphere(preFabVertices, preFabIndices, 1, 8, false);
-	m_vertexCount = preFabVertices.size();
-	m_indexCount = preFabIndices.size();
-
-	bool result;
-	// Initialize the vertex and index buffers.
-	result = InitializeBuffers(device);
-	if (!result)
-	{
-		return false;
-	}
-	return true;
-}
-
-bool ModelClass::InitializeBox(ID3D11Device* device, float xwidth, float yheight, float zdepth)
-{
-	GeometricPrimitive::CreateBox(preFabVertices, preFabIndices,
-		DirectX::SimpleMath::Vector3(xwidth, yheight, zdepth), false);
-	m_vertexCount = preFabVertices.size();
-	m_indexCount = preFabIndices.size();
-
-	bool result;
-	// Initialize the vertex and index buffers.
-	result = InitializeBuffers(device);
-	if (!result)
-	{
-		return false;
-	}
-	return true;
-}
+//bool ModelClass::InitializeBox(ID3D11Device* device, float xwidth, float yheight, float zdepth)
+//{
+//	GeometricPrimitive::CreateBox(preFabVertices, preFabIndices,
+//		DirectX::SimpleMath::Vector3(xwidth, yheight, zdepth), false);
+//	m_vertexCount = preFabVertices.size();
+//	m_indexCount = preFabIndices.size();
+//
+//	bool result;
+//	// Initialize the vertex and index buffers.
+//	result = InitializeBuffers(device);
+//	if (!result)
+//	{
+//		return false;
+//	}
+//	return true;
+//}
 
 
 void ModelClass::Shutdown()
@@ -92,7 +104,8 @@ void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
 	//deviceContext->DrawIndexed(m_indexCount, 0, 0);
-	deviceContext->Draw(m_vertexCount, 0);
+	//deviceContext->Draw(m_vertexCount, 0);
+	deviceContext->DrawIndexedInstanced(m_indexCount, m_instanceCount, 0, 0, 0);
 	return;
 }
 
@@ -112,7 +125,7 @@ int ModelClass::GetIndexCount()
 }
 
 
-bool ModelClass::InitializeBuffers(ID3D11Device* device)
+bool ModelClass::InitializeBuffers(ID3D11Device* device, XMFLOAT3* p, UINT count)
 {
 	VertexType* vertices;
 	unsigned long* indices;
@@ -193,7 +206,37 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 
 	delete[] indices;
 	indices = 0;
+	std::vector<InstanceType> instances;
+	D3D11_BUFFER_DESC instanceBufferDesc;
+	D3D11_SUBRESOURCE_DATA instanceData;
 
+	// Set the number of instances in the array.
+	m_instanceCount = count;
+	UINT rt = cbrt(m_instanceCount);
+
+	InstanceType it;
+
+	// Load the instance array with data.
+	for (UINT inst = 0; inst < m_instanceCount; inst++) {
+		it.position = p[inst];
+		instances.push_back(it);
+	}
+
+	// Set up the description of the instance buffer.
+	instanceBufferDesc.Usage = D3D11_USAGE_DEFAULT;
+	instanceBufferDesc.ByteWidth = sizeof(InstanceType) * m_instanceCount;
+	instanceBufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	instanceBufferDesc.CPUAccessFlags = 0;
+	instanceBufferDesc.MiscFlags = 0;
+	instanceBufferDesc.StructureByteStride = 0;
+
+	// Give the subresource structure a pointer to the instance data.
+	instanceData.pSysMem = &(instances.front());
+	instanceData.SysMemPitch = 0;
+	instanceData.SysMemSlicePitch = 0;
+
+	// Create the instance buffer.
+	device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);
 	return true;
 }
 
@@ -220,19 +263,24 @@ void ModelClass::ShutdownBuffers()
 
 void ModelClass::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
-	unsigned int stride;
-	unsigned int offset;
+	UINT strides[2];
+	UINT offsets[2];
+
+	ID3D11Buffer* bufferPointers[2];
+
+	bufferPointers[0] = m_vertexBuffer;
+	bufferPointers[1] = m_instanceBuffer;
 
 	// Set vertex buffer stride and offset.
-	stride = sizeof(VertexType);
-	offset = 0;
+	strides[0] = sizeof(VertexType);
+	strides[1] = sizeof(InstanceType);
 
-	// Set the vertex buffer to active in the input assembler so it can be rendered.
-	deviceContext->IASetVertexBuffers(0, 1, &m_vertexBuffer, &stride, &offset);
+	// Set the buffer offsets.
+	offsets[0] = 0;
+	offsets[1] = 0;
 
-	// Set the index buffer to active in the input assembler so it can be rendered.
+	deviceContext->IASetVertexBuffers(0, 2, bufferPointers, strides, offsets);
 	deviceContext->IASetIndexBuffer(m_indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
 	// Set the type of primitive that should be rendered from this vertex buffer, in this case triangles.
 	deviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 

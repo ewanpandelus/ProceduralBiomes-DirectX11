@@ -49,7 +49,7 @@ public:
 	int GetInstanceCount();
 
 private:
-	bool InitializeBuffers(ID3D11Device*);
+	bool InitializeBuffers(ID3D11Device*, XMFLOAT3* p, UINT count);
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 	bool LoadModel(char*);

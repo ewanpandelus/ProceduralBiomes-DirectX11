@@ -11,5 +11,6 @@ struct InputType
 
 InputType main(InputType input)
 {
+    input.position.y += input.instancePosition.y;
     return input;
 }

@@ -285,11 +285,13 @@ void Game::Render()
         m_geometryShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
             m_objectMap[index].texture.Get(), m_timer.GetTotalSeconds());
 
-        m_objectMap[index].model.Render(context);
+        //m_objectMap[index].model.Render(context);
         index++;
     }
+    if (m_objectMap.size() > 1) {
+        m_objectMap[0].model.Render(context);
+    }
 
-    
 
 
 
