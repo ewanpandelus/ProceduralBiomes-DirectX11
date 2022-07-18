@@ -23,3 +23,25 @@ std::vector<ModelClass> EntityData::GetModels()
     return models;
 }
 
+void EntityData::SetupModelBuffers(ID3D11Device* device)
+{
+    auto iter = entities.begin();
+    int index = 0;
+    while (iter != entities.end()) {
+        entities[index].InitializeBuffers(device);
+        ++iter;
+        index++;
+    }
+}
+
+void EntityData::ClearModelBuffers()
+{
+    auto iter = entities.begin();
+    int index = 0;
+    while (iter != entities.end()) {
+        entities[index].ClearPositions();
+        ++iter;
+        index++;
+    }
+}
+

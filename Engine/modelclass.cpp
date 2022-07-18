@@ -22,18 +22,6 @@ bool ModelClass::InitializeModel(ID3D11Device* device, char* filename, Microsoft
 {
 	LoadModel(filename);
 	this->m_texture = texture;
-
-	std::vector<XMFLOAT3> positions;
-
-	int instanceCount = 0;
-	//Create two crossing sine waves and only draw the cubes that are under the "height" value
-	for (int i = 0; i < 1000; i++) {
-	
-		positions.push_back(XMFLOAT3(i, i, i));
-		instanceCount++;
-	}
-	
-	InitializeBuffers(device, &(positions.front()),instanceCount);
 	return false;
 }
 
@@ -54,6 +42,9 @@ void ModelClass::Shutdown()
 
 void ModelClass::Render(ID3D11DeviceContext* deviceContext)
 {
+	if (m_instanceCount == 0) {
+		return;
+	}
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
 	//deviceContext->DrawIndexed(m_indexCount, 0, 0);
@@ -84,12 +75,15 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ModelClass::GetTexture()
 }
 void ModelClass::AddNewPosition(DirectX::SimpleMath::Vector3 position) {
 	m_positions.push_back(position);
-	m_indexCount++;
+	m_instanceCount++;
 }
 
 
-bool ModelClass::InitializeBuffers(ID3D11Device* device, XMFLOAT3* p, UINT count)
+bool ModelClass::InitializeBuffers(ID3D11Device* device)
 {
+	if (m_instanceCount == 0) {
+		return false;
+	}
 	VertexType* vertices;
 	unsigned long* indices;
 	D3D11_BUFFER_DESC vertexBufferDesc, indexBufferDesc;
@@ -174,14 +168,14 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, XMFLOAT3* p, UINT count
 	D3D11_SUBRESOURCE_DATA instanceData;
 
 	// Set the number of instances in the array.
-	m_instanceCount = count;
+	
 	UINT rt = cbrt(m_instanceCount);
 
 	InstanceType it;
 
 	// Load the instance array with data.
 	for (UINT inst = 0; inst < m_instanceCount; inst++) {
-		it.position = p[inst];
+		it.position = m_positions[inst];
 		instances.push_back(it);
 	}
 
@@ -201,6 +195,12 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device, XMFLOAT3* p, UINT count
 	// Create the instance buffer.
 	device->CreateBuffer(&instanceBufferDesc, &instanceData, &m_instanceBuffer);
 	return true;
+}
+
+void ModelClass::ClearPositions()
+{
+	m_instanceCount = 0;
+	m_positions.clear();
 }
 
 

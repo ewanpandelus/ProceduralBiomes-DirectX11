@@ -276,7 +276,7 @@ void Game::Render()
     float time = m_timer.GetTotalSeconds();
     
     std::vector<ModelClass> models = m_entityData.GetModels();
-
+    
     for each (auto position in models)
     {
 
@@ -292,6 +292,8 @@ void Game::Render()
         position.Render(context);
         index++;
     }
+    
+ 
   
 
 
@@ -321,8 +323,8 @@ void Game::Render()
 
 void Game::GenerateBiomes(ID3D11Device* device)
 {
-
     m_poissonPositions.clear();
+    m_entityData.ClearModelBuffers();
     m_poissonPositions = m_poissonDiscSampling.GeneratePoints();
     m_terrain.GenerateHeightMap(device, m_terrainScale);
     m_biomeObjects.SetHeightMap(m_terrain.GetHeightMap());
@@ -330,6 +332,8 @@ void Game::GenerateBiomes(ID3D11Device* device)
     m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
     m_objectMap = m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositions, m_terrainWidth);
     m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+    m_entityData.SetupModelBuffers(device);
+ 
    // m_water.GenerateHeightMap(device);
 }
 

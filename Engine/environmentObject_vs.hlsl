@@ -11,7 +11,7 @@ struct InputType
 
 InputType main(InputType input)
 {
-    input.position.x += input.instancePosition.y;
+    input.position.x += input.instancePosition.x;
     input.position.y += input.instancePosition.y;
     input.position.z += input.instancePosition.z;
     return input;

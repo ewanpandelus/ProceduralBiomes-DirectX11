@@ -233,5 +233,4 @@ private:
     int                                                                     m_terrainScale = 1;
     float xOffset = -63.4f;
     float zOffset = -63.0f;
- 
 };

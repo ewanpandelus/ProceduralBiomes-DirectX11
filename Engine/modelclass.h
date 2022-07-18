@@ -49,8 +49,10 @@ public:
 	int GetInstanceCount();
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetTexture();
 	void AddNewPosition(DirectX::SimpleMath::Vector3 position);
+	bool InitializeBuffers(ID3D11Device*);
+	void ClearPositions();
 private:
-	bool InitializeBuffers(ID3D11Device*, XMFLOAT3* p, UINT count);
+
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 	bool LoadModel(char*);
