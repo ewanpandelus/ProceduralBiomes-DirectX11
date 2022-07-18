@@ -20,6 +20,7 @@
 #include "ClimateMap.h"
 #include "BiomeObjects.h"
 #include "WaterShader.h"
+#include "EntityData.h"
 
 
 
@@ -93,7 +94,7 @@ private:
     std::unique_ptr<DirectX::EffectFactory>                                 m_fxFactory;
     std::unique_ptr<DirectX::SpriteBatch>                                   m_sprites;
     std::unique_ptr<DirectX::SpriteFont>                                    m_font;
-
+    Microsoft::WRL::ComPtr<ID3D11RasterizerState>                           m_raster;
 	// Scene Objects
 	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>  m_batch;
 	Microsoft::WRL::ComPtr<ID3D11InputLayout>                               m_batchInputLayout;
@@ -118,9 +119,6 @@ private:
 
 
 
-    //Snow
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTreeTextures;
-    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTexture;
 
 
 
@@ -146,7 +144,7 @@ private:
  
 
 
-
+    EntityData                                                              m_entityData;
 
     //Desert Models
 	ModelClass																m_desertCactus;
@@ -174,8 +172,6 @@ private:
     ModelClass																m_forestGrassRockModel;
 
 
-
-
     ModelClass																m_forestFlowerModel;
 
     //Forest Textures
@@ -183,15 +179,16 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestTreeColdTexture2;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestGrassTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestDetailsTexture;
-
-
-
-
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_forestColourPalletTexture;
 
 
     //Snow Biome 
     ModelClass																m_snowTreeModel;
+
+   //Snow Textures
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTreeTextures;
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTexture;
+
 
 	//RenderTextures
 	RenderTexture*															m_FirstRenderPass;

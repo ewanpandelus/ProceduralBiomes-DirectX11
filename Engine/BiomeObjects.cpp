@@ -29,24 +29,23 @@ std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingTo
 
 		index = (terrainWidth * positionOnClimateMap.y) + positionOnClimateMap.x;  
 		SimpleMath::Vector3 position = SimpleMath::Vector3(pos.x, m_heightMap[index].y, pos.y);
-		m_objectMap.push_back(AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification));
+		BiomeObjects::BiomeObjectType biomeObj = AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification);
+		//m_objectMap.push_back(AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification));
+		m_entityData->IncreaseEntityCount(biomeObj.modelID, biomeObj.position);
 	}
 	return m_objectMap;
 }
-void BiomeObjects::AddToObjects(ModelClass model, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture, int biomeType)
+void BiomeObjects::AddToObjects(int modelID, int biomeType)
 {
-	ObjectType obj;
-	obj.model = model;
-	obj.texture = texture;
 	switch (biomeType) {
 	case 0:
-		m_desertObjects.push_back(obj);
+		m_desertObjects.push_back(modelID);
 		break;
 	case 1:
-		m_forestObjects.push_back(obj);
+		m_forestObjects.push_back(modelID);
 		break;
 	case 2:
-		m_snowObjects.push_back(obj);
+		m_snowObjects.push_back(modelID);
 		break;
 	default:
 		return;
@@ -55,7 +54,7 @@ void BiomeObjects::AddToObjects(ModelClass model, Microsoft::WRL::ComPtr<ID3D11S
 
 
 
-BiomeObjects::ObjectType BiomeObjects::GetRandomObjectFromBiome(int biomeType)
+int BiomeObjects::GetRandomObjectFromBiome(int biomeType)
 {
 	int listSize = 0;
 	switch (biomeType) {
@@ -72,8 +71,7 @@ BiomeObjects::ObjectType BiomeObjects::GetRandomObjectFromBiome(int biomeType)
 		return m_snowObjects[rand() % listSize];
 		break;
 	default:
-		BiomeObjects::ObjectType obj;
-		return obj;
+		return -1;
 	}
 }
 
@@ -85,16 +83,14 @@ BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(SimpleMath
 	float forestPercent = climateClassification.y * 100;
 	float snowPercent = climateClassification.z * 100;
 	if (desertPercent > 55 || percentage < desertPercent) {
-		BiomeObjects::ObjectType obj = GetRandomObjectFromBiome(0);
-		return SetupObject(obj.model, obj.texture, position);
+		return SetupObject(GetRandomObjectFromBiome(0), position);
 	}
 	if (forestPercent > 55 || (percentage < desertPercent + forestPercent)) {
-		BiomeObjects::ObjectType obj = GetRandomObjectFromBiome(1);
-		return SetupObject(obj.model, obj.texture, position);
+		return SetupObject(GetRandomObjectFromBiome(1), position);
 	}
 	if (snowPercent > 55 || percentage <= (desertPercent + forestPercent + snowPercent+0.01f)) {
-		BiomeObjects::ObjectType obj = GetRandomObjectFromBiome(2);
-		return SetupObject(obj.model, obj.texture, position);
+		return SetupObject(GetRandomObjectFromBiome(2), position);
+
 	}
 }
 
@@ -108,11 +104,10 @@ BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(SimpleMath
 	//https://nbertoa.wordpress.com/2016/02/02/instancing-vs-geometry-shader-vs-vertex-shader/
 
 
-BiomeObjects::BiomeObjectType BiomeObjects::SetupObject(ModelClass associatedModel, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> associatedTexture, SimpleMath::Vector3 position)
+BiomeObjects::BiomeObjectType BiomeObjects::SetupObject(int modelID,  SimpleMath::Vector3 position)
 {
 	BiomeObjectType biomeObject;
-	biomeObject.model = associatedModel;
-	biomeObject.texture = associatedTexture;
+	biomeObject.modelID = modelID;
 	biomeObject.position = position;
 	return biomeObject;
 }
@@ -129,4 +124,9 @@ void BiomeObjects::SetClimateMap(ClimateMap::ClimateMapType* m_climateMap)
 void BiomeObjects::SetHeightMap(Terrain::HeightMapType* m_heightMap)
 {
 	this->m_heightMap = m_heightMap;
+}
+
+void BiomeObjects::SetEntityData(EntityData* entityData)
+{
+	m_entityData = entityData;
 }

@@ -3,9 +3,11 @@
 #include "modelclass.h"
 #include "ClimateMap.h"
 #include "Terrain.h" 
+#include "EntityData.h"
 class BiomeObjects
 {
 public:
+	
 	void SetLargeModels(ModelClass desertModel, ModelClass forestModel, ModelClass snowModel);
 	void SetLargeModelsTextures(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> forestTexture,
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> snowTexture);
@@ -15,42 +17,37 @@ public:
 	void SetCellWidth(float cellWidth);
 	void SetClimateMap(ClimateMap::ClimateMapType* m_climateMap);
 	void SetHeightMap(Terrain::HeightMapType* m_heightMap);
-
+	void SetEntityData(EntityData* entityData);
 	struct BiomeObjectType
 	{
 		SimpleMath::Vector3 position;
-		ModelClass model;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture;
+		int modelID;
 	};
 
-	struct ObjectType
-	{
-		ModelClass model;
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture;
-	};
+	
 	std::vector<BiomeObjectType> SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions, int terrainWidth);
 
-	void AddToObjects(ModelClass model, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture, int biomeType);
+	void AddToObjects(int modelID, int biomeType);
 	
 private:
 
 
 
 
-	std::vector<ObjectType> m_desertObjects;
-	std::vector<ObjectType> m_forestObjects;
-	std::vector<ObjectType> m_snowObjects;
-
+	std::vector<int> m_desertObjects;
+	std::vector<int> m_forestObjects;
+	std::vector<int> m_snowObjects;
+	EntityData* m_entityData;
 	ModelClass snowModel, forestModel, desertModel;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture, forestTexture, snowTexture;
 	float currentCellWidth = 0;
 	ClimateMap::ClimateMapType* m_climateMap;
 	Terrain::HeightMapType* m_heightMap;
 	
-	ObjectType GetRandomObjectFromBiome(int biomeType);
+	int GetRandomObjectFromBiome(int biomeType);
 
 	BiomeObjectType AssignModelBasedOnClimate(SimpleMath::Vector3 position, SimpleMath::Vector3 climateClassification);
-	BiomeObjectType SetupObject(ModelClass model, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture, SimpleMath::Vector3 position);
+	BiomeObjectType SetupObject(int modelID,  SimpleMath::Vector3 position);
 
 
 

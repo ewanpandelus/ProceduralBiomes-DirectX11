@@ -41,7 +41,7 @@ void Game::Initialize(HWND window, int width, int height)
     m_input.Initialise(window);
 
     m_poissonDiscSampling  =  PoissonDiscSampling(m_biomeObjects);
-
+    m_biomeObjects.SetEntityData(&m_entityData);
     m_deviceResources->SetWindow(window, width, height);
     m_deviceResources->CreateDeviceResources();
     CreateDeviceDependentResources();
@@ -261,6 +261,7 @@ void Game::Render()
     context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
     context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
     context->RSSetState(m_states->CullClockwise());
+  //  context->RSSetState(m_raster.Get());
     //context->RSSetState(m_states->Wireframe());
 
     //prepare transform for floor object. 
@@ -273,25 +274,25 @@ void Game::Render()
     float index = 0;
     SimpleMath::Matrix objectScale = SimpleMath::Matrix::CreateScale(1);
     float time = m_timer.GetTotalSeconds();
-    for each (auto position in m_objectMap)
+    
+    std::vector<ModelClass> models = m_entityData.GetModels();
+
+    for each (auto position in models)
     {
 
         m_world = SimpleMath::Matrix::Identity; //set world back to identity
-        SimpleMath::Vector3 objPos = m_objectMap[index].position;
-        objectPosition = SimpleMath::Matrix::CreateTranslation((objPos.x*m_terrainScale)-m_terrainWidth + xOffset, objPos.y, (objPos.z*m_terrainScale)-m_terrainWidth + zOffset);
+//        SimpleMath::Vector3 objPos = m_objectMap[index].position;
+        //objectPosition = SimpleMath::Matrix::CreateTranslation((objPos.x*m_terrainScale)-m_terrainWidth + xOffset, objPos.y, (objPos.z*m_terrainScale)-m_terrainWidth + zOffset);
 
 
-        m_world = m_world * objectPosition;
+//        m_world = m_world * objectPosition;
         m_geometryShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-            m_objectMap[index].texture.Get(), m_timer.GetTotalSeconds());
+            models[index].GetTexture().Get(), m_timer.GetTotalSeconds());
 
-        //m_objectMap[index].model.Render(context);
+        position.Render(context);
         index++;
     }
-    if (m_objectMap.size() > 1) {
-        m_objectMap[0].model.Render(context);
-    }
-
+  
 
 
 
@@ -428,6 +429,13 @@ void Game::CreateDeviceDependentResources()
     m_font = std::make_unique<SpriteFont>(device, L"SegoeUI_18.spritefont");
     m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
 
+    CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_NONE, FALSE,
+        D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
+        D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, FALSE, TRUE);
+
+    DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc,
+        m_raster.ReleaseAndGetAddressOf()));
+
     //setup our terrain
     m_terrain.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
    // m_terrainLoader.Initialise(device, m_terrainWidth);
@@ -535,20 +543,24 @@ void Game::SetupDesertBiome(ID3D11Device* device)
     CreateDDSTextureFromFile(device, L"desert_colours.dds", nullptr, m_desertTexture.ReleaseAndGetAddressOf());
     CreateDDSTextureFromFile(device, L"desert2.dds", nullptr, m_desertTexture2.ReleaseAndGetAddressOf());
 
-    m_desertCactus.InitializeModel(device, "desert_cactus.obj");
-    m_desesrtCactus2.InitializeModel(device, "desert_cactus2.obj");
-    m_desertCactus3.InitializeModel(device, "desert_cactus3.obj");
-    m_desertCactus4.InitializeModel(device, "desert_cactus4.obj");
-    m_desertAloe.InitializeModel(device, "desert_aloe.obj");
-    m_desertRock.InitializeModel(device, "desert_rock.obj");
+    m_desertCactus.InitializeModel(device, "desert_cactus.obj", m_desertTexture);
+    m_desesrtCactus2.InitializeModel(device, "desert_cactus2.obj", m_desertTexture);
+    m_desertCactus3.InitializeModel(device, "desert_cactus3.obj", m_desertTexture2);
+    m_desertCactus4.InitializeModel(device, "desert_cactus4.obj", m_desertTexture2);
+    m_desertAloe.InitializeModel(device, "desert_aloe.obj", m_desertTexture2);
+    m_desertRock.InitializeModel(device, "desert_rock.obj", m_desertTexture);
 
 
-    m_biomeObjects.AddToObjects(m_desertCactus, m_desertTexture, 0);
-    m_biomeObjects.AddToObjects(m_desesrtCactus2, m_desertTexture, 0);
-    m_biomeObjects.AddToObjects(m_desertCactus3, m_desertTexture2, 0);
-    m_biomeObjects.AddToObjects(m_desertCactus4, m_desertTexture2, 0);
-    m_biomeObjects.AddToObjects(m_desertAloe, m_desertTexture2, 0);
-    m_biomeObjects.AddToObjects(m_desertRock, m_desertTexture, 0);
+   
+
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus), 0);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desesrtCactus2), 0);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus3), 0);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus4), 0);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertAloe), 0);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertRock), 0);
+
+
 }
 void Game::SetupForestBiome(ID3D11Device* device)
 {
@@ -557,25 +569,28 @@ void Game::SetupForestBiome(ID3D11Device* device)
     CreateDDSTextureFromFile(device, L"forest_flowers.dds", nullptr, m_forestColourPalletTexture.ReleaseAndGetAddressOf());
     CreateDDSTextureFromFile(device, L"forest_details.dds", nullptr, m_forestDetailsTexture.ReleaseAndGetAddressOf());
 
-    m_forestTreeModel.InitializeModel(device, "forest_tree.obj");
-    m_forestGrassModel.InitializeModel(device, "forest_grass.obj");
-    m_forestGrassModel2.InitializeModel(device, "forest_grass2.obj");
-    m_forestGrassModel3.InitializeModel(device, "forest_grass3.obj");
-    m_forestFlowerModel.InitializeModel(device, "forest_flower.obj");
-    m_forestGrassRockModel.InitializeModel(device, "forest_grass_rock.obj");
+    m_forestTreeModel.InitializeModel(device, "forest_tree.obj", m_forestTreeColdTexture);
+    m_forestGrassModel.InitializeModel(device, "forest_grass.obj", m_forestGrassTexture);
+    m_forestGrassModel2.InitializeModel(device, "forest_grass2.obj", m_forestGrassTexture);
+    m_forestGrassModel3.InitializeModel(device, "forest_grass3.obj", m_forestGrassTexture);
+    m_forestFlowerModel.InitializeModel(device, "forest_flower.obj", m_forestColourPalletTexture);
+    m_forestGrassRockModel.InitializeModel(device, "forest_grass_rock.obj", m_forestDetailsTexture);
 
-    m_biomeObjects.AddToObjects(m_forestTreeModel, m_forestTreeColdTexture, 1);
-    m_biomeObjects.AddToObjects(m_forestGrassModel, m_forestGrassTexture, 1);
-    m_biomeObjects.AddToObjects(m_forestGrassModel2, m_forestGrassTexture, 1);
-    m_biomeObjects.AddToObjects(m_forestGrassModel3, m_forestGrassTexture, 1);
-    m_biomeObjects.AddToObjects(m_forestFlowerModel, m_forestColourPalletTexture, 1);
-    m_biomeObjects.AddToObjects(m_forestGrassRockModel, m_forestDetailsTexture, 1);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestTreeModel), 1);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel), 1);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel2), 1);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel3), 1);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestFlowerModel), 1);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassRockModel), 1);
 }
+
+
+
 void Game::SetupSnowBiome(ID3D11Device* device)
 {
     CreateDDSTextureFromFile(device, L"snowTreeTex.dds", nullptr, m_snowTreeTextures.ReleaseAndGetAddressOf());
-    m_snowTreeModel.InitializeModel(device, "snowTree.obj");
-    m_biomeObjects.AddToObjects(m_snowTreeModel, m_snowTreeTextures, 2);
+    m_snowTreeModel.InitializeModel(device, "snowTree.obj", m_snowTreeTextures);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_snowTreeModel), 2);
 }
 
 void Game::OnDeviceLost()
@@ -587,6 +602,7 @@ void Game::OnDeviceLost()
     m_batch.reset();
     m_testmodel.reset();
     m_batchInputLayout.Reset();
+    m_raster.Reset();
 }
 
 void Game::OnDeviceRestored()

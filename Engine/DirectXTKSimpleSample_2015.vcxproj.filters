@@ -88,6 +88,7 @@
     <ClInclude Include="TerrainLoader.h">
       <Filter>Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="EntityData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -153,6 +154,7 @@
     <ClCompile Include="TerrainLoader.cpp">
       <Filter>Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="EntityData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

@@ -17,18 +17,19 @@ ModelClass::~ModelClass()
 }
 
 
-bool ModelClass::InitializeModel(ID3D11Device* device, char* filename)
+bool ModelClass::InitializeModel(ID3D11Device* device, char* filename, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture)
+
 {
 	LoadModel(filename);
-
+	this->m_texture = texture;
 
 	std::vector<XMFLOAT3> positions;
 
 	int instanceCount = 0;
 	//Create two crossing sine waves and only draw the cubes that are under the "height" value
-	for (int i = 0; i < 20000; i++) {
+	for (int i = 0; i < 1000; i++) {
 	
-		positions.push_back(XMFLOAT3(0, i, 0));
+		positions.push_back(XMFLOAT3(i, i, i));
 		instanceCount++;
 	}
 	
@@ -36,54 +37,6 @@ bool ModelClass::InitializeModel(ID3D11Device* device, char* filename)
 	return false;
 }
 
-//bool ModelClass::InitializeTeapot(ID3D11Device* device)
-//{
-//	GeometricPrimitive::CreateTeapot(preFabVertices, preFabIndices, 1, 8, false);
-//	m_vertexCount = preFabVertices.size();
-//	m_indexCount = preFabIndices.size();
-//
-//	bool result;
-//	// Initialize the vertex and index buffers.
-//	result = InitializeBuffers(device);
-//	if (!result)
-//	{
-//		return false;
-//	}
-//	return true;
-//}
-
-//bool ModelClass::InitializeSphere(ID3D11Device* device)
-//{
-//	GeometricPrimitive::CreateSphere(preFabVertices, preFabIndices, 1, 8, false);
-//	m_vertexCount = preFabVertices.size();
-//	m_indexCount = preFabIndices.size();
-//
-//	bool result;
-//	// Initialize the vertex and index buffers.
-//	result = InitializeBuffers(device);
-//	if (!result)
-//	{
-//		return false;
-//	}
-//	return true;
-//}
-
-//bool ModelClass::InitializeBox(ID3D11Device* device, float xwidth, float yheight, float zdepth)
-//{
-//	GeometricPrimitive::CreateBox(preFabVertices, preFabIndices,
-//		DirectX::SimpleMath::Vector3(xwidth, yheight, zdepth), false);
-//	m_vertexCount = preFabVertices.size();
-//	m_indexCount = preFabIndices.size();
-//
-//	bool result;
-//	// Initialize the vertex and index buffers.
-//	result = InitializeBuffers(device);
-//	if (!result)
-//	{
-//		return false;
-//	}
-//	return true;
-//}
 
 
 void ModelClass::Shutdown()
@@ -122,6 +75,16 @@ void ModelClass::IndexRender(ID3D11DeviceContext* deviceContext)
 int ModelClass::GetIndexCount()
 {
 	return m_indexCount;
+}
+
+
+Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ModelClass::GetTexture()
+{
+	return m_texture;
+}
+void ModelClass::AddNewPosition(DirectX::SimpleMath::Vector3 position) {
+	m_positions.push_back(position);
+	m_indexCount++;
 }
 
 
@@ -431,3 +394,4 @@ void ModelClass::ReleaseModel()
 {
 	return;
 }
+
