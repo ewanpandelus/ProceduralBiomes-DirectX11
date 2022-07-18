@@ -58,8 +58,7 @@ ClimateMap::ClimateMapType* ClimateMap::GenerateClimateMap()
 
 Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapTexture(ID3D11Device* device)
 {
-	//int width = m_tempGridWidth;
-	int resolution = 128;
+	int resolution = m_tempGridWidth;
 	std::vector<uint32_t> m_colourBuffers(resolution * resolution);
 
 	int index = 0;
@@ -74,22 +73,14 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapT
 
 				m_climateMap[index].temperature = (InverseLerp(m_minTemp, m_maxTemp, m_climateMap[index].temperature));
 				float temperature = m_climateMap[index].temperature;
-
-
 				m_climateMap[index].rainfall = (InverseLerp(m_minRainfall, m_maxRainfall, m_climateMap[index].rainfall));
 				float rainfall = m_climateMap[index].rainfall;
-
-
 				m_climateMap[index].climateClassification = m_biomeClassifier.CalculateDistanceToAllBiomes(temperature, rainfall);
-
-
 
 				int rValue = m_climateMap[index].climateClassification.x * 255;
 				int bValue = m_climateMap[index].climateClassification.y * 255;
 				int gValue = m_climateMap[index].climateClassification.z * 255;
-				if (gValue > 255) {
-					int x = 4;
-				}
+			
 				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rValue, bValue, gValue);
 
 			}

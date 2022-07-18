@@ -229,8 +229,8 @@ private:
 
     std::vector<SimpleMath::Vector2>                                        m_poissonPositions;
     int                                                                     m_regionSize;
-    int                                                                     m_terrainWidth = 128;
-    int                                                                     m_terrainScale = 1;
+    int                                                                     m_terrainWidth = 64;
+    int                                                                     m_terrainScale = 4;
     float xOffset = -63.4f;
     float zOffset = -63.0f;
 };

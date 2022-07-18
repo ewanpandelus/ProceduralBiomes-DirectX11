@@ -25,7 +25,7 @@ public:
 	};
 
 	
-	std::vector<BiomeObjectType> SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions, int terrainWidth);
+	std::vector<BiomeObjectType> SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions, int terrainWidth, int terrainScale);
 
 	void AddToObjects(int modelID, int biomeType);
 	

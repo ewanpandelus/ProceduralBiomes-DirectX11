@@ -19,7 +19,7 @@ void BiomeObjects::SetLargeModelsTextures(Microsoft::WRL::ComPtr<ID3D11ShaderRes
 }
 
 
-std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions, int terrainWidth)
+std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions, int terrainWidth, int terrainScale)
 {
 	std::vector<BiomeObjects::BiomeObjectType> m_objectMap;
 	int index = 0;
@@ -30,7 +30,8 @@ std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingTo
 		index = (terrainWidth * positionOnClimateMap.y) + positionOnClimateMap.x;  
 		SimpleMath::Vector3 position = SimpleMath::Vector3(pos.x, m_heightMap[index].y, pos.y);
 		BiomeObjects::BiomeObjectType biomeObj = AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification);
-		//m_objectMap.push_back(AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification));
+		biomeObj.position.x *= terrainScale;
+		biomeObj.position.z *= terrainScale;
 		m_entityData->IncreaseEntityCount(biomeObj.modelID, biomeObj.position);
 	}
 	return m_objectMap;

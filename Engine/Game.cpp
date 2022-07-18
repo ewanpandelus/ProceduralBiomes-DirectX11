@@ -277,20 +277,19 @@ void Game::Render()
     
     std::vector<ModelClass> models = m_entityData.GetModels();
     
-    for each (auto position in models)
+    for each (auto model in models)
     {
 
         m_world = SimpleMath::Matrix::Identity; //set world back to identity
-//        SimpleMath::Vector3 objPos = m_objectMap[index].position;
-        //objectPosition = SimpleMath::Matrix::CreateTranslation((objPos.x*m_terrainScale)-m_terrainWidth + xOffset, objPos.y, (objPos.z*m_terrainScale)-m_terrainWidth + zOffset);
+//     SimpleMath::Vector3 objPos = m_objectMap[index].position;
+       objectPosition = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth + xOffset, 0, -m_terrainWidth + zOffset);
 
 
-//        m_world = m_world * objectPosition;
+        m_world = m_world * objectPosition;
         m_geometryShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-            models[index].GetTexture().Get(), m_timer.GetTotalSeconds());
-
-        position.Render(context);
-        index++;
+            model.GetTexture().Get(), m_timer.GetTotalSeconds());
+        model.Render(context);
+      
     }
     
  
@@ -301,7 +300,7 @@ void Game::Render()
     m_world = m_world * objectPosition;
     m_terrainShader.EnableShader(context);
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
-    SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth, 0.f, -m_terrainWidth);
+    SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth*m_terrainScale/2, 0.f, -m_terrainWidth*m_terrainScale/2);
     m_world = m_world * positionAccountedFor;
     m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_generatedClimateMapTexture.Get(), m_noiseTexture.Get());
@@ -330,7 +329,7 @@ void Game::GenerateBiomes(ID3D11Device* device)
     m_biomeObjects.SetHeightMap(m_terrain.GetHeightMap());
     m_objectMap.clear();
     m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
-    m_objectMap = m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositions, m_terrainWidth);
+    m_objectMap = m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositions, m_terrainWidth, m_terrainScale);
     m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
     m_entityData.SetupModelBuffers(device);
  
