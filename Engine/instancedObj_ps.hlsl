@@ -5,10 +5,10 @@ SamplerState SampleType : register(s0);
 
 cbuffer MatrixBuffer : register(b0)
 {
-	matrix worldMatrix;
-	matrix viewMatrix;
-	matrix projectionMatrix;
-	float time;
+    matrix worldMatrix;
+    matrix viewMatrix;
+    matrix projectionMatrix;
+    float time;
 };
 cbuffer LightBuffer : register(b1)
 {
@@ -21,16 +21,16 @@ cbuffer LightBuffer : register(b1)
 
 struct InputType
 {
-	float4 position : SV_POSITION;
-	float2 tex : TEXCOORD0;
-	float3 normal : NORMAL;
+    float4 position : SV_POSITION;
+    float2 tex : TEXCOORD0;
+    float3 normal : NORMAL;
 };
 
 
 float4 main(InputType input) : SV_TARGET
 {
-	float4 textureColor;
-	textureColor = texture0.Sample(SampleType, input.tex);
+    float4 textureColor;
+    textureColor = texture0.Sample(SampleType, input.tex);
 
     float3	lightDir;
     float	lightIntensity;
@@ -52,7 +52,7 @@ float4 main(InputType input) : SV_TARGET
 
 
     color = color * textureColor;
- 
+
 
     return color;
 }

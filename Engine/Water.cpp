@@ -12,14 +12,14 @@ Water::~Water()
 {
 }
 
-bool Water::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight)
+bool Water::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight, int scale)
 {
 
 	perlinNoise.Initialize();
 	int index;
 	float height = 0.0;
 	bool result;
-
+	m_scale = scale;
 	// Save the dimensions of the terrain.
 	m_terrainWidth = terrainWidth;
 	m_terrainHeight = terrainHeight;
@@ -47,9 +47,9 @@ bool Water::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight
 		{
 			index = (m_terrainHeight * j) + i;
 
-			m_heightMap[index].x = (float)i;
+			m_heightMap[index].x = (float)i * m_scale;
 			m_heightMap[index].y = (float)0;//perlinNoise.SimplexNoise(i * 0.1f, j * 0.1f) *2.f;
-			m_heightMap[index].z = (float)j;
+			m_heightMap[index].z = (float)j * m_scale;
 
 			//and use this step to calculate the texture coordinates for this point on the terrain.
 			m_heightMap[index].u = (float)i * textureCoordinatesStep;
@@ -79,7 +79,7 @@ bool Water::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight
 
 void Water::Render(ID3D11DeviceContext* deviceContext)
 {
-	deviceContext->GSSetShader(NULL, NULL, 0);
+
 	// Put the vertex and index buffers on the graphics pipeline to prepare them for drawing.
 	RenderBuffers(deviceContext);
 	deviceContext->DrawIndexed(m_indexCount, 0, 0);

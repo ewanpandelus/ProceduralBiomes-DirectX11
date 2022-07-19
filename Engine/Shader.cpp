@@ -130,7 +130,7 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMa
 	dataPtr->padding = time;
 	context->Unmap(m_matrixBuffer, 0);
 	context->VSSetConstantBuffers(0, 1, &m_matrixBuffer);
-	//context->GSSetConstantBuffers(0, 1, &m_matrixBuffer);
+	context->GSSetConstantBuffers(0, 1, &m_matrixBuffer);
 	context->PSSetConstantBuffers(0, 1, &m_matrixBuffer);
 	context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
@@ -195,11 +195,14 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMa
 }
 
 
-void Shader::EnableShader(ID3D11DeviceContext* context)
+void Shader::EnableShader(ID3D11DeviceContext* context, bool geomOn)
 {
 	context->IASetInputLayout(m_layout);							//set the input layout for the shader to match out geometry
 	context->VSSetShader(m_vertexShader.Get(), 0, 0);
-	//context->GSSetShader(m_geometryShader.Get(), 0, 0);
+	if (geomOn) {
+		context->GSSetShader(m_geometryShader.Get(), 0, 0);
+	}
+	
 	context->PSSetShader(m_pixelShader.Get(), 0, 0);				//turn on pixel shader
 	// Set the sampler state in the pixel shader.
 	context->PSSetSamplers(0, 1, &m_sampleState);

@@ -270,7 +270,7 @@ void Game::Render()
     SimpleMath::Matrix objectPosition = SimpleMath::Matrix::CreateTranslation(0, 0, 0);
 
 
-    m_geometryShader.EnableShader(context);
+    m_geometryShader.EnableShader(context, false);
     float index = 0;
     SimpleMath::Matrix objectScale = SimpleMath::Matrix::CreateScale(1);
     float time = m_timer.GetTotalSeconds();
@@ -292,25 +292,34 @@ void Game::Render()
       
     }
     
- 
-  
 
-
-
-    m_world = m_world * objectPosition;
-    m_terrainShader.EnableShader(context);
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
     SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth*m_terrainScale/2, 0.f, -m_terrainWidth*m_terrainScale/2);
     m_world = m_world * positionAccountedFor;
+
+    m_waterShader.EnableShader(context, true);
+    m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+        m_forestTreeColdTexture2.Get(), m_timer.GetTotalSeconds());
+    m_water.Render(context);
+
+
+
+    m_terrainShader.EnableShader(context);
     m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_generatedClimateMapTexture.Get(), m_noiseTexture.Get());
     m_terrain.Render(context);
 
+ 
+  //  context->OMSetBlendState(m_states->NonPremultiplied(), nullptr, 0xFFFFFFFF);
+    //m_waterShader.EnableShader(context);
+    //m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+     //  m_forestTreeColdTexture.Get(), m_timer.GetTotalSeconds());
 
-    context->OMSetBlendState(m_states->NonPremultiplied(), nullptr, 0xFFFFFFFF);
-    m_waterShader.EnableShader(context);
-    m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light, m_terrain.GetMaxDepth());
-   // m_water.Render(context);
+    //m_geometryShader.EnableShader(context);
+    //m_geometryShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+     //m_forestTreeColdTexture2.Get(), m_timer.GetTotalSeconds());
+
+
     //render our GUI
     ImGui::Render();
     ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -447,7 +456,7 @@ void Game::CreateDeviceDependentResources()
     *m_poissonDiscSampling.GetSampleRegionSize() = m_terrainWidth - 1;
 
     m_water.SetTerrainHeightMap(m_terrain);
-    m_water.Initialize(device, m_terrainWidth, m_terrainWidth);
+    m_water.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
 
 
 
@@ -459,8 +468,8 @@ void Game::CreateDeviceDependentResources()
 
     //load and set up our Vertex and Pixel Shaders
     m_terrainShader.InitStandard(device, L"terrain_vs.cso", L"terrain_ps.cso");
-    m_waterShader.InitStandard(device, L"water_vs.cso", L"water_ps.cso");
-    m_geometryShader.InitStandard(device, L"environmentObject_vs.cso", L"environmentObject_gs.cso", L"environmentObject_ps.cso");
+    m_waterShader.InitStandard(device, L"water_vs.cso", L"water_gs.cso", L"water_ps.cso");
+    m_geometryShader.InitStandard(device, L"instancedObj_vs.cso", L"instancedObj_gs.cso", L"instancedObj_ps.cso");
     m_standardShader.InitStandard(device, L"object_vs.cso", L"object_ps.cso");
 
 

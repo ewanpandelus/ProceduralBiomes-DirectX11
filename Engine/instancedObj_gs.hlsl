@@ -30,22 +30,18 @@ void main(triangle InputType input[3], inout TriangleStream<OutputType> triStrea
 
     // Move the vertex away from the point position
     output.position = input[0].position;
-    output.position = mul(output.position, worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
+
     output.tex = input[0].tex;
     output.normal = mul(input[0].normal, (float3x3) worldMatrix);
     output.normal = normalize(output.normal);
     triStream.Append(output);
 
-  
+
 
 
     // Move the vertex away from the point position
     output.position = input[1].position;
-    output.position = mul(output.position, worldMatrix);
-    output.position = mul(output.position, viewMatrix);
-    output.position = mul(output.position, projectionMatrix);
+
     output.tex = input[1].tex;
     output.normal = mul(input[1].normal, (float3x3) worldMatrix);
     output.normal = normalize(output.normal);

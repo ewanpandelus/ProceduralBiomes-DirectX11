@@ -25,7 +25,7 @@ public:
 	Water();
 	~Water();
 
-	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight);
+	bool Initialize(ID3D11Device*, int terrainWidth, int terrainHeight, int scale);
 	void Render(ID3D11DeviceContext*);
 	bool GenerateHeightMap(ID3D11Device*);
 	bool Update();
@@ -54,6 +54,7 @@ private:
 	int m_vertexCount, m_indexCount;
 	float m_frequency, m_amplitude, m_lacunarity, m_persistance, m_offset;
 	int m_octaves = 0;
+	int m_scale = 1;
 	HeightMapType* m_heightMap;
 
 	//arrays for our generated objects Made by directX

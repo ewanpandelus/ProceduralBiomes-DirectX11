@@ -23,10 +23,10 @@ struct InputType
 
 OutputType main(InputType input)
 {
- 
+
     OutputType output;
 
-    input.position *= input.instanceScale;
+    //  input.position *= input.instanceScale;
     input.position.x += input.instancePosition.x;
     input.position.y += input.instancePosition.y;
     input.position.z += input.instancePosition.z;
@@ -36,7 +36,7 @@ OutputType main(InputType input)
     output.position = mul(input.position, worldMatrix);
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
-    
+
     // Store the texture coordinates for the pixel shader.
     output.tex = input.tex;
 
@@ -47,9 +47,9 @@ OutputType main(InputType input)
     output.normal = normalize(output.normal);
 
     // world position of vertex (for point light)
-   
+
 
     return output;
-    
-    
+
+
 }

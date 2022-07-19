@@ -188,19 +188,22 @@
     <FxCompile Include="terrain_vs.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
-    <FxCompile Include="environmentObject_vs.hlsl">
+    <FxCompile Include="instancedObj_gs.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
-    <FxCompile Include="environmentObject_ps.hlsl">
+    <FxCompile Include="instancedObj_ps.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
-    <FxCompile Include="environmentObject_gs.hlsl">
-      <Filter>Assets</Filter>
-    </FxCompile>
-    <FxCompile Include="water_vs.hlsl">
+    <FxCompile Include="instancedObj_vs.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
     <FxCompile Include="water_ps.hlsl">
+      <Filter>Assets</Filter>
+    </FxCompile>
+    <FxCompile Include="water_gs.hlsl">
+      <Filter>Assets</Filter>
+    </FxCompile>
+    <FxCompile Include="water_vs.hlsl">
       <Filter>Assets</Filter>
     </FxCompile>
   </ItemGroup>
