@@ -75,9 +75,13 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ModelClass::GetTexture()
 }
 void ModelClass::AddNewPosition(DirectX::SimpleMath::Vector3 position) {
 	m_positions.push_back(position);
+	GenerateRandomScale();
 	m_instanceCount++;
 }
-
+void ModelClass::GenerateRandomScale() {
+	float random = rand() % 21;
+	m_scales.push_back((1 + (random /100.f)));
+}
 
 bool ModelClass::InitializeBuffers(ID3D11Device* device)
 {
@@ -176,6 +180,7 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	// Load the instance array with data.
 	for (UINT inst = 0; inst < m_instanceCount; inst++) {
 		it.position = m_positions[inst];
+		it.scale = m_scales[inst];
 		instances.push_back(it);
 	}
 
@@ -197,10 +202,11 @@ bool ModelClass::InitializeBuffers(ID3D11Device* device)
 	return true;
 }
 
-void ModelClass::ClearPositions()
+void ModelClass::ClearInstances()
 {
 	m_instanceCount = 0;
 	m_positions.clear();
+	m_scales.clear();
 }
 
 
@@ -327,22 +333,6 @@ bool ModelClass::LoadModel(char* filename)
 				else {
 					return false;
 				}
-
-				//unsigned int face1[9];
-				//int matches = fscanf_s(file, "%d/%d/%d %d/%d/%d %d/%d/%d\n", &face1[0], &face1[1], &face1[2],
-				//	&face1[3], &face1[4], &face1[5],
-				//	&face1[6], &face1[7], &face1[8]);
-				//if (matches != 9)
-				//{
-				//// Parser error, or not triangle faces
-				//	return false;
-				//	}
-				//for (int i = 0; i < 9; i++)
-				//{
-				//	faces.push_back(face1[i]);
-				//}
-
-
 			}
 		}
 	}

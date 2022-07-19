@@ -42,7 +42,9 @@ bool Shader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* psFile
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
 		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{"TEXCOORD", 1, DXGI_FORMAT_R32G32B32_FLOAT, 1,0, D3D11_INPUT_PER_INSTANCE_DATA ,1 }
+		{"TEXCOORD", 1, DXGI_FORMAT_R32G32B32_FLOAT, 1,0, D3D11_INPUT_PER_INSTANCE_DATA ,1 },
+		{"TEXCOORD", 2, DXGI_FORMAT_R32_FLOAT, 2,0, D3D11_INPUT_PER_INSTANCE_DATA ,1 }
+
 	};
 
 	// Get a count of the elements in the layout.
@@ -127,7 +129,8 @@ bool Shader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMa
 	dataPtr->projection = tproj;
 	dataPtr->padding = time;
 	context->Unmap(m_matrixBuffer, 0);
-	context->GSSetConstantBuffers(0, 1, &m_matrixBuffer);
+	context->VSSetConstantBuffers(0, 1, &m_matrixBuffer);
+	//context->GSSetConstantBuffers(0, 1, &m_matrixBuffer);
 	context->PSSetConstantBuffers(0, 1, &m_matrixBuffer);
 	context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
@@ -196,7 +199,7 @@ void Shader::EnableShader(ID3D11DeviceContext* context)
 {
 	context->IASetInputLayout(m_layout);							//set the input layout for the shader to match out geometry
 	context->VSSetShader(m_vertexShader.Get(), 0, 0);
-	context->GSSetShader(m_geometryShader.Get(), 0, 0);
+	//context->GSSetShader(m_geometryShader.Get(), 0, 0);
 	context->PSSetShader(m_pixelShader.Get(), 0, 0);				//turn on pixel shader
 	// Set the sampler state in the pixel shader.
 	context->PSSetSamplers(0, 1, &m_sampleState);

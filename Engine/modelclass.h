@@ -31,15 +31,13 @@ private:
 	struct InstanceType
 	{
 		DirectX::SimpleMath::Vector3 position;
+		float scale;
 	};
 public:
 	ModelClass();
 	~ModelClass();
 
 	bool InitializeModel(ID3D11Device* device, char* filename, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> texture);
-	bool InitializeTeapot(ID3D11Device*);
-	bool InitializeSphere(ID3D11Device*);
-	bool InitializeBox(ID3D11Device*, float xwidth, float yheight, float zdepth);
 	void Shutdown();
 	void Render(ID3D11DeviceContext*);
 	void IndexRender(ID3D11DeviceContext*);
@@ -50,13 +48,14 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> GetTexture();
 	void AddNewPosition(DirectX::SimpleMath::Vector3 position);
 	bool InitializeBuffers(ID3D11Device*);
-	void ClearPositions();
+	void ClearInstances();
+
 private:
 
 	void ShutdownBuffers();
 	void RenderBuffers(ID3D11DeviceContext*);
 	bool LoadModel(char*);
-
+	void GenerateRandomScale();
 	void ReleaseModel();
 
 private:
@@ -70,6 +69,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>   m_texture;
 	int												   m_biomeType;
 	std::vector<SimpleMath::Vector3> m_positions;
+	std::vector<float> m_scales;
 
 };
 

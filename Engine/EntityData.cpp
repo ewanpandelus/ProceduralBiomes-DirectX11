@@ -39,7 +39,7 @@ void EntityData::ClearModelBuffers()
     auto iter = entities.begin();
     int index = 0;
     while (iter != entities.end()) {
-        entities[index].ClearPositions();
+        entities[index].ClearInstances();
         ++iter;
         index++;
     }
