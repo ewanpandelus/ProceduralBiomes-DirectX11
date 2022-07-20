@@ -16,6 +16,28 @@ void PoissonDiscSampling::InitialiseGrid(int width, int height)
 
 }
 
+void PoissonDiscSampling::GenerateAllPoints(int numSamplesBeforeRejectionBig, float radiusBig, int numSamplesBeforeRejectionSmall, float radiusSmall)
+{
+	m_bigObjPoints.clear();
+	m_smallObjPoints.clear();
+	m_savedPoints.clear();
+	m_numSamplesBeforeRejection = numSamplesBeforeRejectionBig;
+	m_radius = radiusBig;
+    m_bigObjPoints = GeneratePoints();
+	m_numSamplesBeforeRejection = numSamplesBeforeRejectionSmall;
+	m_radius = radiusSmall;
+	m_smallObjPoints = GeneratePoints();
+}
+
+std::vector<SimpleMath::Vector2> PoissonDiscSampling::GetBigObjPoints()
+{
+	return m_bigObjPoints;
+}
+
+std::vector<SimpleMath::Vector2> PoissonDiscSampling::GetSmallObjPoints()
+{
+	return m_smallObjPoints;
+}
 
 std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 {
@@ -33,6 +55,9 @@ std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 	float maximum = -1000;
 
 	InitialiseGrid(cols, rows);
+
+//	m_grid = PopulateGrid(m_grid, cellWidth, m_savedPoints);
+	
 	std::vector<SimpleMath::Vector2> active;
 	float x = m_sampleRegionLength/2;
 	float y = m_sampleRegionLength /2;
@@ -76,6 +101,7 @@ std::vector<SimpleMath::Vector2> PoissonDiscSampling::GeneratePoints()
 				}
 				active.push_back(sample);
 				points.push_back(sample);
+				m_savedPoints.push_back(sample);
 				break;
 			}
 
@@ -108,6 +134,11 @@ float* PoissonDiscSampling::GetRadius()
 float PoissonDiscSampling::GetCellWidth()
 {
 	return cellWidth;
+}
+
+void PoissonDiscSampling::ClearSavedPoints()
+{
+	m_savedPoints.clear();
 }
 
 float PoissonDiscSampling::SquaredMagnitude(SimpleMath::Vector2 v)
@@ -153,6 +184,16 @@ bool PoissonDiscSampling::CheckSamplingValid(SimpleMath::Vector2 sample, int col
 		}
 	}
 	return valid;
+}
+
+std::vector<std::vector<SimpleMath::Vector2>> PoissonDiscSampling::PopulateGrid(std::vector<std::vector<SimpleMath::Vector2>> grid, float cellWidth, std::vector<SimpleMath::Vector2> points)
+{
+	for each(auto point in points) {
+		int col = floor(point.x / cellWidth);
+		int row = floor(point.y / cellWidth);
+		grid[col][row] = point;
+	}
+	return grid;
 }
 
 SimpleMath::Vector2 PoissonDiscSampling::GenerateSample(SimpleMath::Vector2 position)

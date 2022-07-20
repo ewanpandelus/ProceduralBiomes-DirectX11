@@ -28,15 +28,20 @@ public:
 	std::vector<BiomeObjectType> SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions, int terrainWidth, int terrainScale);
 
 	void AddToObjects(int modelID, int biomeType);
+	void SetIsSmall(bool isSmall);
 	
 private:
 
 
 
 
-	std::vector<int> m_desertObjects;
-	std::vector<int> m_forestObjects;
-	std::vector<int> m_snowObjects;
+	std::vector<int> m_desertObjectsSmall;
+	std::vector<int> m_desertObjectsLarge;
+	std::vector<int> m_forestObjectsSmall;
+	std::vector<int> m_forestObjectsLarge;
+	std::vector<int> m_snowObjectsSmall;
+	std::vector<int> m_snowObjectsLarge;
+
 	EntityData* m_entityData;
 	ModelClass snowModel, forestModel, desertModel;
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture, forestTexture, snowTexture;
@@ -45,6 +50,7 @@ private:
 	Terrain::HeightMapType* m_heightMap;
 	
 	int GetRandomObjectFromBiome(int biomeType);
+	bool isSmall = false;
 
 	BiomeObjectType AssignModelBasedOnClimate(SimpleMath::Vector3 position, SimpleMath::Vector3 climateClassification);
 	BiomeObjectType SetupObject(int modelID,  SimpleMath::Vector3 position);

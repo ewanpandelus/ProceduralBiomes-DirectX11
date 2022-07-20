@@ -218,7 +218,6 @@ private:
     DirectX::SimpleMath::Matrix                                             m_projection;
 
     BiomeObjects                                                            m_biomeObjects;
-    std::vector<BiomeObjects::BiomeObjectType>                              m_objectMap;
     DepthTexture                                                            m_depthTextureClass;
     ClimateMap                                                              m_climateMap;
     PoissonDiscSampling                                                     m_poissonDiscSampling;
@@ -227,7 +226,9 @@ private:
 
     float                                                                   m_elapsedTime = 0;
 
-    std::vector<SimpleMath::Vector2>                                        m_poissonPositions;
+    std::vector<SimpleMath::Vector2>                                        m_poissonPositionsBigObjects;
+    std::vector<SimpleMath::Vector2>                                        m_poissonPositionsSmallObjects;
+
     int                                                                     m_regionSize;
     int                                                                     m_terrainWidth = 64;
     int                                                                     m_terrainScale = 4;

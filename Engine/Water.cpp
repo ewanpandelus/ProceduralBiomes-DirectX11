@@ -43,7 +43,7 @@ bool Water::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight
 			index = (m_terrainHeight * j) + i;
 
 			m_heightMap[index].x = (float)i * m_scale;
-			m_heightMap[index].y = (float)-0.5f;
+			m_heightMap[index].y = (float)-1.5f;
 			m_heightMap[index].z = (float)j * m_scale;
 
 			//and use this step to calculate the texture coordinates for this point on the terrain.

@@ -309,7 +309,7 @@ void Game::Render()
     m_waterShader.EnableShader(context, false);
     m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_forestTreeColdTexture2.Get(), m_timer.GetTotalSeconds());
-    m_water.Render(context);
+  //  m_water.Render(context);
 
   
 
@@ -325,15 +325,28 @@ void Game::Render()
 
 void Game::GenerateBiomes(ID3D11Device* device)
 {
-    m_poissonPositions.clear();
+    m_poissonPositionsBigObjects.clear();
     m_entityData.ClearModelBuffers();
-    m_poissonPositions = m_poissonDiscSampling.GeneratePoints();
+   
+
     m_terrain.GenerateHeightMap(device, m_terrainScale);
+
+
+
     m_biomeObjects.SetHeightMap(m_terrain.GetHeightMap());
-    m_objectMap.clear();
     m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
-    m_objectMap = m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositions, m_terrainWidth, m_terrainScale);
     m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+
+
+    m_poissonDiscSampling.GenerateAllPoints(20, 1.5f, 5, 0.4f);
+    m_poissonPositionsBigObjects = m_poissonDiscSampling.GetBigObjPoints();
+    m_poissonPositionsSmallObjects = m_poissonDiscSampling.GetSmallObjPoints();
+
+    m_biomeObjects.SetIsSmall(false);
+    m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsBigObjects, m_terrainWidth, m_terrainScale);
+
+    m_biomeObjects.SetIsSmall(true);
+    m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsSmallObjects, m_terrainWidth, m_terrainScale);
     m_entityData.SetupModelBuffers(device);
  
    // m_water.GenerateHeightMap(device);
@@ -552,16 +565,18 @@ void Game::SetupDesertBiome(ID3D11Device* device)
     m_desesrtCactus2.InitializeModel(device, "desert_cactus2.obj", m_desertTexture);
     m_desertCactus3.InitializeModel(device, "desert_cactus3.obj", m_desertTexture2);
     m_desertCactus4.InitializeModel(device, "desert_cactus4.obj", m_desertTexture2);
+
     m_desertAloe.InitializeModel(device, "desert_aloe.obj", m_desertTexture2);
     m_desertRock.InitializeModel(device, "desert_rock.obj", m_desertTexture);
 
 
    
-
+    m_biomeObjects.SetIsSmall(false);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus), 0);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desesrtCactus2), 0);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus3), 0);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus4), 0);
+    m_biomeObjects.SetIsSmall(true);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertAloe), 0);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertRock), 0);
 
@@ -581,21 +596,27 @@ void Game::SetupForestBiome(ID3D11Device* device)
     m_forestFlowerModel.InitializeModel(device, "forest_flower.obj", m_forestColourPalletTexture);
     m_forestGrassRockModel.InitializeModel(device, "forest_grass_rock.obj", m_forestDetailsTexture);
 
+    m_biomeObjects.SetIsSmall(false);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestTreeModel), 1);
+    m_biomeObjects.SetIsSmall(true);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel), 1);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel2), 1);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel3), 1);
-    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestFlowerModel), 1);
-    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassRockModel), 1);
+
+   // m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestFlowerModel), 1);
+   // m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassRockModel), 1);
 }
 
 
 
 void Game::SetupSnowBiome(ID3D11Device* device)
 {
+    m_biomeObjects.SetIsSmall(false);
     CreateDDSTextureFromFile(device, L"snowTreeTex.dds", nullptr, m_snowTreeTextures.ReleaseAndGetAddressOf());
     m_snowTreeModel.InitializeModel(device, "snowTree.obj", m_snowTreeTextures);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_snowTreeModel), 2);
+    m_biomeObjects.SetIsSmall(true);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel2), 2);
 }
 
 void Game::OnDeviceLost()

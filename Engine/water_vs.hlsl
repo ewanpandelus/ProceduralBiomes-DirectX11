@@ -43,24 +43,8 @@ OutputType main(InputType input)
     input.position.w = 1.0f;
     // Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
-    float amplitude = 0.5f;
-    float wavelength = 4.f;
-    float2 direction = float2(1, 1);
-    float2 d = normalize(direction);
-    float steepness = 0.5;
+    float amplitude = 0.5;
 
-
-  /*  float3 p = output.position.xyz;
-    float k = 3.14/wavelength;
-    float c = sqrt(9.8 / k);
-    float f = k * (dot(d, p.xz) - c * time);
-    float a = steepness / k;
-    p.x += d.x * (a * cos(f));
-    p.y = a * sin(f)*amplitude;
-    p.z += d.y * (a * cos(f));
-    float3 tangent = float3( 1 - d.x * d.x * (steepness * sin(f)),d.x * (steepness * cos(f)),-d.x * d.y * (steepness * sin(f)) );
-    float3 binormal = float3(-d.x * d.y * (steepness * sin(f)), d.y * (steepness * cos(f)), 1 - d.y * d.y * (steepness * sin(f)));
-    float3 normal = normalize(cross(binormal, tangent));*/
     float4 waveA = float4(1, 0, 0.5, 10);
     float4 waveB = float4(0, 1, 0.25, 20);
     float4 waveC = float4(1, 1, 0.15, 10);

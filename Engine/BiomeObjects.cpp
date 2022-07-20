@@ -30,6 +30,9 @@ std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingTo
 		index = (terrainWidth * positionOnClimateMap.y) + positionOnClimateMap.x;  
 		SimpleMath::Vector3 position = SimpleMath::Vector3(pos.x, m_heightMap[index].y, pos.y);
 		BiomeObjects::BiomeObjectType biomeObj = AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification);
+		if (biomeObj.modelID == -1) {
+			continue;
+		}
 		biomeObj.position.x *= terrainScale;
 		biomeObj.position.z *= terrainScale;
 		m_entityData->IncreaseEntityCount(biomeObj.modelID, biomeObj.position);
@@ -40,17 +43,37 @@ void BiomeObjects::AddToObjects(int modelID, int biomeType)
 {
 	switch (biomeType) {
 	case 0:
-		m_desertObjects.push_back(modelID);
+		if (isSmall) {
+			m_desertObjectsSmall.push_back(modelID);
+		}
+		else {
+			m_desertObjectsLarge.push_back(modelID);
+		}
 		break;
 	case 1:
-		m_forestObjects.push_back(modelID);
+		if (isSmall) {
+			m_forestObjectsSmall.push_back(modelID);
+		}
+		else {
+			m_forestObjectsLarge.push_back(modelID);
+		}
 		break;
 	case 2:
-		m_snowObjects.push_back(modelID);
+		if (isSmall) {
+			m_snowObjectsSmall.push_back(modelID);
+		}
+		else {
+			m_snowObjectsLarge.push_back(modelID);
+		}
 		break;
 	default:
 		return;
 	}
+}
+
+void BiomeObjects::SetIsSmall(bool isSmall)
+{
+	this->isSmall = isSmall;
 }
 
 
@@ -60,16 +83,29 @@ int BiomeObjects::GetRandomObjectFromBiome(int biomeType)
 	int listSize = 0;
 	switch (biomeType) {
 	case 0:
-		listSize = m_desertObjects.size();
-		return m_desertObjects[rand() % listSize];
+		if (isSmall) {
+			listSize = m_desertObjectsSmall.size();
+			return -1;//m_desertObjectsSmall[rand() % listSize];
+		}
+		listSize = m_desertObjectsLarge.size();
+		return m_desertObjectsLarge[rand() % listSize];
 		break;
 	case 1:
-		listSize = m_forestObjects.size();
-		return m_forestObjects[rand() % listSize];
+		if (isSmall) {
+			listSize = m_forestObjectsSmall.size();
+			return m_forestObjectsSmall[rand() % listSize];
+		}
+		listSize = m_forestObjectsLarge.size();
+		return m_forestObjectsLarge[rand() % listSize];
 		break;
 	case 2:
-		listSize = m_snowObjects.size();
-		return m_snowObjects[rand() % listSize];
+
+		if (isSmall) {
+			//listSize = m_snowObjectsSmall.size();
+			return -1;// m_snowObjectsSmall[rand() % listSize];
+		}
+		listSize = m_snowObjectsLarge.size();
+		return m_snowObjectsLarge[rand() % listSize];
 		break;
 	default:
 		return -1;
