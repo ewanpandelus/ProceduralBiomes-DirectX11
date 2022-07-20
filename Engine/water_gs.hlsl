@@ -37,7 +37,7 @@ void main(triangle InputType input[3], inout TriangleStream<OutputType> triStrea
     for (int i = 0; i < 3; i++) {
         output.position = input[i].position;
         output.tex = input[i].tex;
-        output.normal = triNormal;
+        output.normal = input[i].normal;
         triStream.Append(output);
     }
     triStream.RestartStrip();

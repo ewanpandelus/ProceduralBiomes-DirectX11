@@ -296,12 +296,7 @@ void Game::Render()
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
     SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth*m_terrainScale/2, 0.f, -m_terrainWidth*m_terrainScale/2);
     m_world = m_world * positionAccountedFor;
-
-    m_waterShader.EnableShader(context, true);
-    m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-        m_forestTreeColdTexture2.Get(), m_timer.GetTotalSeconds());
-    m_water.Render(context);
-
+   
 
 
     m_terrainShader.EnableShader(context);
@@ -309,15 +304,14 @@ void Game::Render()
         m_generatedClimateMapTexture.Get(), m_noiseTexture.Get());
     m_terrain.Render(context);
 
- 
-  //  context->OMSetBlendState(m_states->NonPremultiplied(), nullptr, 0xFFFFFFFF);
-    //m_waterShader.EnableShader(context);
-    //m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-     //  m_forestTreeColdTexture.Get(), m_timer.GetTotalSeconds());
+    float blendFactor[4] = { 0,0,0,0 };
+    context->OMSetBlendState(m_states->AlphaBlend(), blendFactor, 0xFFFFFFFF);
+    m_waterShader.EnableShader(context, false);
+    m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+        m_forestTreeColdTexture2.Get(), m_timer.GetTotalSeconds());
+    m_water.Render(context);
 
-    //m_geometryShader.EnableShader(context);
-    //m_geometryShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-     //m_forestTreeColdTexture2.Get(), m_timer.GetTotalSeconds());
+  
 
 
     //render our GUI
@@ -455,7 +449,6 @@ void Game::CreateDeviceDependentResources()
 
     *m_poissonDiscSampling.GetSampleRegionSize() = m_terrainWidth - 1;
 
-    m_water.SetTerrainHeightMap(m_terrain);
     m_water.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
 
 

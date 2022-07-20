@@ -23,7 +23,7 @@ struct InputType
 {
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
-    float3 normal : NORMAL;
+    nointerpolation float3 normal : NORMAL;
 };
 
 
@@ -35,12 +35,19 @@ float4 main(InputType input) : SV_TARGET
     float3	lightDir;
     float	lightIntensity;
     float4	color;
-
-
-    float3 position3D = (float3)mul(input.position, worldMatrix);
+    float3 reflection;
+    float4 specular;
+    float specularPower = 32;
     // Invert the light direction for calculations.
 
-    lightDir = float3(0.5, -0.5, 0.5);// normalize(position3D - lightPosition);
+    reflection = normalize(2 * lightIntensity * input.normal - lightDir);
+
+    // Determine the amount of specular light based on the reflection vector, viewing direction, and specular power.
+
+
+    // Invert the light direction for calculations.
+
+    lightDir = float3(0.5, -0.5, 0.5);// lightDir = normalize(input.position3D - lightPosition);
 
     // Calculate the amount of light on this pixel.
     lightIntensity = saturate(dot(input.normal, -lightDir));
@@ -49,10 +56,12 @@ float4 main(InputType input) : SV_TARGET
     color = ambientColor + (diffuseColor * lightIntensity); //adding ambient
     color = saturate(color);
 
+   // specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
+    //color = saturate(color + (specular / 3));
 
+     color*=float4(0.2,0.2,1,0.8);
+     //color.a = 0;
+     return color;
 
-    color = color;
-
-
-    return color;
+    //return color;
 }

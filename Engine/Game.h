@@ -131,7 +131,7 @@ private:
 	//Shaders
 	TerrainShader														    m_terrainShader;
     Shader														            m_standardShader;
-    Shader														        m_waterShader;
+    WaterShader														        m_waterShader;
     Shader                                                                  m_geometryShader;
   
 

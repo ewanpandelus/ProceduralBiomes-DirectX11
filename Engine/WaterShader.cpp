@@ -41,11 +41,7 @@ bool WaterShader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* p
 	// This setup needs to match the VertexType stucture in the MeshClass and in the shader.
 	D3D11_INPUT_ELEMENT_DESC polygonLayout[] = {
 		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{"TEXCOORD", 1, DXGI_FORMAT_R32G32B32_FLOAT, 1,0, D3D11_INPUT_PER_INSTANCE_DATA ,1 },
-		{"TEXCOORD", 2, DXGI_FORMAT_R32_FLOAT, 2,0, D3D11_INPUT_PER_INSTANCE_DATA ,1 }
-
+		{ "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D11_APPEND_ALIGNED_ELEMENT, D3D11_INPUT_PER_VERTEX_DATA, 0}
 	};
 
 	// Get a count of the elements in the layout.
@@ -148,104 +144,16 @@ bool WaterShader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::Sim
 
 	return false;
 }
-bool WaterShader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection)
-{
-	HRESULT result;
-	D3D11_MAPPED_SUBRESOURCE mappedResource;
-	MatrixBufferType* dataPtr;
-	LightBufferType* lightPtr;
-	unsigned int bufferNumber;
-	DirectX::SimpleMath::Matrix  tworld, tview, tproj;
-
-	// Transpose the matrices to prepare them for the shader.
-	tworld = world->Transpose();
-	tview = view->Transpose();
-	tproj = projection->Transpose();
-
-	// Lock the constant buffer so it can be written to.
-	result = context->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-
-	// Get a pointer to the data in the constant buffer.
-	dataPtr = (MatrixBufferType*)mappedResource.pData;
-
-	// Copy the matrices into the constant buffer.
-	dataPtr->world = tworld;// worldMatrix;
-	dataPtr->view = tview;
-	dataPtr->projection = tproj;
-
-	// Unlock the constant buffer.
-	context->Unmap(m_matrixBuffer, 0);
-
-	// Set the position of the constant buffer in the vertex shader.
-	bufferNumber = 0;
-
-	// Now set the constant buffer in the vertex shader with the updated values.
-	context->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
-
-	context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
-	lightPtr = (LightBufferType*)mappedResource.pData;
-	lightPtr->diffuse = DirectX::SimpleMath::Vector4(0.02f, 0.2f, 0.02f, 1.0f);
-	lightPtr->ambient = DirectX::SimpleMath::Vector4(0.2f, 0.2f, 0.2f, 0.2f);
-	lightPtr->padding = 0.0f;
-	context->Unmap(m_lightBuffer, 0);
-	bufferNumber = 0;
-	context->PSSetConstantBuffers(bufferNumber, 1, &m_lightBuffer);
 
 
-	return false;
-}
-
-
-void WaterShader::EnableShader(ID3D11DeviceContext* context)
-{
+void WaterShader::EnableShader(ID3D11DeviceContext* context, bool geomOn) {
 	context->IASetInputLayout(m_layout);							//set the input layout for the shader to match out geometry
 	context->VSSetShader(m_vertexShader.Get(), 0, 0);
-    context->GSSetShader(m_geometryShader.Get(), 0, 0);
+	if (geomOn) {
+		context->GSSetShader(m_geometryShader.Get(), 0, 0);
+	}
+
 	context->PSSetShader(m_pixelShader.Get(), 0, 0);				//turn on pixel shader
 	// Set the sampler state in the pixel shader.
 	context->PSSetSamplers(0, 1, &m_sampleState);
-
-}
-void WaterShader::LoadGeometryShader(ID3D11Device* device, WCHAR* filename)
-{
-	ID3D10Blob* geometryShaderBuffer;
-
-	// check file extension for correct loading function.
-	std::wstring fn(filename);
-	std::string::size_type idx;
-	std::wstring extension;
-
-	idx = fn.rfind('.');
-
-	if (idx != std::string::npos)
-	{
-		extension = fn.substr(idx + 1);
-	}
-	else
-	{
-		// No extension found
-		MessageBox(hwnd, L"Error finding geometry shader file", L"ERROR", MB_OK);
-		exit(0);
-	}
-
-	// Load the texture in.
-	if (extension != L"cso")
-	{
-		MessageBox(hwnd, L"Incorrect geometry shader file type", L"ERROR", MB_OK);
-		exit(0);
-	}
-
-	// Reads compiled shader into buffer (bytecode).
-	HRESULT result = D3DReadFileToBlob(filename, &geometryShaderBuffer);
-	if (result != S_OK)
-	{
-		MessageBox(NULL, filename, L"File not found", MB_OK);
-		exit(0);
-	}
-	// Create the domain shader from the buffer.
-	device->CreateGeometryShader(geometryShaderBuffer->GetBufferPointer(), geometryShaderBuffer->GetBufferSize(), NULL, &m_geometryShader);
-
-	geometryShaderBuffer->Release();
-	geometryShaderBuffer = 0;
-
-}
+ }
