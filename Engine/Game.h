@@ -169,6 +169,9 @@ private:
     ModelClass																m_forestGrassModel;
     ModelClass																m_forestGrassModel2;
     ModelClass																m_forestGrassModel3;
+    ModelClass																m_forestMushroomModel;
+    ModelClass																m_forestMushroomModel2;
+
     ModelClass																m_forestGrassRockModel;
 
 

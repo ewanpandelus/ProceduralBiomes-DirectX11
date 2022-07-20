@@ -338,11 +338,13 @@ void Game::GenerateBiomes(ID3D11Device* device)
     m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
 
 
-    m_poissonDiscSampling.GenerateAllPoints(20, 1.5f, 5, 0.4f);
+    m_poissonDiscSampling.GenerateAllPoints(20, 1.5f, 2, 0.18f);
     m_poissonPositionsBigObjects = m_poissonDiscSampling.GetBigObjPoints();
     m_poissonPositionsSmallObjects = m_poissonDiscSampling.GetSmallObjPoints();
 
     m_biomeObjects.SetIsSmall(false);
+   
+    
     m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsBigObjects, m_terrainWidth, m_terrainScale);
 
     m_biomeObjects.SetIsSmall(true);
@@ -574,11 +576,12 @@ void Game::SetupDesertBiome(ID3D11Device* device)
     m_biomeObjects.SetIsSmall(false);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus), 0);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desesrtCactus2), 0);
-    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus3), 0);
-    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus4), 0);
-    m_biomeObjects.SetIsSmall(true);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertAloe), 0);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertRock), 0);
+    //m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus3), 0);
+  //  m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus4), 0);
+    m_biomeObjects.SetIsSmall(true);
+
 
 
 }
@@ -594,6 +597,9 @@ void Game::SetupForestBiome(ID3D11Device* device)
     m_forestGrassModel2.InitializeModel(device, "forest_grass2.obj", m_forestGrassTexture);
     m_forestGrassModel3.InitializeModel(device, "forest_grass3.obj", m_forestGrassTexture);
     m_forestFlowerModel.InitializeModel(device, "forest_flower.obj", m_forestColourPalletTexture);
+    m_forestMushroomModel.InitializeModel(device, "forest_mushroom.obj", m_forestColourPalletTexture);
+    m_forestMushroomModel2.InitializeModel(device, "forest_mushroom2.obj", m_forestColourPalletTexture);
+
     m_forestGrassRockModel.InitializeModel(device, "forest_grass_rock.obj", m_forestDetailsTexture);
 
     m_biomeObjects.SetIsSmall(false);
@@ -602,6 +608,10 @@ void Game::SetupForestBiome(ID3D11Device* device)
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel), 1);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel2), 1);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel3), 1);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestMushroomModel), 1);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestMushroomModel2), 1);
+
+
 
    // m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestFlowerModel), 1);
    // m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassRockModel), 1);

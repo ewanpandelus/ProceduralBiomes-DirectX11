@@ -35,8 +35,8 @@ private:
 	float m_maxTemp, m_minTemp;
 	float m_maxRainfall, m_minRainfall;
 
-	float m_temperatureAmplitude = 0, m_temperatureFrequency = 0, m_temperatureOffset = 0;
-	float m_rainfallAmplitude = 0, m_rainFallFrequency = 0, m_rainfallOffset = 0;
+	float m_temperatureAmplitude = 1, m_temperatureFrequency = 0.008, m_temperatureOffset = 30.137;
+	float m_rainfallAmplitude = 1, m_rainFallFrequency = 0.025, m_rainfallOffset = 84.247;
 
 	BiomeClassifier m_biomeClassifier;
 
