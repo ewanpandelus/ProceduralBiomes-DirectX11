@@ -300,32 +300,23 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			}
 			counter++;
 
-			SetupVertex(indices, vertices, index, index3, index4, index1);
-			index++;
+			SetupVertex(indices, vertices, &index, index3, index4, index1);
+
+			// Upper right.
+			SetupVertex(indices, vertices, &index, index4, index3, index1);
+
+			// Bottom left.
+			SetupVertex(indices, vertices, &index, index1, index3, index4);
 		
-			// Upper right.
-			SetupVertex(indices, vertices, index, index4, index3, index1);
-			index++;
-			
-
 			// Bottom left.
-			SetupVertex(indices, vertices, index, index1, index3, index4);
-			index++;
-
-
-			// Bottom left.
-			SetupVertex(indices, vertices, index, index1, index4, index2);
-			index++;
-
-
+			SetupVertex(indices, vertices, &index, index1, index4, index2);
+	
 			// Upper right.
-			SetupVertex(indices, vertices, index, index4, index1, index2);
-			index++;
-
+			SetupVertex(indices, vertices, &index, index4, index1, index2);
 
 			// Bottom right.
-			SetupVertex(indices, vertices, index, index2, index1, index4);
-			index++;
+			SetupVertex(indices, vertices, &index, index2, index1, index4);
+	
 		}
 	}
 
@@ -378,15 +369,16 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 
 	return true;
 }
-void Terrain::SetupVertex(unsigned long* indices, VertexType* vertices, int currentIndex, int triangle1Index, int triangle2Index, int triangle3Index)
+void Terrain::SetupVertex(unsigned long* indices, VertexType* vertices, int* currentIndex, int triangle1Index, int triangle2Index, int triangle3Index)
 {
-	vertices[currentIndex].position = DirectX::SimpleMath::Vector3(m_heightMap[triangle1Index].x, m_heightMap[triangle1Index].y, m_heightMap[triangle1Index].z);
-	vertices[currentIndex].normal = DirectX::SimpleMath::Vector3(m_heightMap[triangle1Index].nx, m_heightMap[triangle1Index].ny, m_heightMap[triangle1Index].nz);
-	vertices[currentIndex].texture = DirectX::SimpleMath::Vector2(m_heightMap[triangle1Index].u, m_heightMap[triangle1Index].v);
-	indices[currentIndex] = currentIndex;
+	int index = *currentIndex;
+	vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[triangle1Index].x, m_heightMap[triangle1Index].y, m_heightMap[triangle1Index].z);
+	vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[triangle1Index].nx, m_heightMap[triangle1Index].ny, m_heightMap[triangle1Index].nz);
+	vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[triangle1Index].u, m_heightMap[triangle1Index].v);
+	indices[index] = index;
 	m_heightMap[triangle1Index].triPos1 = SimpleMath::Vector3(m_heightMap[triangle2Index].x, m_heightMap[triangle2Index].y, m_heightMap[triangle2Index].z);
 	m_heightMap[triangle1Index].triPos2 = SimpleMath::Vector3(m_heightMap[triangle3Index].x, m_heightMap[triangle3Index].y, m_heightMap[triangle3Index].z);
-
+	*currentIndex += 1;
 }
 void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {

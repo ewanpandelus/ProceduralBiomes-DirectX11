@@ -42,6 +42,9 @@ void Game::Initialize(HWND window, int width, int height)
 
     m_poissonDiscSampling  =  PoissonDiscSampling(m_biomeObjects);
     m_biomeObjects.SetEntityData(&m_entityData);
+    m_biomeObjects.SetBarycentricCoordinates(&m_barycentricCoordinates);
+    m_barycentricCoordinates.SetTerrainScale(m_terrainScale);
+
     m_deviceResources->SetWindow(window, width, height);
     m_deviceResources->CreateDeviceResources();
     CreateDeviceDependentResources();
@@ -262,7 +265,7 @@ void Game::Render()
     context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
     context->RSSetState(m_states->CullClockwise());
   //  context->RSSetState(m_raster.Get());
-    context->RSSetState(m_states->Wireframe());
+    //context->RSSetState(m_states->Wireframe());
 
     //prepare transform for floor object. 
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
@@ -309,7 +312,7 @@ void Game::Render()
     m_waterShader.EnableShader(context, false);
     m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_forestTreeColdTexture2.Get(), m_timer.GetTotalSeconds());
-  //  m_water.Render(context);
+    m_water.Render(context);
 
   
 
@@ -327,13 +330,10 @@ void Game::GenerateBiomes(ID3D11Device* device)
 {
     m_poissonPositionsBigObjects.clear();
     m_entityData.ClearModelBuffers();
-   
+
 
     m_terrain.GenerateHeightMap(device, m_terrainScale);
-
-
-
-    m_biomeObjects.SetHeightMap(m_terrain.GetHeightMap());
+    m_barycentricCoordinates.SetHeightMap(m_terrain.GetHeightMap());
     m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
     m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
 
@@ -351,7 +351,7 @@ void Game::GenerateBiomes(ID3D11Device* device)
     m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsSmallObjects, m_terrainWidth, m_terrainScale);
     m_entityData.SetupModelBuffers(device);
  
-   // m_water.GenerateHeightMap(device);
+ 
 }
 
 // Helper method to clear the back buffers.

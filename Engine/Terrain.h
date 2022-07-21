@@ -46,7 +46,7 @@ private:
 	bool InitializeBuffers(ID3D11Device*);
 	void RenderBuffers(ID3D11DeviceContext*);
 	float Redistribution(float nx, float ny, float exp);
-	void SetupVertex(unsigned long* indices, VertexType* vertices, int currentIndex, int triangle1Index, int triangle2Index, int triangle3Index);
+	void SetupVertex(unsigned long* indices, VertexType* vertices, int* currentIndex, int triangle1Index, int triangle2Index, int triangle3Index);
 
 private:
 	bool m_terrainGeneratedToggle;

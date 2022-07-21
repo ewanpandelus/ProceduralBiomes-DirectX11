@@ -3,20 +3,7 @@
 
 
 
-void BiomeObjects::SetLargeModels(ModelClass desertModel, ModelClass forestModel, ModelClass snowModel)
-{
-	this->desertModel = desertModel;
-	this->forestModel = forestModel;
-	this->snowModel = snowModel;
-}
 
-void BiomeObjects::SetLargeModelsTextures(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture,
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> forestTexture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> snowTexture)
-{
-	this->desertTexture = desertTexture;
-	this->forestTexture = forestTexture;
-	this->snowTexture = snowTexture;
-}
 
 
 std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingToBiomes(std::vector<SimpleMath::Vector2> gridPositions, int terrainWidth, int terrainScale)
@@ -28,7 +15,7 @@ std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingTo
 		SimpleMath::Vector2 positionOnClimateMap =SimpleMath::Vector2((int)pos.x, (int)pos.y);
 
 		index = (terrainWidth * positionOnClimateMap.y) + positionOnClimateMap.x;  
-		SimpleMath::Vector3 position = SimpleMath::Vector3(pos.x, m_heightMap[index].y, pos.y);
+		SimpleMath::Vector3 position = SimpleMath::Vector3(pos.x, m_barycentricCoords->GetYPosition(pos.x, pos.y,index),  pos.y);
 		BiomeObjects::BiomeObjectType biomeObj = AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification);
 		if (biomeObj.modelID == -1) {
 			continue;
@@ -135,8 +122,6 @@ BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(SimpleMath
 
 
 
-	//else  return PickFirstChoice(percentage, forestPercent) ? SetupObject(forestModel, forestTexture, x , z, 1) : SetupObject(desertModel, desertTexture, x, z, 2);
-
 
 	//https://nbertoa.wordpress.com/2016/02/02/instancing-vs-geometry-shader-vs-vertex-shader/
 
@@ -158,10 +143,12 @@ void BiomeObjects::SetClimateMap(ClimateMap::ClimateMapType* m_climateMap)
 	this->m_climateMap = m_climateMap;
 }
 
-void BiomeObjects::SetHeightMap(Terrain::HeightMapType* m_heightMap)
+void BiomeObjects::SetBarycentricCoordinates(BarycentricCoordinates* barycentricCoords)
 {
-	this->m_heightMap = m_heightMap;
+	m_barycentricCoords = barycentricCoords;
 }
+
+
 
 void BiomeObjects::SetEntityData(EntityData* entityData)
 {

@@ -224,7 +224,7 @@ private:
     DepthTexture                                                            m_depthTextureClass;
     ClimateMap                                                              m_climateMap;
     PoissonDiscSampling                                                     m_poissonDiscSampling;
-
+    BarycentricCoordinates                                                  m_barycentricCoordinates;
 
 
     float                                                                   m_elapsedTime = 0;

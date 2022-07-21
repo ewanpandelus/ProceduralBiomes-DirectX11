@@ -4,19 +4,20 @@
 #include "ClimateMap.h"
 #include "Terrain.h" 
 #include "EntityData.h"
+#include "BarycentricCoordinates.h"
 class BiomeObjects
 {
 public:
 	
-	void SetLargeModels(ModelClass desertModel, ModelClass forestModel, ModelClass snowModel);
-	void SetLargeModelsTextures(Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture, Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> forestTexture,
-		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> snowTexture);
+
+	
 
 
 
 	void SetCellWidth(float cellWidth);
 	void SetClimateMap(ClimateMap::ClimateMapType* m_climateMap);
-	void SetHeightMap(Terrain::HeightMapType* m_heightMap);
+	void SetBarycentricCoordinates(BarycentricCoordinates* barycentricCoords);
+	
 	void SetEntityData(EntityData* entityData);
 	struct BiomeObjectType
 	{
@@ -47,8 +48,7 @@ private:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture, forestTexture, snowTexture;
 	float currentCellWidth = 0;
 	ClimateMap::ClimateMapType* m_climateMap;
-	Terrain::HeightMapType* m_heightMap;
-	
+	BarycentricCoordinates* m_barycentricCoords;
 	int GetRandomObjectFromBiome(int biomeType);
 	bool isSmall = false;
 
