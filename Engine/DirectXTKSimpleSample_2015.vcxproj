@@ -166,6 +166,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="BarycentricCoordinates.h" />
     <ClInclude Include="BiomeClassifier.h" />
     <ClInclude Include="BiomeObjects.h" />
     <ClInclude Include="Camera.h" />
@@ -199,6 +200,7 @@
     <ClInclude Include="WaterShader.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="BarycentricCoordinates.cpp" />
     <ClCompile Include="BiomeClassifier.cpp" />
     <ClCompile Include="BiomeObjects.cpp" />
     <ClCompile Include="Camera.cpp" />

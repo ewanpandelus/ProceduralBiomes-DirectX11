@@ -300,51 +300,31 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 			}
 			counter++;
 
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index3].x, m_heightMap[index3].y, m_heightMap[index3].z);
-			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index3].nx, m_heightMap[index3].ny, m_heightMap[index3].nz);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index3].u, m_heightMap[index3].v);
-			indices[index] = index;
+			SetupVertex(indices, vertices, index, index3, index4, index1);
 			index++;
-
-
-
+		
 			// Upper right.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
-			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index4].nx, m_heightMap[index4].ny, m_heightMap[index4].nz);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index4].u, m_heightMap[index4].v);
-			indices[index] = index;
+			SetupVertex(indices, vertices, index, index4, index3, index1);
+			index++;
+			
+
+			// Bottom left.
+			SetupVertex(indices, vertices, index, index1, index3, index4);
 			index++;
 
 
 			// Bottom left.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
-			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index1].nx, m_heightMap[index1].ny, m_heightMap[index1].nz);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index1].u, m_heightMap[index1].v);
-			indices[index] = index;
-			index++;
-
-
-			// Bottom left.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
-			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index1].nx, m_heightMap[index1].ny, m_heightMap[index1].nz);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index1].u, m_heightMap[index1].v);
-			indices[index] = index;
+			SetupVertex(indices, vertices, index, index1, index4, index2);
 			index++;
 
 
 			// Upper right.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
-			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index4].nx, m_heightMap[index4].ny, m_heightMap[index4].nz);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index4].u, m_heightMap[index4].v);
-			indices[index] = index;
+			SetupVertex(indices, vertices, index, index4, index1, index2);
 			index++;
 
 
 			// Bottom right.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index2].x, m_heightMap[index2].y, m_heightMap[index2].z);
-			vertices[index].normal = DirectX::SimpleMath::Vector3(m_heightMap[index2].nx, m_heightMap[index2].ny, m_heightMap[index2].nz);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index2].u, m_heightMap[index2].v);
-			indices[index] = index;
+			SetupVertex(indices, vertices, index, index2, index1, index4);
 			index++;
 		}
 	}
@@ -398,7 +378,16 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 
 	return true;
 }
+void Terrain::SetupVertex(unsigned long* indices, VertexType* vertices, int currentIndex, int triangle1Index, int triangle2Index, int triangle3Index)
+{
+	vertices[currentIndex].position = DirectX::SimpleMath::Vector3(m_heightMap[triangle1Index].x, m_heightMap[triangle1Index].y, m_heightMap[triangle1Index].z);
+	vertices[currentIndex].normal = DirectX::SimpleMath::Vector3(m_heightMap[triangle1Index].nx, m_heightMap[triangle1Index].ny, m_heightMap[triangle1Index].nz);
+	vertices[currentIndex].texture = DirectX::SimpleMath::Vector2(m_heightMap[triangle1Index].u, m_heightMap[triangle1Index].v);
+	indices[currentIndex] = currentIndex;
+	m_heightMap[triangle1Index].triPos1 = SimpleMath::Vector3(m_heightMap[triangle2Index].x, m_heightMap[triangle2Index].y, m_heightMap[triangle2Index].z);
+	m_heightMap[triangle1Index].triPos2 = SimpleMath::Vector3(m_heightMap[triangle3Index].x, m_heightMap[triangle3Index].y, m_heightMap[triangle3Index].z);
 
+}
 void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
 	unsigned int stride;
@@ -479,6 +468,7 @@ float Terrain::Redistribution(float x, float y, float exponent) {
 	float e = (e0 + e1 + e2) / (1 + 0.5 + 0.25);
 	return round(e * exponent) / exponent;
 }
+
 bool Terrain::Update()
 {
 	return true;

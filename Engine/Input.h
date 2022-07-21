@@ -42,5 +42,7 @@ private:
 	float prevY = 0;
 	float deltaX = 0;
 	float deltaY = 0;
+	bool moving = false;
+	float acceleration = 1.;
 };
 

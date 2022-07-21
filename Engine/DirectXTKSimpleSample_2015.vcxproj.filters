@@ -89,6 +89,7 @@
       <Filter>Rendering</Filter>
     </ClInclude>
     <ClInclude Include="EntityData.h" />
+    <ClInclude Include="BarycentricCoordinates.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp" />
@@ -155,6 +156,7 @@
       <Filter>Rendering</Filter>
     </ClCompile>
     <ClCompile Include="EntityData.cpp" />
+    <ClCompile Include="BarycentricCoordinates.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="resource.rc" />

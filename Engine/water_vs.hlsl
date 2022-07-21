@@ -43,7 +43,7 @@ OutputType main(InputType input)
     input.position.w = 1.0f;
     // Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
-    float amplitude = 0.5;
+    float amplitude = 0.3;
 
     float4 waveA = float4(1, 0, 0.5, 10);
     float4 waveB = float4(0, 1, 0.25, 20);

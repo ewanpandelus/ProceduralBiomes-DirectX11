@@ -64,7 +64,7 @@ void Input::Update()
 	if (currentX != prevX)
 	{
 		m_GameInput.rotY = true;
-		deltaX = currentX - prevX;
+		deltaX = (currentX - prevX);
 	}
 	else
 	{
@@ -73,12 +73,13 @@ void Input::Update()
 	if (currentY != prevY)
 	{
 		m_GameInput.rotX = true;
-		deltaY = currentY - prevY;
+		deltaY = (currentY - prevY);
 	}
 	else
 	{
 		m_GameInput.rotX = false;
 	}
+
 	prevX = currentX;
 	prevY = currentY;
 }

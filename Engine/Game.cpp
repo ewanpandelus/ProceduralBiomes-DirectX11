@@ -262,7 +262,7 @@ void Game::Render()
     context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
     context->RSSetState(m_states->CullClockwise());
   //  context->RSSetState(m_raster.Get());
-    //context->RSSetState(m_states->Wireframe());
+    context->RSSetState(m_states->Wireframe());
 
     //prepare transform for floor object. 
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
@@ -304,7 +304,7 @@ void Game::Render()
         m_generatedClimateMapTexture.Get(), m_noiseTexture.Get());
     m_terrain.Render(context);
 
-    float blendFactor[4] = { 0,0,0,0 };
+    float blendFactor[4] = { 1,1,1,1 };
     context->OMSetBlendState(m_states->AlphaBlend(), blendFactor, 0xFFFFFFFF);
     m_waterShader.EnableShader(context, false);
     m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,

@@ -59,7 +59,7 @@ float4 main(InputType input) : SV_TARGET
    // specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
     //color = saturate(color + (specular / 3));
 
-     color*=float4(0.2,0.2,1,0.8);
+     color*=float4(0.2,0.4,1,0.6);
      //color.a = 0;
      return color;
 
