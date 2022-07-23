@@ -77,7 +77,9 @@ private:
     void SetupDesertBiome(ID3D11Device* device);
     void SetupForestBiome(ID3D11Device* device);
     void SetupSnowBiome(ID3D11Device* device);
-
+    void GenerateClimate(ID3D11Device* device);
+    void GenerateTerrain(ID3D11Device* device);
+    void SetupModelPositions(ID3D11Device* device);
 
     // Device resources.
     std::unique_ptr<DX::DeviceResources>    m_deviceResources;
@@ -236,8 +238,8 @@ private:
     int                                                                     m_regionSize;
     int                                                                     m_terrainWidth = 64;
     int                                                                     m_terrainScale = 4;
-    bool hideUI = false;
-    int fps = 0;
+    bool                                                                    m_hideUI = false;
+    bool m_playMode =                                                       false;
   /*  float xOffset = -63.4f;
     float zOffset = -63.0f;*/
   float xOffset = -63.4f;

@@ -155,18 +155,24 @@ void Game::Update(DX::StepTimer const& timer)
     m_Light.setAmbientColour(m_ambientLight[0], m_ambientLight[1], m_ambientLight[2], 1.0f);
     m_Light.setDiffuseColour(m_diffuseLight[0], m_diffuseLight[1], m_diffuseLight[2], 1.0f);
     auto device = m_deviceResources->GetD3DDevice();
+    float deltaTime = m_timer.GetElapsedSeconds();
     m_elapsedTime += m_timer.GetElapsedSeconds();
+
     Vector3 rotation = m_Camera01.getRotation();
     if (m_gameInputCommands.left && m_elapsedTime>0.1)
     {
         m_elapsedTime = 0;
-        hideUI = !hideUI;
+        m_hideUI = !m_hideUI;
     }
-
-    if (m_gameInputCommands.rotX)
+    if (m_gameInputCommands.P && m_elapsedTime > 0.1) {
+        m_elapsedTime = 0;
+        m_playMode = !m_playMode;
+        m_input.SwapPlayMode(m_playMode);
+    }
+    if (m_gameInputCommands.rotX && m_playMode)
     {
         float deltaY = m_input.GetDeltaY();
-        rotation.x = rotation.x -= m_Camera01.getRotationSpeed() * deltaY;
+        rotation.x = rotation.x -= m_Camera01.getRotationSpeed() * deltaY * deltaTime;
         if (rotation.x < -170)
         {
             rotation.x = -169;
@@ -177,22 +183,22 @@ void Game::Update(DX::StepTimer const& timer)
         }
         m_Camera01.setRotation(rotation);
     }
-    if (m_gameInputCommands.rotY)
+    if (m_gameInputCommands.rotY && m_playMode)
     {
         float deltaX = m_input.GetDeltaX();
-        rotation.y = rotation.y -= m_Camera01.getRotationSpeed() * deltaX;
+        rotation.y = rotation.y -= m_Camera01.getRotationSpeed() * deltaX * deltaTime;
         m_Camera01.setRotation(rotation);
     }
     if (m_gameInputCommands.forward)
     {
         Vector3 position = m_Camera01.getPosition(); //get the position
-        position += (m_Camera01.getForward() * m_Camera01.getMoveSpeed()); //add the forward vector
+        position += (m_Camera01.getForward() * m_Camera01.getMoveSpeed() * deltaTime);
         m_Camera01.setPosition(position);
     }
     if (m_gameInputCommands.back)
     {
         Vector3 position = m_Camera01.getPosition(); //get the position
-        position -= (m_Camera01.getForward() * m_Camera01.getMoveSpeed()); //add the forward vector
+        position -= (m_Camera01.getForward() * m_Camera01.getMoveSpeed() * deltaTime); 
         m_Camera01.setPosition(position);
     }
 
@@ -262,8 +268,7 @@ void Game::Render()
     // Draw Text to the screen
 
     char string[20];
-    fps = m_timer.GetFramesPerSecond();
-    itoa(fps, string, 10);
+    itoa(m_timer.GetFramesPerSecond(), string, 10);
 
  
     //Set Rendering states. 
@@ -325,7 +330,7 @@ void Game::Render()
     //render our GUI
 
 
-    if (!hideUI) {
+    if (!m_hideUI) {
         SetupGUI();
         ImGui::Render();
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
@@ -359,30 +364,10 @@ void Game::RenderTexturePass()
 }
 
 void Game::GenerateBiomes(ID3D11Device* device)
-{
-    m_poissonPositionsBigObjects.clear();
-    m_entityData.ClearModelBuffers();
-
-
-    m_terrain.GenerateHeightMap(device, m_terrainScale);
-    m_barycentricCoordinates.SetHeightMap(m_terrain.GetHeightMap());
-    m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
-    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
-
-
-    m_poissonDiscSampling.GenerateAllPoints(20, 1.5f, 2, 0.18f);
-    m_poissonPositionsBigObjects = m_poissonDiscSampling.GetBigObjPoints();
-    m_poissonPositionsSmallObjects = m_poissonDiscSampling.GetSmallObjPoints();
-
-    m_biomeObjects.SetIsSmall(false);
-   
-    //
-    m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsBigObjects, m_terrainWidth, m_terrainScale);
-
-    m_biomeObjects.SetIsSmall(true);
-    m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsSmallObjects, m_terrainWidth, m_terrainScale);
-    m_entityData.SetupModelBuffers(device);
-
+{ 
+    GenerateClimate(device);
+    GenerateTerrain(device);
+    SetupModelPositions(device);
 }
 
 // Helper method to clear the back buffers.
@@ -481,36 +466,21 @@ void Game::CreateDeviceDependentResources()
     m_font = std::make_unique<SpriteFont>(device, L"SegoeUI_18.spritefont");
     m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
     m_FirstRenderPass = new RenderTexture(device, 960, 600, 1, 2);
-    CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_NONE, FALSE,
-        D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
-        D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, FALSE, TRUE);
-
-    DX::ThrowIfFailed(device->CreateRasterizerState(&rastDesc,
-        m_raster.ReleaseAndGetAddressOf()));
-
+    
     //setup our terrain
     m_terrain.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
    // m_terrainLoader.Initialise(device, m_terrainWidth);
     m_terrainMap = m_terrainLoader.GetTerrainMap();
-
     *m_poissonDiscSampling.GetSampleRegionSize() = m_terrainWidth - 1;
-
     m_water.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
-
-
-
     //setup map of climate over the terrain
     m_climateMap.Initialize(m_terrainWidth, m_terrainWidth);
-
-
-
 
     //load and set up our Vertex and Pixel Shaders
     m_terrainShader.InitStandard(device, L"terrain_vs.cso", L"terrain_ps.cso");
     m_waterShader.InitStandard(device, L"water_vs.cso", L"water_gs.cso", L"water_ps.cso");
     m_geometryShader.InitStandard(device, L"instancedObj_vs.cso", L"instancedObj_gs.cso", L"instancedObj_ps.cso");
     m_standardShader.InitStandard(device, L"object_vs.cso", L"object_ps.cso");
-
 
     //load Textures
     m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
@@ -660,6 +630,34 @@ void Game::SetupSnowBiome(ID3D11Device* device)
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_snowTreeModel), 2);
     m_biomeObjects.SetIsSmall(true);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel2), 2);
+}
+
+void Game::GenerateClimate(ID3D11Device* device)
+{
+    m_biomeObjects.SetClimateMap(m_climateMap.GenerateClimateMap());
+    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+
+}
+
+void Game::GenerateTerrain(ID3D11Device* device)
+{
+    m_terrain.GenerateHeightMap(device, m_terrainScale);
+    m_barycentricCoordinates.SetHeightMap(m_terrain.GetHeightMap());
+}
+
+void Game::SetupModelPositions(ID3D11Device* device)
+{
+    m_entityData.ClearModelBuffers();
+    m_poissonPositionsBigObjects.clear();
+    m_poissonPositionsSmallObjects.clear();
+    m_poissonDiscSampling.GenerateAllPoints(20, 1.5f, 2, 0.18f);
+    m_poissonPositionsBigObjects = m_poissonDiscSampling.GetBigObjPoints();
+    m_poissonPositionsSmallObjects = m_poissonDiscSampling.GetSmallObjPoints();
+    m_biomeObjects.SetIsSmall(false);
+    m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsBigObjects, m_terrainWidth, m_terrainScale);
+    m_biomeObjects.SetIsSmall(true);
+    m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsSmallObjects, m_terrainWidth, m_terrainScale);
+    m_entityData.SetupModelBuffers(device);
 }
 
 void Game::OnDeviceLost()

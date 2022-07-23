@@ -15,6 +15,7 @@ void Input::Initialise(HWND window)
 	m_keyboard = std::make_unique<DirectX::Keyboard>();
 	m_mouse = std::make_unique<DirectX::Mouse>();
 	m_mouse->SetWindow(window);
+
 	m_quitApp = false;
 
 	m_GameInput.forward		= false;
@@ -30,8 +31,7 @@ void Input::Update()
 	auto kb = m_keyboard->GetState();	//updates the basic keyboard state
 	m_KeyboardTracker.Update(kb);		//updates the more feature filled state. Press / release etc. 
 	auto mouse = m_mouse->GetState();   //updates the basic mouse state
-	m_MouseTracker.Update(mouse);		//updates the more advanced mouse state. 
-
+	m_MouseTracker.Update(mouse);		//updates the more advanced mouse state.
 	if (kb.Escape)// check has escape been pressed.  if so, quit out. 
 	{
 		m_quitApp = true;
@@ -57,6 +57,8 @@ void Input::Update()
 	if (kb.Space) m_GameInput.generate = true;
 	else		m_GameInput.generate = false;
 
+	if (kb.P) m_GameInput.P = true;
+	else      m_GameInput.P = false;
 
 	float currentX = mouse.x;
 	float currentY = mouse.y;
@@ -64,7 +66,7 @@ void Input::Update()
 	if (currentX != prevX)
 	{
 		m_GameInput.rotY = true;
-		deltaX = (currentX - prevX);
+		deltaX = currentX;
 	}
 	else
 	{
@@ -73,7 +75,7 @@ void Input::Update()
 	if (currentY != prevY)
 	{
 		m_GameInput.rotX = true;
-		deltaY = (currentY - prevY);
+		deltaY = currentY;
 	}
 	else
 	{
@@ -96,7 +98,15 @@ bool Input::Quit()
 {
 	return m_quitApp;
 }
-
+void Input::SwapPlayMode(bool playMode) {
+	if (playMode) {
+		m_mouse->SetMode(DirectX::Mouse::MODE_RELATIVE);
+		m_mouse->SetVisible(true);
+	}
+	else {
+		m_mouse->SetMode(DirectX::Mouse::MODE_ABSOLUTE);
+	}
+}
 InputCommands Input::getGameInput()
 {
 	return m_GameInput;

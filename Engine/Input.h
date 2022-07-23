@@ -12,6 +12,7 @@ struct InputCommands
 	bool left;
 	bool rotRight;
 	bool rotLeft;
+	bool P;
 	bool generate;
 	bool rotY = false;
 	bool rotX = false;
@@ -29,7 +30,7 @@ public:
 	InputCommands getGameInput();
 	float GetDeltaX();
 	float GetDeltaY();
-
+	void Input::SwapPlayMode(bool playMode);
 
 private:
 	bool m_quitApp;
@@ -43,6 +44,7 @@ private:
 	float deltaX = 0;
 	float deltaY = 0;
 	bool moving = false;
-	float acceleration = 1.;
+
+	float elapsedTime = 0;
 };
 
