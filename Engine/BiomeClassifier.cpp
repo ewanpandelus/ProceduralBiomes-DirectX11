@@ -8,9 +8,9 @@ void BiomeClassifier::Initialise()
 
 
     m_desert.maxTemp = 60;
-    m_desert.minTemp = 50;
-    m_desert.maxRainfall = 60;
-    m_desert.minRainfall = 50;
+    m_desert.minTemp = 45;
+    m_desert.maxRainfall = 15;
+    m_desert.minRainfall = 0;
 
 
 
@@ -22,8 +22,8 @@ void BiomeClassifier::Initialise()
 
     m_snow.maxTemp = 10;
     m_snow.minTemp = 0;
-    m_snow.maxRainfall = 10;
-    m_snow.minRainfall = 0;
+    m_snow.maxRainfall = 60;
+    m_snow.minRainfall = 50;
 
 
     m_biomes[0] = m_desert;
@@ -122,12 +122,12 @@ std::vector<float> BiomeClassifier::CalculateFractionOfClosestBiomes(std::vector
     float frac2 = sortedDistances[1];
 
 
-    frac1 = ExponentialFraction(frac1);
+    frac1 = ExponentialFraction(frac1);         //Creates quicker changes between biomes
     frac2 = ExponentialFraction(frac2);
 
 
     float total = frac1 + frac2;
-    fractions[0] = frac2 / total;                         //Must be opposite fraction if closer to biome (i.e. distance to forest 4, distance to desert 2, then 4/6 desert, 66.66% desert
+    fractions[0] = frac2 / total;               //Must be opposite fraction if closer to biome (i.e. distance to forest 4, distance to desert 2, then 4/6 desert, 66.66% desert
     fractions[1] = frac1 / total;
 
 

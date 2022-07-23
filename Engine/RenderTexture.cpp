@@ -128,7 +128,7 @@ RenderTexture::~RenderTexture()
 void RenderTexture::setRenderTarget(ID3D11DeviceContext* deviceContext)
 {
 	deviceContext->OMSetRenderTargets(1, &renderTargetView, depthStencilView);
-//	deviceContext->RSSetViewports(1, &viewport);
+   //deviceContext->RSSetViewports(1, &viewport);
 }
 
 // Clear render texture to specified colour. Similar to clearing the back buffer, ready for the next frame.

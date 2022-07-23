@@ -16,6 +16,9 @@ std::vector<BiomeObjects::BiomeObjectType> BiomeObjects::SetupObjectsAccordingTo
 
 		index = (terrainWidth * positionOnClimateMap.y) + positionOnClimateMap.x;  
 		SimpleMath::Vector3 position = SimpleMath::Vector3(pos.x, m_barycentricCoords->GetYPosition(pos.x, pos.y,index),  pos.y);
+		if (position.y == -10) {
+			continue;
+		}
 		BiomeObjects::BiomeObjectType biomeObj = AssignModelBasedOnClimate(position, m_climateMap[index].climateClassification);
 		if (biomeObj.modelID == -1) {
 			continue;
@@ -106,16 +109,25 @@ BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(SimpleMath
 	float desertPercent = climateClassification.x * 100;
 	float forestPercent = climateClassification.y * 100;
 	float snowPercent = climateClassification.z * 100;
-	if (desertPercent > 55 || percentage < desertPercent) {
+	if (desertPercent > 55 ) {
 		return SetupObject(GetRandomObjectFromBiome(0), position);
 	}
-	if (forestPercent > 55 || (percentage < desertPercent + forestPercent)) {
+	if (forestPercent > 55) {
 		return SetupObject(GetRandomObjectFromBiome(1), position);
 	}
-	if (snowPercent > 55 || percentage <= (desertPercent + forestPercent + snowPercent+0.01f)) {
+	if (snowPercent > 50) {
 		return SetupObject(GetRandomObjectFromBiome(2), position);
-
 	}
+	if (percentage < desertPercent && desertPercent!=0) {
+		return SetupObject(GetRandomObjectFromBiome(0), position);
+	}
+	if ((percentage < desertPercent + forestPercent)) {
+		return SetupObject(GetRandomObjectFromBiome(1), position);
+	}
+	if (percentage <= (desertPercent + forestPercent + snowPercent + 0.01f)&&snowPercent!=0) {
+		return SetupObject(GetRandomObjectFromBiome(2), position);
+	}
+	return SetupObject(GetRandomObjectFromBiome(1), position);
 }
 
 

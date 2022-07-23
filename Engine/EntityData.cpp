@@ -7,9 +7,9 @@ int EntityData::AddToMap(ModelClass model) {
 	return currentID - 1;
 }
 void EntityData::IncreaseEntityCount(int modelID, DirectX::SimpleMath::Vector3 position) {
-    if (position.y < -1.6) {
+   /* if (position.y < -1.6) {
         return;
-    }
+    }*/
 	entities[modelID].AddNewPosition(position);
 }
 

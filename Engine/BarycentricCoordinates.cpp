@@ -9,10 +9,14 @@ float BarycentricCoordinates::GetYPosition(float x, float z, int heightMapIndex)
 	SimpleMath::Vector2 v1 = SimpleMath::Vector2(m_heightMap[heightMapIndex].triPos1.x, m_heightMap[heightMapIndex].triPos1.z);
 	SimpleMath::Vector2 v2 = SimpleMath::Vector2(m_heightMap[heightMapIndex].triPos2.x, m_heightMap[heightMapIndex].triPos2.z);
 
+	if (m_heightMap[heightMapIndex].ny < 0.9) {
+		return -10;
+	}
+
 	SimpleMath::Vector2 point = SimpleMath::Vector2(x, z);
 
 	float weight1, weight2, weight3;
-	 Intersects(point , v0, v1, v2, &weight1, &weight2, &weight3);
+	Intersects(point , v0, v1, v2, &weight1, &weight2, &weight3);
 	 
 	 return (m_heightMap[heightMapIndex].y*(weight1))+ (m_heightMap[heightMapIndex].triPos1.y * (weight2)) + (m_heightMap[heightMapIndex].triPos2.y * (weight3));
 }

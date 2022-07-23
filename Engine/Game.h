@@ -71,6 +71,7 @@ private:
     void Clear();
     void CreateDeviceDependentResources();
     void CreateWindowSizeDependentResources();
+    void RenderTexturePass();
     void GenerateBiomes(ID3D11Device* device);
 	void SetupGUI();
     void SetupDesertBiome(ID3D11Device* device);
@@ -111,7 +112,7 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedRainfallMapTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_noiseTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_depthTexture;
-
+  
 
 
 
@@ -235,6 +236,10 @@ private:
     int                                                                     m_regionSize;
     int                                                                     m_terrainWidth = 64;
     int                                                                     m_terrainScale = 4;
-    float xOffset = -63.4f;
-    float zOffset = -63.0f;
+    bool hideUI = false;
+    int fps = 0;
+  /*  float xOffset = -63.4f;
+    float zOffset = -63.0f;*/
+  float xOffset = -63.4f;
+  float zOffset = -63.0f;
 };

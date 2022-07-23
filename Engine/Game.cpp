@@ -157,7 +157,11 @@ void Game::Update(DX::StepTimer const& timer)
     auto device = m_deviceResources->GetD3DDevice();
     m_elapsedTime += m_timer.GetElapsedSeconds();
     Vector3 rotation = m_Camera01.getRotation();
-
+    if (m_gameInputCommands.left && m_elapsedTime>0.1)
+    {
+        m_elapsedTime = 0;
+        hideUI = !hideUI;
+    }
 
     if (m_gameInputCommands.rotX)
     {
@@ -204,7 +208,7 @@ void Game::Update(DX::StepTimer const& timer)
     m_world = Matrix::Identity;
 
     /*create our UI*/
-    SetupGUI();
+  
 
 #ifdef DXTK_AUDIO
     m_audioTimerAcc -= (float)timer.GetElapsedSeconds();
@@ -249,17 +253,19 @@ void Game::Render()
     }
 
     Clear();
-
+    RenderTexturePass();
     m_deviceResources->PIXBeginEvent(L"Render");
     auto context = m_deviceResources->GetD3DDeviceContext();
     auto renderTargetView = m_deviceResources->GetRenderTargetView();
     auto depthTargetView = m_deviceResources->GetDepthStencilView();
 
     // Draw Text to the screen
-    m_sprites->Begin();
-    m_font->DrawString(m_sprites.get(), L"Procedural Biomes", XMFLOAT2(10, 10), Colors::Yellow);
-    m_sprites->End();
 
+    char string[20];
+    fps = m_timer.GetFramesPerSecond();
+    itoa(fps, string, 10);
+
+ 
     //Set Rendering states. 
     context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
     context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
@@ -307,23 +313,49 @@ void Game::Render()
         m_generatedClimateMapTexture.Get(), m_noiseTexture.Get());
     m_terrain.Render(context);
 
-    float blendFactor[4] = { 1,1,1,1 };
-    context->OMSetBlendState(m_states->AlphaBlend(), blendFactor, 0xFFFFFFFF);
+    context->OMSetBlendState(m_states->AlphaBlend(), nullptr, 0xFFFFFFFF);
     m_waterShader.EnableShader(context, false);
-    m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-        m_forestTreeColdTexture2.Get(), m_timer.GetTotalSeconds());
-    m_water.Render(context);
+    m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,    
+    m_FirstRenderPass->getShaderResourceView(), m_timer.GetTotalSeconds());
+   // m_water.Render(context);
 
   
 
 
     //render our GUI
-    ImGui::Render();
-    ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
 
 
+    if (!hideUI) {
+        SetupGUI();
+        ImGui::Render();
+        ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+    }
+    m_sprites->Begin();
+    m_font->DrawString(m_sprites.get(), string, XMFLOAT2(10, 10), Colors::Yellow);
+    m_sprites->End();
     // Show the new frame.
     m_deviceResources->Present();
+}
+void Game::RenderTexturePass()
+{
+    auto context = m_deviceResources->GetD3DDeviceContext();
+    auto renderTargetView = m_deviceResources->GetRenderTargetView();
+    auto depthTargetView = m_deviceResources->GetDepthStencilView();
+    m_FirstRenderPass->setRenderTarget(context);
+    m_FirstRenderPass->clearRenderTarget(context, 0.0f, 0.0f, 1.0f, 1.0f);
+
+ 
+    context->OMSetBlendState(m_states->Opaque(), nullptr, 0xFFFFFFFF);
+    context->OMSetDepthStencilState(m_states->DepthDefault(), 0);
+    context->RSSetState(m_states->CullClockwise());
+
+    m_terrainShader.EnableShader(context);
+    m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+        m_generatedClimateMapTexture.Get(), m_noiseTexture.Get());
+    m_terrain.Render(context);
+
+    // Reset the render target back to the original back buffer and not the render to texture anymore.	
+    context->OMSetRenderTargets(1, &renderTargetView, depthTargetView);
 }
 
 void Game::GenerateBiomes(ID3D11Device* device)
@@ -344,14 +376,13 @@ void Game::GenerateBiomes(ID3D11Device* device)
 
     m_biomeObjects.SetIsSmall(false);
    
-    
+    //
     m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsBigObjects, m_terrainWidth, m_terrainScale);
 
     m_biomeObjects.SetIsSmall(true);
     m_biomeObjects.SetupObjectsAccordingToBiomes(m_poissonPositionsSmallObjects, m_terrainWidth, m_terrainScale);
     m_entityData.SetupModelBuffers(device);
- 
- 
+
 }
 
 // Helper method to clear the back buffers.
@@ -449,7 +480,7 @@ void Game::CreateDeviceDependentResources()
     m_sprites = std::make_unique<SpriteBatch>(context);
     m_font = std::make_unique<SpriteFont>(device, L"SegoeUI_18.spritefont");
     m_batch = std::make_unique<PrimitiveBatch<VertexPositionColor>>(context);
-
+    m_FirstRenderPass = new RenderTexture(device, 960, 600, 1, 2);
     CD3D11_RASTERIZER_DESC rastDesc(D3D11_FILL_SOLID, D3D11_CULL_NONE, FALSE,
         D3D11_DEFAULT_DEPTH_BIAS, D3D11_DEFAULT_DEPTH_BIAS_CLAMP,
         D3D11_DEFAULT_SLOPE_SCALED_DEPTH_BIAS, TRUE, FALSE, FALSE, TRUE);
@@ -518,6 +549,8 @@ void Game::CreateWindowSizeDependentResources()
         500.0f
     );
 }
+
+
 
 void Game::SetupGUI()
 {
