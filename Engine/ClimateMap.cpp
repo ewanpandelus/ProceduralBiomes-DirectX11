@@ -140,7 +140,7 @@ ClimateMap::ClimateMapType* ClimateMap::GetClimateMap()
 Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTexture(ID3D11Device* device)
 {
 	//int width = m_tempGridWidth;
-	int resolution = 128;
+	int resolution = 64;
 	std::vector<uint32_t> m_colourBuffers(resolution * resolution);
 
 	int index = 0;
@@ -153,7 +153,7 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTextur
 				index = ((resolution * j) + i);
 
 
-				float tempPerlinVal = (float)m_perlinNoise.Noise((i * 0.05), (j * 0.05), 1);
+				float tempPerlinVal = (float)m_perlinNoise.Noise((i * 0.1), (j * 0.1), 1);
 				int bwValue = abs(tempPerlinVal * 255);
 				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(bwValue, 0, 0);
 

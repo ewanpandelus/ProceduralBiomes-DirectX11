@@ -553,6 +553,10 @@ void Game::SetupGUI()
 
     ImGui::ColorEdit3("Diffuse Light Colour", m_diffuseLight);
     ImGui::ColorEdit3("Ambient Light Colour", m_ambientLight);
+    ImGui::ColorEdit3("Desert Colour", m_terrainShader.SetDesertColour());
+    ImGui::ColorEdit3("Forest Colour", m_terrainShader.SetForestColour());
+    ImGui::ColorEdit3("Snow Colour", m_terrainShader.SetSnowColour());
+
     ImGui::End();
 
     ImGui::Begin("Poisson Disk Sample Params");

@@ -1,5 +1,5 @@
 Texture2D biomesTexture : register(t0);
-Texture2D noiseTexture : register(t5);
+Texture2D noiseTexture : register(t1);
 
 SamplerState SampleType : register(s0);
 
@@ -57,7 +57,7 @@ float4 main(InputType input) : SV_TARGET
     float3	lightDir;
     float	lightIntensity;
     float4	color;
-
+    float4 rockColor = float4(0.5, 0.4, 0.35, 1);
     // Invert the light direction for calculations.
     lightDir = float3(0.5, -0.5, 0.5);// lightDir = normalize(input.position3D - lightPosition);
 
@@ -78,20 +78,20 @@ float4 main(InputType input) : SV_TARGET
 
 
 
-    desertCol = lerp(desertCol1, desertCol2, noiseTex.r);
+  //  desertCol = lerp(desertCol1, desertColour, noiseTex.r);
     //   desertCol = lerp(float4(1, 1, 1, 1), float4(0.7, 0.7, 0.9, 1), noiseTex.r);
-    forestCol = lerp(forestCol1, forestCol2, noiseTex.r);
+//    forestCol = lerp(forestCol1, forestColour, noiseTex.r);
    
 
    
    //forestColor  = lerp(desertColor, float4(0, 1, 0, 1), .4);
 
-    snowColor = lerp(float4(1, 1, 1, 1), float4(0.35, 0.25,0.15,1),slope);
+    snowColor = lerp(float4(1, 1, 1, 1), rockColor,slope);
 
 
 
-    desertCol = textureColor.r * desertCol;
-    forestCol = textureColor.g * forestCol;
+    desertCol = textureColor.r * desertColour;
+    forestCol = textureColor.g * forestColour;
     snowColor = textureColor.b * snowColor;
     return color * saturate(desertCol + forestCol + snowColor);
 

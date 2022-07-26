@@ -397,6 +397,7 @@ void Terrain::SetClimateMap(ClimateMap::ClimateMapType* climateMap)
 {
 	this->climateMap = climateMap;
 }
+
 void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
 	unsigned int stride;

@@ -17,6 +17,7 @@ bool TerrainShader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR*
 	D3D11_SAMPLER_DESC	samplerDesc;
 	D3D11_BUFFER_DESC	lightBufferDesc;
 	D3D11_BUFFER_DESC   noiseTextureBufferDesc;
+	D3D11_BUFFER_DESC   biomeColourBufferDesc;
 	//LOAD SHADER:	VERTEX
 	auto vertexShaderBuffer = DX::ReadData(vsFilename);
 	HRESULT result = device->CreateVertexShader(vertexShaderBuffer.data(), vertexShaderBuffer.size(), NULL, &m_vertexShader);
@@ -84,6 +85,15 @@ bool TerrainShader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR*
 	noiseTextureBufferDesc.StructureByteStride = 0;
 
 	device->CreateBuffer(&noiseTextureBufferDesc, NULL, &m_noiseTextureBuffer);
+
+	biomeColourBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	biomeColourBufferDesc.ByteWidth = sizeof(LightBufferType);
+	biomeColourBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	biomeColourBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	biomeColourBufferDesc.MiscFlags = 0;
+	biomeColourBufferDesc.StructureByteStride = 0;
+
+	device->CreateBuffer(&biomeColourBufferDesc, NULL, &m_biomeColourBuffer);
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_CLAMP;
@@ -112,6 +122,7 @@ bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext* context, Direc
 	MatrixBufferType* dataPtr;
 	LightBufferType* lightPtr;
 	NoiseTextureBufferType* noisePtr;
+	BiomeColourBufferType* biomePtr;
 	DirectX::SimpleMath::Matrix  tworld, tview, tproj;
 
 	// Transpose the matrices to prepare them for the shader.
@@ -136,6 +147,16 @@ bool TerrainShader::SetBiomeShaderParameters(ID3D11DeviceContext* context, Direc
 	context->Unmap(m_lightBuffer, 0);
 	context->PSSetConstantBuffers(0, 1, &m_lightBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
 
+
+	context->Map(m_biomeColourBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	biomePtr = (BiomeColourBufferType*)mappedResource.pData;
+	biomePtr->desertColour = SimpleMath::Vector4(m_desertColour[0], m_desertColour[1], m_desertColour[2], 1);
+	biomePtr->forestColour = SimpleMath::Vector4(m_forestColour[0], m_forestColour[1], m_forestColour[2], 1);
+	biomePtr->snowColour = SimpleMath::Vector3(m_snowColour[0], m_snowColour[1], m_snowColour[2]);
+	context->Unmap(m_biomeColourBuffer, 0);
+	context->PSSetConstantBuffers(1, 1, &m_biomeColourBuffer);	//note the first variable is the mapped buffer ID.  Corresponding to what you set in the PS
+
+
 	//pass the desired texture to the pixel shader.
 	context->PSSetShaderResources(0, 1, &noiseTemperatureTexture);
 
@@ -159,4 +180,44 @@ void TerrainShader::EnableShader(ID3D11DeviceContext* context)
 	// Set the sampler state in the pixel shader.
 	context->PSSetSamplers(0, 1, &m_sampleState);
 
+}
+float* TerrainShader::SetDesertColour()
+{
+	return m_desertColour;
+}
+std::vector<float> TerrainShader::GetDesertColour()
+{
+	std::vector<float> colorVals;
+	colorVals.push_back(m_desertColour[0]);
+	colorVals.push_back(m_desertColour[1]);
+	colorVals.push_back(m_desertColour[2]);
+
+	return colorVals;
+}
+float* TerrainShader::SetForestColour()
+{
+	return m_forestColour;
+}
+std::vector<float> TerrainShader::GetForestColour()
+{
+	std::vector<float> colorVals;
+	colorVals.push_back(m_forestColour[0]);
+	colorVals.push_back(m_forestColour[1]);
+	colorVals.push_back(m_snowColour[2]);
+
+	return colorVals;
+}
+
+float* TerrainShader::SetSnowColour()
+{
+	return m_snowColour;
+}
+std::vector<float> TerrainShader::GetSnowColour()
+{
+	std::vector<float> colorVals;
+	colorVals.push_back(m_snowColour[0]);
+	colorVals.push_back(m_snowColour[1]);
+	colorVals.push_back(m_snowColour[2]);
+
+	return colorVals;
 }

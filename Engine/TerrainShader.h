@@ -21,15 +21,21 @@ public:
 	bool SetBiomeShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view, DirectX::SimpleMath::Matrix* projection, Light* sceneLight1,
 		ID3D11ShaderResourceView* noiseTemperatureTexture,  ID3D11ShaderResourceView* noiseTexture);
 	void EnableShader(ID3D11DeviceContext* context);
-	float* SetDesertColour();
 	float* SetForestColour();
+	std::vector<float> GetForestColour();
+	float* SetDesertColour();
+	std::vector<float> GetDesertColour();
+	float* SetSnowColour();
+	std::vector<float> GetSnowColour();
 
 
 
 
 private:
 
-	float m_desertColour[3], m_forestColour[3];
+	float m_desertColour[3] = { 0.95, 0.77, 0.5 };
+	float m_forestColour[3] = { 0.2, 0.67, 0.335 };
+	float m_snowColour[3] = { 1,1,1 };
 
 	//buffer to pass in camera world Position
 	struct CameraBufferType

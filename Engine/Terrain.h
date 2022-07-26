@@ -41,6 +41,8 @@ public:
 	HeightMapType* GetHeightMap();
 	void SetClimateMap(ClimateMap::ClimateMapType* climateMap);
 
+
+
 private:
 	bool CalculateNormals();
 	void Shutdown();
