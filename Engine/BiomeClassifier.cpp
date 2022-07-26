@@ -8,8 +8,8 @@ void BiomeClassifier::Initialise()
 
 
     m_desert.maxTemp = 60;
-    m_desert.minTemp = 45;
-    m_desert.maxRainfall = 15;
+    m_desert.minTemp = 40;
+    m_desert.maxRainfall = 20;
     m_desert.minRainfall = 0;
 
 
@@ -23,7 +23,7 @@ void BiomeClassifier::Initialise()
     m_snow.maxTemp = 10;
     m_snow.minTemp = 0;
     m_snow.maxRainfall = 60;
-    m_snow.minRainfall = 50;
+    m_snow.minRainfall = 47;
 
 
     m_biomes[0] = m_desert;

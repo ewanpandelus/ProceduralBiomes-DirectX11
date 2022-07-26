@@ -25,31 +25,35 @@ public:
 		SimpleMath::Vector3 climateClassification;
 	};
 
+
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>  GenerateClimateMapTexture(ID3D11Device* device);
+	ClimateMapType* GetClimateMap();
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>  GenerateNoiseTexture(ID3D11Device* device);
 	uint32_t RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b);
-	ClimateMapType* GenerateClimateMap();
+	ClimateMapType* GenerateClimateMap(int xOffset, int zOffset);
 private:
 	int m_tempGridWidth, m_tempGridHeight;
-	float m_maxTemp, m_minTemp;
-	float m_maxRainfall, m_minRainfall;
+	float m_maxTemp = -1000, m_minTemp = 1000;
+	float m_maxRainfall = -1000, m_minRainfall = 1000;
 
-	float m_temperatureAmplitude = 1, m_temperatureFrequency = 0.008, m_temperatureOffset = 30.137;
-	float m_rainfallAmplitude = 1, m_rainFallFrequency = 0.025, m_rainfallOffset = 84.247;
+	float m_temperatureAmplitude = 1, m_temperatureFrequency = 0.012, m_temperatureOffset = 51.282;
+	float m_rainfallAmplitude = 1, m_rainFallFrequency = 0.012, m_rainfallOffset = 36.4;
 
 	BiomeClassifier m_biomeClassifier;
 
 	PerlinNoise m_perlinNoise;
 
 	ClimateMapType* m_climateMap;
-
+	std::vector < std::vector<ClimateMapType>> m_climateMaps;
 	const int RED = 255; const int GREEN = 255; const int BLUE = 0; const int ALPHA = 255;
 	float InverseLerp(float u, float v, float value);
 	void AssessMaxAndMinNoiseValues(float noiseVal, float* maxNoise, float* minNoise);
 
+	std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> CreateShaderResources(ID3D11Device* device, std::vector<uint32_t> colourBuffers);
 
 
+	std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> CreateShaderResources(ID3D11Device device, std::vector<uint32_t> colourBuffers);
 
 };
 

@@ -12,6 +12,7 @@ public:
 		SimpleMath::Vector2 position;
 		ClimateMap::ClimateMapType* climateMap;
 		Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> climateMapTex;
+
 	};
 public:
 	void Initialise(ID3D11Device* device, int positionalStep);
@@ -21,6 +22,7 @@ public:
 private:
 	std::vector<TerrainType> m_terrainMap;
 	SimpleMath::Vector2 currentCentrePosition;
+	std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> m_climateMapTextures;
 
 
 };

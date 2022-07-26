@@ -67,6 +67,7 @@ float4 main(InputType input) : SV_TARGET
     // Determine the final amount of diffuse color based on the diffuse color combined with the light intensity.
     color = ambientColor + (diffuseColor * lightIntensity); //adding ambient
     color = saturate(color);
+    float slope = 1-input.normal.y;
 
     // Sample the pixel color from the texture using the sampler at this texture coordinate location.
 
@@ -77,22 +78,22 @@ float4 main(InputType input) : SV_TARGET
 
 
 
-      desertCol = lerp(desertCol1, desertCol2, noiseTex.r);
+    desertCol = lerp(desertCol1, desertCol2, noiseTex.r);
     //   desertCol = lerp(float4(1, 1, 1, 1), float4(0.7, 0.7, 0.9, 1), noiseTex.r);
-       forestCol = lerp(forestCol1, forestCol2, noiseTex.r);
+    forestCol = lerp(forestCol1, forestCol2, noiseTex.r);
    
 
-   ;
+   
    //forestColor  = lerp(desertColor, float4(0, 1, 0, 1), .4);
 
-      snowColor = float4(1, 1, 1, 1);
+    snowColor = lerp(float4(1, 1, 1, 1), float4(0.35, 0.25,0.15,1),slope);
 
 
 
-       desertCol = textureColor.r * desertCol;
-       forestCol = textureColor.g * forestCol;
-       snowColor = textureColor.b * snowColor;
-       return color * saturate(desertCol + forestCol + snowColor);
+    desertCol = textureColor.r * desertCol;
+    forestCol = textureColor.g * forestCol;
+    snowColor = textureColor.b * snowColor;
+    return color * saturate(desertCol + forestCol + snowColor);
 
 
 }

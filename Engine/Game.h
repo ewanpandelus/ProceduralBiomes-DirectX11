@@ -55,16 +55,16 @@ public:
 #endif
 
     // Properties
-    void GetDefaultSize( int& width, int& height ) const;
-	
+    void GetDefaultSize(int& width, int& height) const;
+
 private:
 
-	struct MatrixBufferType
-	{
-		DirectX::XMMATRIX world;
-		DirectX::XMMATRIX view;
-		DirectX::XMMATRIX projection;
-	}; 
+    struct MatrixBufferType
+    {
+        DirectX::XMMATRIX world;
+        DirectX::XMMATRIX view;
+        DirectX::XMMATRIX projection;
+    };
 
     void Update(DX::StepTimer const& timer);
     void Render();
@@ -73,7 +73,7 @@ private:
     void CreateWindowSizeDependentResources();
     void RenderTexturePass();
     void GenerateBiomes(ID3D11Device* device);
-	void SetupGUI();
+    void SetupGUI();
     void SetupDesertBiome(ID3D11Device* device);
     void SetupForestBiome(ID3D11Device* device);
     void SetupSnowBiome(ID3D11Device* device);
@@ -87,34 +87,34 @@ private:
     // Rendering loop timer.
     DX::StepTimer                           m_timer;
 
-	//input manager. 
-	Input									m_input;
-	InputCommands							m_gameInputCommands;
+    //input manager. 
+    Input									m_input;
+    InputCommands							m_gameInputCommands;
 
     // DirectXTK objects.
     std::unique_ptr<DirectX::CommonStates>                                  m_states;
-    std::unique_ptr<DirectX::BasicEffect>                                   m_batchEffect;	
+    std::unique_ptr<DirectX::BasicEffect>                                   m_batchEffect;
     std::unique_ptr<DirectX::EffectFactory>                                 m_fxFactory;
     std::unique_ptr<DirectX::SpriteBatch>                                   m_sprites;
     std::unique_ptr<DirectX::SpriteFont>                                    m_font;
     Microsoft::WRL::ComPtr<ID3D11RasterizerState>                           m_raster;
-	// Scene Objects
-	std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>  m_batch;
-	Microsoft::WRL::ComPtr<ID3D11InputLayout>                               m_batchInputLayout;
-	std::unique_ptr<DirectX::GeometricPrimitive>                            m_testmodel;
+    // Scene Objects
+    std::unique_ptr<DirectX::PrimitiveBatch<DirectX::VertexPositionColor>>  m_batch;
+    Microsoft::WRL::ComPtr<ID3D11InputLayout>                               m_batchInputLayout;
+    std::unique_ptr<DirectX::GeometricPrimitive>                            m_testmodel;
 
-	//lights
-	Light																	m_Light;
+    //lights
+    Light																	m_Light;
 
-	//Cameras
-	Camera																	m_Camera01;
+    //Cameras
+    Camera																	m_Camera01;
 
-	//textures 
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedClimateMapTexture;
+    //textures 
+    Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedClimateMapTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_generatedRainfallMapTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_noiseTexture;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_depthTexture;
-  
+
 
 
 
@@ -131,26 +131,26 @@ private:
     float                                                                  m_diffuseLight[3];
     float                                                                  m_ambientLight[3];
 
-	//Shaders
-	TerrainShader														    m_terrainShader;
+    //Shaders
+    TerrainShader														    m_terrainShader;
     Shader														            m_standardShader;
     WaterShader														        m_waterShader;
     Shader                                                                  m_geometryShader;
-  
 
 
-	//Scene. 
+
+    //Scene. 
     Terrain																	m_terrain;
     TerrainLoader                                                           m_terrainLoader;
-    std::vector<TerrainLoader::TerrainType>                                *m_terrainMap;
+    std::vector<TerrainLoader::TerrainType>* m_terrainMap;
     Water																	m_water;
- 
+
 
 
     EntityData                                                              m_entityData;
 
     //Desert Models
-	ModelClass																m_desertCactus;
+    ModelClass																m_desertCactus;
     ModelClass																m_desesrtCactus2;
     ModelClass																m_desertCactus3;
     ModelClass																m_desertCactus4;
@@ -191,16 +191,16 @@ private:
     //Snow Biome 
     ModelClass																m_snowTreeModel;
 
-   //Snow Textures
+    //Snow Textures
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTreeTextures;
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTexture;
 
 
-	//RenderTextures
-	RenderTexture*															m_FirstRenderPass;
-	RECT																	m_fullscreenRect;
-	RECT																	m_CameraViewRect;
-  
+    //RenderTextures
+    RenderTexture* m_FirstRenderPass;
+    RECT																	m_fullscreenRect;
+    RECT																	m_CameraViewRect;
+
 
 
 #ifdef DXTK_AUDIO
@@ -210,7 +210,7 @@ private:
     std::unique_ptr<DirectX::SoundEffectInstance>                           m_effect1;
     std::unique_ptr<DirectX::SoundEffectInstance>                           m_effect2;
 #endif
-    
+
 
 #ifdef DXTK_AUDIO
     uint32_t                                                                m_audioEvent;
@@ -236,12 +236,11 @@ private:
     std::vector<SimpleMath::Vector2>                                        m_poissonPositionsSmallObjects;
 
     int                                                                     m_regionSize;
-    int                                                                     m_terrainWidth = 64;
+    int                                                                     m_terrainWidth = 128;
     int                                                                     m_terrainScale = 4;
     bool                                                                    m_hideUI = false;
-    bool m_playMode =                                                       false;
-  /*  float xOffset = -63.4f;
-    float zOffset = -63.0f;*/
-  float xOffset = -63.4f;
-  float zOffset = -63.0f;
+    bool m_playMode = false;
+
+    float xOffset = -63.4f;
+    float zOffset = -63.0f;
 };

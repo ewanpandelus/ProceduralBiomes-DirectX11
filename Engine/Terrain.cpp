@@ -2,6 +2,7 @@
 #include "Terrain.h"
 
 
+
 Terrain::Terrain()
 {
 	m_terrainGeneratedToggle = false;
@@ -47,9 +48,9 @@ bool Terrain::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeig
 		{
 			index = (m_terrainHeight * j) + i;
 
-			m_heightMap[index].x = (float)i*scaleIncrease;
+			m_heightMap[index].x = (float)i * scaleIncrease;
 			m_heightMap[index].y = (float)0;
-			m_heightMap[index].z = (float)j*scaleIncrease;
+			m_heightMap[index].z = (float)j * scaleIncrease;
 
 			//and use this step to calculate the texture coordinates for this point on the terrain.
 			m_heightMap[index].u = (float)i * textureCoordinatesStep;
@@ -307,16 +308,16 @@ bool Terrain::InitializeBuffers(ID3D11Device* device)
 
 			// Bottom left.
 			SetupVertex(indices, vertices, &index, index1, index3, index4);
-		
+
 			// Bottom left.
 			SetupVertex(indices, vertices, &index, index1, index4, index2);
-	
+
 			// Upper right.
 			SetupVertex(indices, vertices, &index, index4, index1, index2);
 
 			// Bottom right.
 			SetupVertex(indices, vertices, &index, index2, index1, index4);
-	
+
 		}
 	}
 
@@ -380,6 +381,22 @@ void Terrain::SetupVertex(unsigned long* indices, VertexType* vertices, int* cur
 	m_heightMap[triangle1Index].triPos2 = SimpleMath::Vector3(m_heightMap[triangle3Index].x, m_heightMap[triangle3Index].y, m_heightMap[triangle3Index].z);
 	*currentIndex += 1;
 }
+float Terrain::EvaluateNoiseBasedOnClimate(int index, float xOffset, float zOffset, int i, int j)
+{
+	SimpleMath::Vector3 climate = climateMap[index].climateClassification;
+	float amplitude = (climate.x * 0.3f) + (climate.y * 1.1) + (climate.z * 2);
+	m_amplitude *= amplitude;
+	float perlinValue =  (float)perlinNoise.Noise((i + xOffset) * m_frequency, (j + zOffset) * m_frequency, 1) * m_amplitude;
+	if (perlinValue < 0) perlinValue = 0;
+	return perlinValue;
+	
+}
+
+
+void Terrain::SetClimateMap(ClimateMap::ClimateMapType* climateMap)
+{
+	this->climateMap = climateMap;
+}
 void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
 {
 	unsigned int stride;
@@ -401,7 +418,7 @@ void Terrain::RenderBuffers(ID3D11DeviceContext* deviceContext)
 	return;
 }
 
-bool Terrain::GenerateHeightMap(ID3D11Device* device, int scaleIncrease)
+bool Terrain::GenerateHeightMap(ID3D11Device* device, int scaleIncrease, int xOffset, int zOffset)
 {
 	Shutdown();
 	bool result;
@@ -425,8 +442,8 @@ bool Terrain::GenerateHeightMap(ID3D11Device* device, int scaleIncrease)
 			m_amplitude = initialAmp;
 			m_frequency = initialFrequency;
 			for (int octave = 0; octave < m_octaves; octave++) {
-				float perlinValue = (float)perlinNoise.Noise(i * m_frequency, j * m_frequency, 1);
-				noiseHeight += perlinValue * m_amplitude;
+				float perlinValue = EvaluateNoiseBasedOnClimate(index, xOffset, zOffset, i, j);//(float)perlinNoise.Noise((i + xOffset) * m_frequency, (j + zOffset) * m_frequency, 1);
+				noiseHeight += perlinValue;
 				m_amplitude *= m_persistance;
 				m_frequency *= m_lacunarity;
 			}
@@ -466,7 +483,7 @@ bool Terrain::Update()
 	return true;
 }
 
-float Terrain:: GetMaxDepth() {
+float Terrain::GetMaxDepth() {
 	return m_maxDepth;
 }
 float* Terrain::GetAmplitude()

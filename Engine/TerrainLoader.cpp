@@ -3,36 +3,42 @@
 
 void TerrainLoader::Initialise(ID3D11Device* device, int positionalStep)
 {
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> climateMapTex;
+
 	SimpleMath::Vector2 currentPosition = SimpleMath::Vector2(0, 0);
+	ClimateMap climateMap;
+
+	climateMap.Initialize(64,64);
+	TerrainLoader::TerrainType terrainType[9];
+	int counter = 0;
+
 	for (int height = 0; height < 3;height++) {
 		for (int width = 0; width < 3; width++) {
-			TerrainLoader::TerrainType terrainType;
-			currentPosition.x = (width * (positionalStep)) - (positionalStep);
-			currentPosition.y = (height * (positionalStep)) - (positionalStep);
-			ClimateMap climateMap;
+		
+			currentPosition.x = (width * positionalStep);
+			currentPosition.y = (height * positionalStep);
+
 			Terrain terrain;
-		/*	if (width && height == 1) {*/
-				climateMap.Initialize(64, 64);
-				terrainType.climateMap = climateMap.GenerateClimateMap();
-				//terrain.Initialize(device, 64, 64);
-				//climateMapTex = climateMap.GenerateClimateMapTexture(device, 64);
-			//}
-			/*else {
-				climateMap.Initialize(32, 32);
-				terrain.Initialize(device, 32, 32);
-				terrainType.climateMap = climateMap.GenerateClimateMap(currentPosition.x, currentPosition.y);
-				climateMapTex = climateMap.GenerateClimateMapTexture(device, 32);
-			}*/
+			climateMap.Initialize(64, 64);
+			climateMap.GenerateClimateMap(currentPosition.x, currentPosition.y);
+			terrain.Initialize(device, 64, 64, 1);
 
-			//terrain.GenerateHeightMap(device);
-			terrainType.terrain = terrain;
-			terrainType.climateMapTex = climateMapTex;
-			terrainType.position = currentPosition;
 
-			m_terrainMap.push_back(terrainType);
+
+			*terrain.GetAmplitude() = 3;
+			*terrain.GetFrequency() = 0.4;
+
+			terrain.GenerateHeightMap(device, 1, currentPosition.x, currentPosition.y);
+
+			terrainType[counter].terrain = terrain;
+
+			terrainType[counter].position = currentPosition;
+			terrainType[counter].climateMapTex = climateMap.GenerateClimateMapTexture(device);
+			m_terrainMap.push_back(terrainType[counter]);
+			counter++;
+			
 		}
 	}
+
 }
 
 std::vector<TerrainLoader::TerrainType>* TerrainLoader::GetTerrainMap()
