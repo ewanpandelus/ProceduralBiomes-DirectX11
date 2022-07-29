@@ -44,7 +44,7 @@ void Game::Initialize(HWND window, int width, int height)
     m_biomeObjects.SetEntityData(&m_entityData);
     m_biomeObjects.SetBarycentricCoordinates(&m_barycentricCoordinates);
     m_barycentricCoordinates.SetTerrainScale(m_terrainScale);
-
+    m_Camera01.setPosition(Vector3(0, 1.0f, 0));
     m_deviceResources->SetWindow(window, width, height);
     m_deviceResources->CreateDeviceResources();
     CreateDeviceDependentResources();
@@ -88,9 +88,8 @@ void Game::Initialize(HWND window, int width, int height)
     m_Light.setDirection(-0.8f, -1.0f, 0.0f);
 
     //setup camera
-    m_Camera01.setPosition(Vector3(0, 100.0f, 0));
     m_Camera01.setRotation(Vector3(180.0f, 0.0f, 0.0f));
-    m_Camera01.setPosition(Vector3(0.0f, 1.0f, 0.0f));
+
     m_Camera01.setRotation(Vector3(-90.0f, -180.0f, 0.0f));	//orientation is -90 becuase zero will be looking up at the sky straight up. 
     m_regionSize = *m_poissonDiscSampling.GetSampleRegionSize();
 
@@ -494,8 +493,8 @@ void Game::CreateDeviceDependentResources()
     m_standardShader.InitStandard(device, L"object_vs.cso", L"object_ps.cso");
 
     //load Textures
-    
-    m_terrainLoader.Initialise(device, m_terrainWidth-1);
+  
+    m_terrainLoader.GenerateSurroundingTerrain(device, m_terrainWidth-1, m_Camera01.getPosition2D());
     m_terrainMap = m_terrainLoader.GetTerrainMap();
     m_noiseTexture = m_climateMap.GenerateNoiseTexture(device);
     //DesertBiome    

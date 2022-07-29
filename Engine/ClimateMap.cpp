@@ -57,7 +57,7 @@ ClimateMap::ClimateMapType* ClimateMap::GenerateClimateMap(int xOffset, int zOff
 	return climateMap;
 }
 
-map<SimpleMath::Vector2, ClimateMap::ClimateMapType*> ClimateMap::GenerateClimateMaps(int positionalStep)
+map<SimpleMath::Vector2, ClimateMap::ClimateMapType*> ClimateMap::GenerateClimateMaps(int positionalStep, SimpleMath:: Vector2 playerPos)
 {
 	m_climateMaps.clear();
 	map<SimpleMath::Vector2, ClimateMapType*> climMap;
@@ -65,8 +65,8 @@ map<SimpleMath::Vector2, ClimateMap::ClimateMapType*> ClimateMap::GenerateClimat
 	for (int width = 0; width < 3; width++) {
 		for (int height = 0; height < 3; height++)
 		{
-			currentPosition.x = (width * positionalStep);
-			currentPosition.y = (height * positionalStep);
+			currentPosition.x = (width * positionalStep) + (playerPos.x - (positionalStep + 1));
+			currentPosition.y = (height * positionalStep) + (playerPos.y - (positionalStep + 1));
 			climMap.insert({ currentPosition, GenerateClimateMap(currentPosition.x, currentPosition.y) });
 		}
 	}

@@ -35,7 +35,7 @@ public:
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>  GenerateNoiseTexture(ID3D11Device* device);
 	uint32_t RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b);
 	ClimateMapType* GenerateClimateMap(int xOffset, int zOffset);
-	map<SimpleMath::Vector2, ClimateMapType*> GenerateClimateMaps(int positionalStep);
+	map<SimpleMath::Vector2, ClimateMapType*> GenerateClimateMaps(int positionalStep, SimpleMath::Vector2 playerPos);
 private:
 	int m_tempGridWidth, m_tempGridHeight;
 	float m_maxTemp = -1000, m_minTemp = 1000;

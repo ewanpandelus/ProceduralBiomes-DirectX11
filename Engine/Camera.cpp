@@ -77,6 +77,11 @@ DirectX::SimpleMath::Vector3 Camera::getPosition()
 	return m_position;
 }
 
+DirectX::SimpleMath::Vector2 Camera::getPosition2D()
+{
+	return DirectX::SimpleMath::Vector2(m_position.x, m_position.z);
+}
+
 DirectX::SimpleMath::Vector3 Camera::getForward()
 {
 	return m_forward;

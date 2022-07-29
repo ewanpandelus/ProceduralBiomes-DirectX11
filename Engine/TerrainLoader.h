@@ -15,7 +15,7 @@ public:
 
 	};
 public:
-	void Initialise(ID3D11Device* device, int positionalStep);
+	void GenerateSurroundingTerrain(ID3D11Device* device, int positionalStep, SimpleMath::Vector2 playerPos);
 	std::vector<TerrainType>* GetTerrainMap();
 
 

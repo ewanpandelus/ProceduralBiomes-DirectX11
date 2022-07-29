@@ -58,7 +58,7 @@ private:
 	int m_terrainWidth, m_terrainHeight;
 	ID3D11Buffer* m_vertexBuffer, * m_indexBuffer;
 	int m_vertexCount, m_indexCount;
-	float m_frequency =0.3, m_amplitude = 5, m_lacunarity, m_persistance, m_offset;
+	float m_frequency = 0.3, m_amplitude = 5, m_lacunarity, m_persistance, m_offset;
 	int m_octaves = 0;
 	HeightMapType* m_heightMap;
 	ClimateMap::ClimateMapType* climateMap;

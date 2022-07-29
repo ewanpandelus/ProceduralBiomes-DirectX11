@@ -9,6 +9,7 @@ public:
 	DirectX::SimpleMath::Matrix		getCameraMatrix();
 	void							setPosition(DirectX::SimpleMath::Vector3 newPosition);
 	DirectX::SimpleMath::Vector3	getPosition();
+	DirectX::SimpleMath::Vector2	getPosition2D();
 	DirectX::SimpleMath::Vector3	getForward();
 	void							setRotation(DirectX::SimpleMath::Vector3 newRotation);
 	DirectX::SimpleMath::Vector3	getRotation();
