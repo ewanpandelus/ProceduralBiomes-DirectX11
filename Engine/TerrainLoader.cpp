@@ -10,7 +10,7 @@ void TerrainLoader::Initialise(ID3D11Device* device, int positionalStep)
 	climateMap.Initialize(64,64);
 	TerrainLoader::TerrainType terrainType[9];
 	int counter = 0;
-
+	climateMaps = climateMap.GenerateClimateMaps(positionalStep);
 	for (int height = 0; height < 3;height++) {
 		for (int width = 0; width < 3; width++) {
 		
@@ -18,21 +18,19 @@ void TerrainLoader::Initialise(ID3D11Device* device, int positionalStep)
 			currentPosition.y = (height * positionalStep);
 
 			Terrain terrain;
-			climateMap.Initialize(64, 64);
-			climateMap.GenerateClimateMap(currentPosition.x, currentPosition.y);
 			terrain.Initialize(device, 64, 64, 1);
-
-
-
-			*terrain.GetAmplitude() = 3;
-			*terrain.GetFrequency() = 0.4;
-
+			*terrain.GetAmplitude() = 1;
+			*terrain.GetFrequency() = 0.2;
+			terrainType[counter].climateMapTex = climateMap.GenerateClimateMapTexture(device, climateMaps[currentPosition]);
+			terrain.SetClimateMap(climateMaps[currentPosition]);
 			terrain.GenerateHeightMap(device, 1, currentPosition.x, currentPosition.y);
+
+		
 
 			terrainType[counter].terrain = terrain;
 
 			terrainType[counter].position = currentPosition;
-			terrainType[counter].climateMapTex = climateMap.GenerateClimateMapTexture(device);
+		
 			m_terrainMap.push_back(terrainType[counter]);
 			counter++;
 			

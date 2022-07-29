@@ -209,6 +209,16 @@ void ModelClass::ClearInstances()
 	m_scales.clear();
 }
 
+float ModelClass::GetPlacementPercentage()
+{
+	return m_placementPercentage;
+}
+
+void ModelClass::SetPlacementPercentage(float placementPercentage)
+{
+	m_placementPercentage = placementPercentage;
+}
+
 
 void ModelClass::ShutdownBuffers()
 {

@@ -310,26 +310,26 @@ void Game::Render()
     m_world = SimpleMath::Matrix::Identity; //set world back to identity
     SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth * m_terrainScale / 2 +64, 0.f, -m_terrainWidth * m_terrainScale / 2+64);
     m_world = m_world * positionAccountedFor;
-    //m_terrainShader.EnableShader(context);
-    //m_terrainMap = m_terrainLoader.GetTerrainMap();
-    //for each (auto terrain in *m_terrainMap) {
-    //    m_world = SimpleMath::Matrix::Identity; //set world back to identity
-    //    positionAccountedFor = SimpleMath::Matrix::CreateTranslation(terrain.position.x, 0.f, terrain.position.y);
-    //    m_world = m_world * positionAccountedFor;
-    //    m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-    //       terrain.climateMapTex.Get(), m_noiseTexture.Get());
-    //    terrain.terrain.Render(context);
-    //}
     m_terrainShader.EnableShader(context);
+    m_terrainMap = m_terrainLoader.GetTerrainMap();
+    for each (auto terrain in *m_terrainMap) {
+        m_world = SimpleMath::Matrix::Identity; //set world back to identity
+        positionAccountedFor = SimpleMath::Matrix::CreateTranslation(terrain.position.x, 0.f, terrain.position.y);
+        m_world = m_world * positionAccountedFor;
+        m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+           terrain.climateMapTex.Get(), m_noiseTexture.Get());
+        terrain.terrain.Render(context);
+    }
+ /*   m_terrainShader.EnableShader(context);
     m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_generatedClimateMapTexture.Get(), m_noiseTexture.Get());
-    m_terrain.Render(context);
+    m_terrain.Render(context);*/
 
-    context->OMSetBlendState(m_states->AlphaBlend(), nullptr, 0xFFFFFFFF);
+    context->OMSetBlendState(m_states->NonPremultiplied(), nullptr, 0xFFFFFFFF);
     m_waterShader.EnableShader(context, false);
     m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_FirstRenderPass->getShaderResourceView(), m_timer.GetTotalSeconds());
-  //  m_water.Render(context);
+ //   m_water.Render(context);
 
 
 
@@ -373,8 +373,9 @@ void Game::RenderTexturePass()
 void Game::GenerateBiomes(ID3D11Device* device)
 {
     GenerateClimate(device);
+
     GenerateTerrain(device);
-    SetupModelPositions(device);
+    //SetupModelPositions(device);
 }
 
 // Helper method to clear the back buffers.
@@ -476,7 +477,7 @@ void Game::CreateDeviceDependentResources()
 
     //setup our terrain
     m_climateMap.Initialize(m_terrainWidth, m_terrainWidth);
-    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+   // m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
     m_terrain.SetClimateMap(m_climateMap.GetClimateMap());
     m_terrain.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
 
@@ -494,8 +495,8 @@ void Game::CreateDeviceDependentResources()
 
     //load Textures
     
-    //terrainLoader.Initialise(device, m_terrainWidth - 1);
-    //m_terrainMap = m_terrainLoader.GetTerrainMap();
+    m_terrainLoader.Initialise(device, m_terrainWidth-1);
+    m_terrainMap = m_terrainLoader.GetTerrainMap();
     m_noiseTexture = m_climateMap.GenerateNoiseTexture(device);
     //DesertBiome    
     SetupDesertBiome(device);
@@ -506,7 +507,7 @@ void Game::CreateDeviceDependentResources()
     //Snow Biome 
     SetupSnowBiome(device);
 
-    m_depthTexture = m_depthTextureClass.GenerateDepthTexture(device);
+   // m_depthTexture = m_depthTextureClass.GenerateDepthTexture(device);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -549,7 +550,8 @@ void Game::SetupGUI()
     ImGui::SliderFloat("Rainfall Amplitude", m_climateMap.GetRainfallAmplitude(), 0.0f, 1.f);
     ImGui::SliderFloat("Rainfall Frequency", m_climateMap.GetRainfallFrequency(), 0.0f, 0.05f);
     ImGui::SliderFloat("Rainfall Offset", m_climateMap.GetRainfallOffset(), 0.0f, 100.f);
-
+    ImGui::SliderFloat("Positional Offset X", m_climateMap.GetPositionalOffsetX(), -100.f, 100.);
+    ImGui::SliderFloat("Positional Offset Z", m_climateMap.GetPositionalOffsetZ(), -100.f, 100.f);
 
     ImGui::ColorEdit3("Diffuse Light Colour", m_diffuseLight);
     ImGui::ColorEdit3("Ambient Light Colour", m_ambientLight);
@@ -583,9 +585,14 @@ void Game::SetupDesertBiome(ID3D11Device* device)
     CreateDDSTextureFromFile(device, L"desert2.dds", nullptr, m_desertTexture2.ReleaseAndGetAddressOf());
 
     m_desertCactus.InitializeModel(device, "desert_cactus.obj", m_desertTexture);
-    m_desesrtCactus2.InitializeModel(device, "desert_cactus2.obj", m_desertTexture);
+    m_desertCactus2.InitializeModel(device, "desert_cactus2.obj", m_desertTexture);
     m_desertCactus3.InitializeModel(device, "desert_cactus3.obj", m_desertTexture2);
     m_desertCactus4.InitializeModel(device, "desert_cactus4.obj", m_desertTexture2);
+
+    m_desertCactus.SetPlacementPercentage(15);
+    m_desertCactus2.SetPlacementPercentage(15);
+    m_desertAloe.SetPlacementPercentage(15);
+    m_desertRock.SetPlacementPercentage(15);
 
     m_desertAloe.InitializeModel(device, "desert_aloe.obj", m_desertTexture2);
     m_desertRock.InitializeModel(device, "desert_rock.obj", m_desertTexture);
@@ -594,7 +601,7 @@ void Game::SetupDesertBiome(ID3D11Device* device)
 
     m_biomeObjects.SetIsSmall(false);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus), 0);
-    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desesrtCactus2), 0);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus2), 0);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertAloe), 0);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertRock), 0);
     //m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_desertCactus3), 0);
@@ -643,6 +650,7 @@ void Game::SetupSnowBiome(ID3D11Device* device)
     m_biomeObjects.SetIsSmall(false);
     CreateDDSTextureFromFile(device, L"snowTreeTex.dds", nullptr, m_snowTreeTextures.ReleaseAndGetAddressOf());
     m_snowTreeModel.InitializeModel(device, "snowTree.obj", m_snowTreeTextures);
+    m_snowTreeModel.SetPlacementPercentage(20);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_snowTreeModel), 2);
     m_biomeObjects.SetIsSmall(true);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel2), 2);
@@ -653,7 +661,7 @@ void Game::GenerateClimate(ID3D11Device* device)
     m_climateMap.GenerateClimateMap(0, 0);
     m_biomeObjects.SetClimateMap(m_climateMap.GetClimateMap());
     m_terrain.SetClimateMap(m_climateMap.GetClimateMap());
-    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+   // m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
 
 }
 

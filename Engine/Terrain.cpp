@@ -384,9 +384,14 @@ void Terrain::SetupVertex(unsigned long* indices, VertexType* vertices, int* cur
 float Terrain::EvaluateNoiseBasedOnClimate(int index, float xOffset, float zOffset, int i, int j)
 {
 	SimpleMath::Vector3 climate = climateMap[index].climateClassification;
-	float amplitude = (climate.x * 0.3f) + (climate.y * 1.1) + (climate.z * 2);
+	float amplitude = (climate.x * 0.3f) + (climate.y) + (climate.z * 2);
 	m_amplitude *= amplitude;
-	float perlinValue =  (float)perlinNoise.Noise((i + xOffset) * m_frequency, (j + zOffset) * m_frequency, 1) * m_amplitude;
+	float perlinValue = 0;
+
+	perlinValue =  (1 - abs(perlinNoise.Noise((i+xOffset)  * m_frequency, (j+zOffset)  * m_frequency, 1)) - 0.5)*m_amplitude;
+
+
+
 	if (perlinValue < 0) perlinValue = 0;
 	return perlinValue;
 	

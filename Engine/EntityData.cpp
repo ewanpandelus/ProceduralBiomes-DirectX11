@@ -7,7 +7,12 @@ int EntityData::AddToMap(ModelClass model) {
 	return currentID - 1;
 }
 void EntityData::IncreaseEntityCount(int modelID, DirectX::SimpleMath::Vector3 position) {
-    if (position.y < -1.6 || position.y > 4) {
+
+    if (position.y < -1.6 || position.y > 40) {
+        return;
+    }
+    float percentage = rand() % 101;
+    if (percentage > entities[modelID].GetPlacementPercentage()) {
         return;
     }
 	entities[modelID].AddNewPosition(position);

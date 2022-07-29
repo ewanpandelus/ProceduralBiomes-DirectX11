@@ -29,6 +29,8 @@ void ClimateMap::Initialize(int tempGridWidth, int tempGridHeight)
 
 ClimateMap::ClimateMapType* ClimateMap::GenerateClimateMap(int xOffset, int zOffset)
 {
+	ClimateMapType* climateMap = new ClimateMapType[m_tempGridWidth * m_tempGridHeight];
+
 
 	int index = 0;
 	for (int j = 0; j < m_tempGridHeight; j++)
@@ -36,12 +38,14 @@ ClimateMap::ClimateMapType* ClimateMap::GenerateClimateMap(int xOffset, int zOff
 		for (int i = 0; i < m_tempGridWidth; i++)
 		{
 			index = (m_tempGridHeight * j) + i;
+			climateMap[index].x = (float)i;
+			climateMap[index].z = (float)j;
 
 			float tempPerlinVal = (float)m_perlinNoise.Noise(((i + xOffset) * m_temperatureFrequency) + m_temperatureOffset, ((j + zOffset) * m_temperatureFrequency + m_temperatureOffset), 1);
-			m_climateMap[index].temperature = tempPerlinVal * m_temperatureAmplitude;
+			climateMap[index].temperature = tempPerlinVal * m_temperatureAmplitude;
 
 			float rainfallPerlinVal = (float)m_perlinNoise.Noise(((i + xOffset) * m_rainFallFrequency) + m_rainfallOffset, ((j + zOffset) * m_rainFallFrequency + m_rainfallOffset), 1);
-			m_climateMap[index].rainfall = rainfallPerlinVal * m_rainfallAmplitude;
+			climateMap[index].rainfall = rainfallPerlinVal * m_rainfallAmplitude;
 
 
 			AssessMaxAndMinNoiseValues(tempPerlinVal, &m_maxTemp, &m_minTemp);  //If the max and min are influenced by ampltude then the range never changes 
@@ -50,11 +54,28 @@ ClimateMap::ClimateMapType* ClimateMap::GenerateClimateMap(int xOffset, int zOff
 		}
 	}
 
-	return m_climateMap;
+	return climateMap;
+}
+
+map<SimpleMath::Vector2, ClimateMap::ClimateMapType*> ClimateMap::GenerateClimateMaps(int positionalStep)
+{
+	m_climateMaps.clear();
+	map<SimpleMath::Vector2, ClimateMapType*> climMap;
+	SimpleMath::Vector2 currentPosition = SimpleMath::Vector2(0, 0);
+	for (int width = 0; width < 3; width++) {
+		for (int height = 0; height < 3; height++)
+		{
+			currentPosition.x = (width * positionalStep);
+			currentPosition.y = (height * positionalStep);
+			climMap.insert({ currentPosition, GenerateClimateMap(currentPosition.x, currentPosition.y) });
+		}
+	}
+
+	return climMap;
 }
 
 
-Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapTexture(ID3D11Device* device)
+Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapTexture(ID3D11Device* device, ClimateMapType* climateMap)
 {
 	int resolution = m_tempGridWidth;
 	std::vector<uint32_t> m_colourBuffers(resolution * resolution);
@@ -69,15 +90,13 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapT
 				index = ((resolution * j) + i);
 
 
-				m_climateMap[index].temperature = (InverseLerp(m_minTemp, m_maxTemp, m_climateMap[index].temperature));
-				float temperature = m_climateMap[index].temperature;
-				m_climateMap[index].rainfall = (InverseLerp(m_minRainfall, m_maxRainfall, m_climateMap[index].rainfall));
-				float rainfall = m_climateMap[index].rainfall;
-				m_climateMap[index].climateClassification = m_biomeClassifier.CalculateDistanceToAllBiomes(temperature, rainfall);
+				float temperature =	climateMap[index].temperature = (InverseLerp(m_minTemp, m_maxTemp, climateMap[index].temperature));
+				float rainfall = climateMap[index].rainfall = (InverseLerp(m_minRainfall, m_maxRainfall, climateMap[index].rainfall));
+				climateMap[index].climateClassification = m_biomeClassifier.CalculateDistanceToAllBiomes(temperature, rainfall);
 
-				int rValue = m_climateMap[index].climateClassification.x * 255;
-				int bValue = m_climateMap[index].climateClassification.y * 255;
-				int gValue = m_climateMap[index].climateClassification.z * 255;
+				int rValue = climateMap[index].climateClassification.x * 255;
+				int bValue = climateMap[index].climateClassification.y * 255;
+				int gValue = climateMap[index].climateClassification.z * 255;
 
 				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rValue, bValue, gValue);
 
@@ -247,6 +266,14 @@ float* ClimateMap::GetTemperatureOffset()
 float* ClimateMap::GetRainfallAmplitude()
 {
 	return &m_rainfallAmplitude;
+}
+float* ClimateMap::GetPositionalOffsetX()
+{
+	return &m_positionalOffsetX;
+}
+float* ClimateMap::GetPositionalOffsetZ()
+{
+	return &m_positionalOffsetZ;
 }
 float* ClimateMap::GetRainfallFrequency()
 {

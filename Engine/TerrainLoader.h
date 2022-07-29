@@ -23,7 +23,7 @@ private:
 	std::vector<TerrainType> m_terrainMap;
 	SimpleMath::Vector2 currentCentrePosition;
 	std::vector<Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>> m_climateMapTextures;
-
+	map<SimpleMath::Vector2, ClimateMap::ClimateMapType*> climateMaps;
 
 };
 

@@ -151,7 +151,7 @@ private:
 
     //Desert Models
     ModelClass																m_desertCactus;
-    ModelClass																m_desesrtCactus2;
+    ModelClass																m_desertCactus2;
     ModelClass																m_desertCactus3;
     ModelClass																m_desertCactus4;
     ModelClass																m_desertAloe;
@@ -236,7 +236,7 @@ private:
     std::vector<SimpleMath::Vector2>                                        m_poissonPositionsSmallObjects;
 
     int                                                                     m_regionSize;
-    int                                                                     m_terrainWidth = 128;
+    int                                                                     m_terrainWidth = 64;
     int                                                                     m_terrainScale = 4;
     bool                                                                    m_hideUI = false;
     bool m_playMode = false;

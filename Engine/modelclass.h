@@ -49,7 +49,9 @@ public:
 	void AddNewPosition(DirectX::SimpleMath::Vector3 position);
 	bool InitializeBuffers(ID3D11Device*);
 	void ClearInstances();
-
+	float GetPlacementPercentage();
+	void SetPlacementPercentage(float placementPercentage);
+	
 private:
 
 	void ShutdownBuffers();
@@ -61,6 +63,7 @@ private:
 private:
 	ID3D11Buffer* m_vertexBuffer, * m_indexBuffer;
 	ID3D11Buffer* m_instanceBuffer;
+	float m_placementPercentage = 100;
 	int m_vertexCount, m_indexCount, m_faceSize;
 	int m_instanceCount = 0;
 	//arrays for our generated objects Made by directX
