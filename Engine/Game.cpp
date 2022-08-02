@@ -156,6 +156,10 @@ void Game::Update(DX::StepTimer const& timer)
     auto device = m_deviceResources->GetD3DDevice();
     float deltaTime = m_timer.GetElapsedSeconds();
     m_elapsedTime += m_timer.GetElapsedSeconds();
+    //if (m_terrainLoader.OutOfCurrentBounds(m_Camera01.getPosition2D())) {
+    //    m_terrainLoader.GenerateSurroundingTerrain(device, m_Camera01.getPosition2D(), false);
+    //    m_terrainMap = m_terrainLoader.GetTerrainMap();
+    //}
 
     Vector3 rotation = m_Camera01.getRotation();
     if (m_gameInputCommands.left && m_elapsedTime > 0.1)
@@ -306,34 +310,34 @@ void Game::Render()
     }
 
 
-    m_world = SimpleMath::Matrix::Identity; //set world back to identity
-    SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth * m_terrainScale / 2 +64, 0.f, -m_terrainWidth * m_terrainScale / 2+64);
-    m_world = m_world * positionAccountedFor;
+    //m_world = SimpleMath::Matrix::Identity; //set world back to identity
+    //SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth * m_terrainScale / 2 +64, 0.f, -m_terrainWidth * m_terrainScale / 2+64);
+    //m_world = m_world * positionAccountedFor;
+    //m_terrainShader.EnableShader(context);
+    //m_terrainMap = m_terrainLoader.GetTerrainMap();
+    //for each (auto terrain in *m_terrainMap) {
+    //    m_world = SimpleMath::Matrix::Identity; //set world back to identity
+    //    positionAccountedFor = SimpleMath::Matrix::CreateTranslation(terrain.position.x, 0.f, terrain.position.y);
+    //    m_world = m_world * positionAccountedFor;
+    //    m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+    //       terrain.climateMapTex.Get(), m_noiseTexture.Get());
+    //    terrain.terrain.Render(context);
+    //}
     m_terrainShader.EnableShader(context);
-    m_terrainMap = m_terrainLoader.GetTerrainMap();
-    for each (auto terrain in *m_terrainMap) {
-        m_world = SimpleMath::Matrix::Identity; //set world back to identity
-        positionAccountedFor = SimpleMath::Matrix::CreateTranslation(terrain.position.x, 0.f, terrain.position.y);
-        m_world = m_world * positionAccountedFor;
-        m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-           terrain.climateMapTex.Get(), m_noiseTexture.Get());
-        terrain.terrain.Render(context);
-    }
- /*   m_terrainShader.EnableShader(context);
     m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_generatedClimateMapTexture.Get(), m_noiseTexture.Get());
-    m_terrain.Render(context);*/
+    m_terrain.Render(context);
 
     context->OMSetBlendState(m_states->NonPremultiplied(), nullptr, 0xFFFFFFFF);
     m_waterShader.EnableShader(context, false);
     m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_FirstRenderPass->getShaderResourceView(), m_timer.GetTotalSeconds());
- //   m_water.Render(context);
+    //   m_water.Render(context);
 
 
 
 
-    //render our GUI
+       //render our GUI
 
 
     if (!m_hideUI) {
@@ -374,7 +378,7 @@ void Game::GenerateBiomes(ID3D11Device* device)
     GenerateClimate(device);
 
     GenerateTerrain(device);
-    //SetupModelPositions(device);
+    SetupModelPositions(device);
 }
 
 // Helper method to clear the back buffers.
@@ -476,11 +480,11 @@ void Game::CreateDeviceDependentResources()
 
     //setup our terrain
     m_climateMap.Initialize(m_terrainWidth, m_terrainWidth);
-   // m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device, m_climateMap.GetClimateMap());
     m_terrain.SetClimateMap(m_climateMap.GetClimateMap());
     m_terrain.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
 
-   
+
     *m_poissonDiscSampling.GetSampleRegionSize() = m_terrainWidth - 1;
     m_water.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
     //setup map of climate over the terrain
@@ -493,8 +497,8 @@ void Game::CreateDeviceDependentResources()
     m_standardShader.InitStandard(device, L"object_vs.cso", L"object_ps.cso");
 
     //load Textures
-  
-    m_terrainLoader.GenerateSurroundingTerrain(device, m_terrainWidth-1, m_Camera01.getPosition2D());
+
+    m_terrainLoader.GenerateSurroundingTerrain(device, m_Camera01.getPosition2D(), true);
     m_terrainMap = m_terrainLoader.GetTerrainMap();
     m_noiseTexture = m_climateMap.GenerateNoiseTexture(device);
     //DesertBiome    
@@ -506,7 +510,7 @@ void Game::CreateDeviceDependentResources()
     //Snow Biome 
     SetupSnowBiome(device);
 
-   // m_depthTexture = m_depthTextureClass.GenerateDepthTexture(device);
+    // m_depthTexture = m_depthTextureClass.GenerateDepthTexture(device);
 }
 
 // Allocate all memory resources that change on a window SizeChanged event.
@@ -649,7 +653,7 @@ void Game::SetupSnowBiome(ID3D11Device* device)
     m_biomeObjects.SetIsSmall(false);
     CreateDDSTextureFromFile(device, L"snowTreeTex.dds", nullptr, m_snowTreeTextures.ReleaseAndGetAddressOf());
     m_snowTreeModel.InitializeModel(device, "snowTree.obj", m_snowTreeTextures);
-    m_snowTreeModel.SetPlacementPercentage(20);
+    m_snowTreeModel.SetPlacementPercentage(100);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_snowTreeModel), 2);
     m_biomeObjects.SetIsSmall(true);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel2), 2);
@@ -657,10 +661,10 @@ void Game::SetupSnowBiome(ID3D11Device* device)
 
 void Game::GenerateClimate(ID3D11Device* device)
 {
-    m_climateMap.GenerateClimateMap(0, 0);
+    m_climateMap.GenerateClimateMapIndvidual();
     m_biomeObjects.SetClimateMap(m_climateMap.GetClimateMap());
     m_terrain.SetClimateMap(m_climateMap.GetClimateMap());
-   // m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device);
+    m_generatedClimateMapTexture = m_climateMap.GenerateClimateMapTexture(device, m_climateMap.GetClimateMap());
 
 }
 

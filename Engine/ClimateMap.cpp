@@ -57,16 +57,16 @@ ClimateMap::ClimateMapType* ClimateMap::GenerateClimateMap(int xOffset, int zOff
 	return climateMap;
 }
 
-map<SimpleMath::Vector2, ClimateMap::ClimateMapType*> ClimateMap::GenerateClimateMaps(int positionalStep, SimpleMath:: Vector2 playerPos)
+map<SimpleMath::Vector2, ClimateMap::ClimateMapType*> ClimateMap::GenerateClimateMaps(int positionalStep, SimpleMath::Vector2 playerPos)
 {
-	m_climateMaps.clear();
+
 	map<SimpleMath::Vector2, ClimateMapType*> climMap;
 	SimpleMath::Vector2 currentPosition = SimpleMath::Vector2(0, 0);
 	for (int width = 0; width < 3; width++) {
 		for (int height = 0; height < 3; height++)
 		{
-			currentPosition.x = (width * positionalStep) + (playerPos.x - (positionalStep + 1));
-			currentPosition.y = (height * positionalStep) + (playerPos.y - (positionalStep + 1));
+			currentPosition.x = playerPos.x + (width * positionalStep);
+			currentPosition.y = playerPos.y + (height * positionalStep);
 			climMap.insert({ currentPosition, GenerateClimateMap(currentPosition.x, currentPosition.y) });
 		}
 	}
@@ -90,7 +90,7 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapT
 				index = ((resolution * j) + i);
 
 
-				float temperature =	climateMap[index].temperature = (InverseLerp(m_minTemp, m_maxTemp, climateMap[index].temperature));
+				float temperature = climateMap[index].temperature = (InverseLerp(m_minTemp, m_maxTemp, climateMap[index].temperature));
 				float rainfall = climateMap[index].rainfall = (InverseLerp(m_minRainfall, m_maxRainfall, climateMap[index].rainfall));
 				climateMap[index].climateClassification = m_biomeClassifier.CalculateDistanceToAllBiomes(temperature, rainfall);
 
@@ -154,6 +154,36 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapT
 ClimateMap::ClimateMapType* ClimateMap::GetClimateMap()
 {
 	return m_climateMap;
+}
+
+ClimateMap::ClimateMapType ClimateMap::GenerateClimateMapIndvidual()
+{
+
+
+
+	int index = 0;
+	for (int j = 0; j < m_tempGridHeight; j++)
+	{
+		for (int i = 0; i < m_tempGridWidth; i++)
+		{
+			index = (m_tempGridHeight * j) + i;
+			m_climateMap[index].x = (float)i;
+			m_climateMap[index].z = (float)j;
+
+			float tempPerlinVal = (float)m_perlinNoise.Noise(((i)*m_temperatureFrequency) + m_temperatureOffset, ((j)*m_temperatureFrequency + m_temperatureOffset), 1);
+			m_climateMap[index].temperature = tempPerlinVal * m_temperatureAmplitude;
+
+			float rainfallPerlinVal = (float)m_perlinNoise.Noise(((i)*m_rainFallFrequency) + m_rainfallOffset, ((j)*m_rainFallFrequency + m_rainfallOffset), 1);
+			m_climateMap[index].rainfall = rainfallPerlinVal * m_rainfallAmplitude;
+
+
+			AssessMaxAndMinNoiseValues(tempPerlinVal, &m_maxTemp, &m_minTemp);  //If the max and min are influenced by ampltude then the range never changes 
+			AssessMaxAndMinNoiseValues(rainfallPerlinVal, &m_maxRainfall, &m_minRainfall);
+
+		}
+	}
+
+	return *m_climateMap;
 }
 
 Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTexture(ID3D11Device* device)

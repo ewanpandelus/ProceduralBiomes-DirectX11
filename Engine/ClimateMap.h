@@ -31,7 +31,7 @@ public:
 
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>  GenerateClimateMapTexture(ID3D11Device* device, ClimateMapType* climateMap);
 	ClimateMapType* GetClimateMap();
-
+	ClimateMapType GenerateClimateMapIndvidual();
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>  GenerateNoiseTexture(ID3D11Device* device);
 	uint32_t RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b);
 	ClimateMapType* GenerateClimateMap(int xOffset, int zOffset);

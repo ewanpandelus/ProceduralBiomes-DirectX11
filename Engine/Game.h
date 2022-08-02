@@ -236,8 +236,8 @@ private:
     std::vector<SimpleMath::Vector2>                                        m_poissonPositionsSmallObjects;
 
     int                                                                     m_regionSize;
-    int                                                                     m_terrainWidth = 64;
-    int                                                                     m_terrainScale = 4;
+    int                                                                     m_terrainWidth = 128;
+    int                                                                     m_terrainScale = 6;
     bool                                                                    m_hideUI = false;
     bool m_playMode = false;
 
