@@ -1,6 +1,7 @@
 #pragma once
 #include "PerlinNoise.h"
 #include "ClimateMap.h"
+#include <cmath>
 using namespace DirectX;
 
 class Terrain
@@ -51,7 +52,8 @@ private:
 	float Redistribution(float nx, float ny, float exp);
 	void SetupVertex(unsigned long* indices, VertexType* vertices, int* currentIndex, int triangle1Index, int triangle2Index, int triangle3Index);
 	float EvaluateNoiseBasedOnClimate(int index, float xOffset, float zOffset, int i, int j);
-
+	float Lerp(float a, float b, float f);
+	
 private:
 	bool m_terrainGeneratedToggle;
 	float m_maxDepth;

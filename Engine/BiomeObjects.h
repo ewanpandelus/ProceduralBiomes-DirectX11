@@ -42,17 +42,17 @@ private:
 	std::vector<int> m_forestObjectsLarge;
 	std::vector<int> m_snowObjectsSmall;
 	std::vector<int> m_snowObjectsLarge;
-
+	std::vector<int> m_waterObjectsSmall;
+	std::vector<int> m_waterObjectsLarge;
 	EntityData* m_entityData;
-	ModelClass snowModel, forestModel, desertModel;
-	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> desertTexture, forestTexture, snowTexture;
+
 	float currentCellWidth = 0;
 	ClimateMap::ClimateMapType* m_climateMap;
 	BarycentricCoordinates* m_barycentricCoords;
 	int GetRandomObjectFromBiome(int biomeType);
 	bool isSmall = false;
 
-	BiomeObjectType AssignModelBasedOnClimate(SimpleMath::Vector3 position, SimpleMath::Vector3 climateClassification);
+	BiomeObjectType AssignModelBasedOnClimate(SimpleMath::Vector3 position, SimpleMath::Vector4 climateClassification);
 	BiomeObjectType SetupObject(int modelID,  SimpleMath::Vector3 position);
 
 

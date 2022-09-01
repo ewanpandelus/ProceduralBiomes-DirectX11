@@ -27,6 +27,8 @@ bool WaterShader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* p
 	D3D11_BUFFER_DESC	matrixBufferDesc;
 	D3D11_SAMPLER_DESC	samplerDesc;
 	D3D11_BUFFER_DESC	lightBufferDesc;
+	D3D11_BUFFER_DESC	cameraBufferDesc;
+
 
 	//LOAD SHADER:	VERTEX
 	auto vertexShaderBuffer = DX::ReadData(vsFilename);
@@ -86,6 +88,18 @@ bool WaterShader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* p
 	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
 	device->CreateBuffer(&lightBufferDesc, NULL, &m_lightBuffer);
 
+	// Note that ByteWidth always needs to be a multiple of 16 if using D3D11_BIND_CONSTANT_BUFFER or CreateBuffer will fail.
+	cameraBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	cameraBufferDesc.ByteWidth = sizeof(CameraBufferType);
+	cameraBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+	cameraBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	cameraBufferDesc.MiscFlags = 0;
+	cameraBufferDesc.StructureByteStride = 0;
+
+	// Create the constant buffer pointer so we can access the vertex shader constant buffer from within this class.
+	device->CreateBuffer(&cameraBufferDesc, NULL, &m_cameraBuffer);
+
+
 	// Create a texture sampler state description.
 	samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -108,11 +122,13 @@ bool WaterShader::InitStandard(ID3D11Device* device, WCHAR* vsFilename, WCHAR* p
 }
 
 bool WaterShader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::SimpleMath::Matrix* world, DirectX::SimpleMath::Matrix* view,
-	DirectX::SimpleMath::Matrix* projection, Light* sceneLight1, ID3D11ShaderResourceView* texture1, float time)
+	DirectX::SimpleMath::Matrix* projection, Light* sceneLight1, ID3D11ShaderResourceView* texture1, float time, SimpleMath::Vector3 cameraPosition)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedResource;
 	MatrixBufferType* dataPtr;
 	LightBufferType* lightPtr;
+	CameraBufferType* cameraPtr;
+
 	DirectX::SimpleMath::Matrix  tworld, tview, tproj;
 
 	// Transpose the matrices to prepare them for the shader.
@@ -129,6 +145,14 @@ bool WaterShader::SetShaderParameters(ID3D11DeviceContext* context, DirectX::Sim
 	context->VSSetConstantBuffers(0, 1, &m_matrixBuffer);
 	context->GSSetConstantBuffers(0, 1, &m_matrixBuffer);
 	context->PSSetConstantBuffers(0, 1, &m_matrixBuffer);
+
+	context->Map(m_cameraBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+	cameraPtr = (CameraBufferType*)mappedResource.pData;
+	cameraPtr->cameraPosition = cameraPosition;
+	context->Unmap(m_cameraBuffer, 0);
+	context->VSSetConstantBuffers(1, 1, &m_cameraBuffer);
+
+
 	context->Map(m_lightBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
 	lightPtr = (LightBufferType*)mappedResource.pData;
 	lightPtr->ambient = sceneLight1->getAmbientColour();

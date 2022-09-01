@@ -81,6 +81,19 @@ void TerrainLoader::RemoveDistantTerrain(SimpleMath::Vector2 playerPos)
 	//		climateMaps.erase(element.first);
 	//	}
 	//}
+	   //m_world = SimpleMath::Matrix::Identity; //set world back to identity
+	//SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth * m_terrainScale / 2 +64, 0.f, -m_terrainWidth * m_terrainScale / 2+64);
+	//m_world = m_world * positionAccountedFor;
+	//m_terrainShader.EnableShader(context);
+	//m_terrainMap = m_terrainLoader.GetTerrainMap();
+	//for each (auto terrain in *m_terrainMap) {
+	//    m_world = SimpleMath::Matrix::Identity; //set world back to identity
+	//    positionAccountedFor = SimpleMath::Matrix::CreateTranslation(terrain.position.x, 0.f, terrain.position.y);
+	//    m_world = m_world * positionAccountedFor;
+	//    m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
+	//       terrain.climateMapTex.Get(), m_noiseTexture.Get());
+	//    terrain.terrain.Render(context);
+	//}
 }
 
 

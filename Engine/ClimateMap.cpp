@@ -97,8 +97,10 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateClimateMapT
 				int rValue = climateMap[index].climateClassification.x * 255;
 				int bValue = climateMap[index].climateClassification.y * 255;
 				int gValue = climateMap[index].climateClassification.z * 255;
+				int wValue = climateMap[index].climateClassification.w * 255;
 
-				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rValue, bValue, gValue);
+
+				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(rValue, bValue, gValue, wValue);
 
 			}
 
@@ -204,7 +206,7 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTextur
 
 				float tempPerlinVal = (float)m_perlinNoise.Noise((i * 0.1), (j * 0.1), 1);
 				int bwValue = abs(tempPerlinVal * 255);
-				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(bwValue, 0, 0);
+				m_colourBuffers.at(index) = RGB_TO_UNSIGNED_INT_COLOUR(bwValue, 0, 0, 0);
 
 			}
 
@@ -256,9 +258,9 @@ Microsoft::WRL::ComPtr<ID3D11ShaderResourceView> ClimateMap::GenerateNoiseTextur
 	}
 	return texSRV;
 }
-uint32_t ClimateMap::RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b)
+uint32_t ClimateMap::RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b, int a)
 {
-	return  r | (g << 8) | (b << 16) | (ALPHA << 24);
+	return  r | (g << 8) | (b << 16) | (a << 24);
 }
 
 float ClimateMap::InverseLerp(float u, float v, float value)

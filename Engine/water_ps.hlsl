@@ -18,7 +18,11 @@ cbuffer LightBuffer : register(b1)
     float padding;
 };
 
-
+float2 ClipSpaceToTextureCoords(float4 clipSpace) {
+    float2 ndc = (clipSpace.xy / clipSpace.w);
+    float2 texCoords = ndc / 2.0 + 0.5;
+    return texCoords;
+}
 struct InputType
 {
     float4 position : SV_POSITION;
@@ -30,8 +34,10 @@ struct InputType
 float4 main(InputType input) : SV_TARGET
 {
     float4 textureColor;
-    textureColor = texture0.Sample(SampleType, input.tex/5);
-
+    float2 texCoordsReal = ClipSpaceToTextureCoords(input.position);
+    float2 refractionCoords = texCoordsReal;
+    textureColor = texture0.Sample(SampleType, 1- (texCoordsReal/5));
+    
     float3	lightDir;
     float	lightIntensity;
     float4	color;
@@ -40,28 +46,21 @@ float4 main(InputType input) : SV_TARGET
     float specularPower = 32;
     // Invert the light direction for calculations.
 
+    lightDir = float3(0.5, -0.5, 0.5);
+    lightIntensity = saturate(dot(input.normal, -lightDir));
     reflection = normalize(2 * lightIntensity * input.normal - lightDir);
 
-    // Determine the amount of specular light based on the reflection vector, viewing direction, and specular power.
 
-
-    // Invert the light direction for calculations.
-
-    lightDir = float3(0.5, -0.5, 0.5);// lightDir = normalize(input.position3D - lightPosition);
-
-    // Calculate the amount of light on this pixel.
-    lightIntensity = saturate(dot(input.normal, -lightDir));
-
-    // Determine the final amount of diffuse color based on the diffuse color combined with the light intensity.
     color = ambientColor + (diffuseColor * lightIntensity); //adding ambient
+   // specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
+
+    //color = color * textureColor;
     color = saturate(color);
 
-   // specular = pow(saturate(dot(reflection, input.viewDirection)), specularPower);
-    //color = saturate(color + (specular / 3));
 
-     color*=float4(0.2,0.2,1,0.8);
+     color*=float4(0.2,0.4,1,0.5);
      ///color.a = 0.01;
-     return color;
+     //return color;
 
-    //return color;
+    return color;
 }

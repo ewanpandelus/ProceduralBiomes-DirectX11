@@ -5,17 +5,24 @@ cbuffer MatrixBuffer : register(b0)
     matrix projectionMatrix;
     float time;
 };
+cbuffer CameraBuffer : register (b1)
+{
+    float3 cameraPosition;
+    float padding;
+};
 struct OutputType
 {
     float4 position : SV_POSITION;
     float2 tex : TEXCOORD0;
     float3 normal : NORMAL;
+   
 };
 
 struct InputType
 {
     float4 position : POSITION;
     float2 tex : TEXCOORD0;
+
 };
 float3 GerstnerWave( float4 wave, float3 p, inout float3 tangent, inout float3 binormal, float amp)
  {
@@ -40,9 +47,11 @@ OutputType main(InputType input)
 
     OutputType output;
 
-
+    float4 worldPosition;
+    
     // Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
+    //worldPosition = output.position;
     float amplitude = 0.3;
 
     float4 waveA = float4(1, 0, 0.5, 10);
@@ -65,7 +74,7 @@ OutputType main(InputType input)
 
 
 
-    output.position = float4(p,1);
+    //output.position = float4(p,1);
 
     output.position = mul(output.position, viewMatrix);
     output.position = mul(output.position, projectionMatrix);
@@ -75,7 +84,8 @@ OutputType main(InputType input)
 
     // Calculate the normal vector against the world matrix only.
     output.normal = normal;// mul(input.normal, (float3x3)worldMatrix);
-
+    //output.viewDirection = cameraPosition.xyz - worldPosition.xyz;
+   // output.viewDirection = normalize(output.viewDirection);
     // Normalize the normal vector.
    // output.normal = normalize(output.normal);
 

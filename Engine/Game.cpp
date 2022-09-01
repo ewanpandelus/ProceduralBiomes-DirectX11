@@ -310,29 +310,17 @@ void Game::Render()
     }
 
 
-    //m_world = SimpleMath::Matrix::Identity; //set world back to identity
-    //SimpleMath::Matrix positionAccountedFor = SimpleMath::Matrix::CreateTranslation(-m_terrainWidth * m_terrainScale / 2 +64, 0.f, -m_terrainWidth * m_terrainScale / 2+64);
-    //m_world = m_world * positionAccountedFor;
-    //m_terrainShader.EnableShader(context);
-    //m_terrainMap = m_terrainLoader.GetTerrainMap();
-    //for each (auto terrain in *m_terrainMap) {
-    //    m_world = SimpleMath::Matrix::Identity; //set world back to identity
-    //    positionAccountedFor = SimpleMath::Matrix::CreateTranslation(terrain.position.x, 0.f, terrain.position.y);
-    //    m_world = m_world * positionAccountedFor;
-    //    m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-    //       terrain.climateMapTex.Get(), m_noiseTexture.Get());
-    //    terrain.terrain.Render(context);
-    //}
+ 
     m_terrainShader.EnableShader(context);
     m_terrainShader.SetBiomeShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
         m_generatedClimateMapTexture.Get(), m_noiseTexture.Get());
     m_terrain.Render(context);
-
     context->OMSetBlendState(m_states->NonPremultiplied(), nullptr, 0xFFFFFFFF);
+
     m_waterShader.EnableShader(context, false);
     m_waterShader.SetShaderParameters(context, &m_world, &m_view, &m_projection, &m_Light,
-        m_FirstRenderPass->getShaderResourceView(), m_timer.GetTotalSeconds());
-    //   m_water.Render(context);
+        m_FirstRenderPass->getShaderResourceView(), m_timer.GetTotalSeconds(), m_Camera01.getPosition());
+    m_water.Render(context);
 
 
 
@@ -486,6 +474,7 @@ void Game::CreateDeviceDependentResources()
 
 
     *m_poissonDiscSampling.GetSampleRegionSize() = m_terrainWidth - 1;
+    m_water.SetHeightMap(m_terrain.GetHeightMap());
     m_water.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
     //setup map of climate over the terrain
 
@@ -510,6 +499,8 @@ void Game::CreateDeviceDependentResources()
     //Snow Biome 
     SetupSnowBiome(device);
 
+
+
     // m_depthTexture = m_depthTextureClass.GenerateDepthTexture(device);
 }
 
@@ -532,7 +523,7 @@ void Game::CreateWindowSizeDependentResources()
         fovAngleY,
         aspectRatio,
         0.01f,
-        500.0f
+        1000.0f
     );
 }
 
@@ -620,6 +611,8 @@ void Game::SetupForestBiome(ID3D11Device* device)
     CreateDDSTextureFromFile(device, L"forest_grass.dds", nullptr, m_forestGrassTexture.ReleaseAndGetAddressOf());
     CreateDDSTextureFromFile(device, L"forest_flowers.dds", nullptr, m_forestColourPalletTexture.ReleaseAndGetAddressOf());
     CreateDDSTextureFromFile(device, L"forest_details.dds", nullptr, m_forestDetailsTexture.ReleaseAndGetAddressOf());
+    m_waterSeaweedModel.InitializeModel(device, "water_seaweed.obj", m_forestGrassTexture);
+    m_waterSeaweedModel.SetPlacementPercentage(10);
 
     m_forestTreeModel.InitializeModel(device, "forest_tree.obj", m_forestTreeColdTexture);
     m_forestGrassModel.InitializeModel(device, "forest_grass.obj", m_forestGrassTexture);
@@ -631,8 +624,12 @@ void Game::SetupForestBiome(ID3D11Device* device)
 
     m_forestGrassRockModel.InitializeModel(device, "forest_grass_rock.obj", m_forestDetailsTexture);
 
+    m_forestMushroomModel.SetPlacementPercentage(20);
+
+    m_forestMushroomModel2.SetPlacementPercentage(20);
     m_biomeObjects.SetIsSmall(false);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestTreeModel), 1);
+    m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_waterSeaweedModel), 3);
     m_biomeObjects.SetIsSmall(true);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel), 1);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassModel2), 1);
@@ -640,9 +637,8 @@ void Game::SetupForestBiome(ID3D11Device* device)
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestMushroomModel), 1);
     m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestMushroomModel2), 1);
 
-
-
-    // m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestFlowerModel), 1);
+  //  m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestFlowerModel), 1);
+    
     // m_biomeObjects.AddToObjects(m_entityData.AddToMap(m_forestGrassRockModel), 1);
 }
 
@@ -672,6 +668,8 @@ void Game::GenerateTerrain(ID3D11Device* device)
 {
     m_terrain.GenerateHeightMap(device, m_terrainScale, 0, 0);
     m_barycentricCoordinates.SetHeightMap(m_terrain.GetHeightMap());
+    m_water.SetHeightMap(m_terrain.GetHeightMap());
+    m_water.Initialize(device, m_terrainWidth, m_terrainWidth, m_terrainScale);
 }
 
 void Game::SetupModelPositions(ID3D11Device* device)
@@ -679,7 +677,7 @@ void Game::SetupModelPositions(ID3D11Device* device)
     m_entityData.ClearModelBuffers();
     m_poissonPositionsBigObjects.clear();
     m_poissonPositionsSmallObjects.clear();
-    m_poissonDiscSampling.GenerateAllPoints(3, 1.5f, 2, 0.3f);
+    m_poissonDiscSampling.GenerateAllPoints(3, 1.2f, 2, 0.3f);
     m_poissonPositionsBigObjects = m_poissonDiscSampling.GetBigObjPoints();
     m_poissonPositionsSmallObjects = m_poissonDiscSampling.GetSmallObjPoints();
     m_biomeObjects.SetIsSmall(false);

@@ -43,7 +43,7 @@ bool Water::Initialize(ID3D11Device* device, int terrainWidth, int terrainHeight
 			index = (m_terrainHeight * j) + i;
 
 			m_heightMap[index].x = (float)i * m_scale;
-			m_heightMap[index].y = (float)3;
+			m_heightMap[index].y = (float)-1;
 			m_heightMap[index].z = (float)j * m_scale;
 
 			//and use this step to calculate the texture coordinates for this point on the terrain.
@@ -159,51 +159,53 @@ bool Water::InitializeBuffers(ID3D11Device* device)
 
 			}
 			counter++;
+			if (m_terrainHeightMap[index3].y < 0 || m_terrainHeightMap[index4].y < 0 || m_terrainHeightMap[index1].y < 0) {
+				vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index3].x, m_heightMap[index3].y, m_heightMap[index3].z);
+				vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index3].u, m_heightMap[index3].v);
+				indices[index] = index;
+				index++;
 
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index3].x, m_heightMap[index3].y, m_heightMap[index3].z);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index3].u, m_heightMap[index3].v);
-			indices[index] = index;
-			index++;
 
 
+				// Upper right.
+				vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
+				vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index4].u, m_heightMap[index4].v);
+				indices[index] = index;
+				index++;
 
-			// Upper right.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index4].u, m_heightMap[index4].v);
-			indices[index] = index;
-			index++;
 
+				// Bottom left.
+				vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
+				vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index1].u, m_heightMap[index1].v);
+				indices[index] = index;
+				index++;
+			}
+		
+			if (m_terrainHeightMap[index1].y < 0 || m_terrainHeightMap[index4].y < 0 || m_terrainHeightMap[index2].y < 0) {
+				vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
+				vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index1].u, m_heightMap[index1].v);
+				indices[index] = index;
+				index++;
+
+
+				// Upper right.
+				vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
+				vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index4].u, m_heightMap[index4].v);
+				indices[index] = index;
+				index++;
+
+
+				// Bottom right.
+				vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index2].x, m_heightMap[index2].y, m_heightMap[index2].z);
+				vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index2].u, m_heightMap[index2].v);
+
+
+				indices[index] = index;
+				index++;
+			}
 
 			// Bottom left.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index1].u, m_heightMap[index1].v);
-			indices[index] = index;
-			index++;
-
-
-			// Bottom left.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index1].x, m_heightMap[index1].y, m_heightMap[index1].z);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index1].u, m_heightMap[index1].v);
-			indices[index] = index;
-			index++;
-
-
-			// Upper right.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index4].x, m_heightMap[index4].y, m_heightMap[index4].z);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index4].u, m_heightMap[index4].v);
-			indices[index] = index;
-			index++;
-
-
-			// Bottom right.
-			vertices[index].position = DirectX::SimpleMath::Vector3(m_heightMap[index2].x, m_heightMap[index2].y, m_heightMap[index2].z);
-			vertices[index].texture = DirectX::SimpleMath::Vector2(m_heightMap[index2].u, m_heightMap[index2].v);
-
-
-
-
-			indices[index] = index;
-			index++;
+		
 		}
 	}
 
@@ -283,6 +285,11 @@ void Water::RenderBuffers(ID3D11DeviceContext* deviceContext)
 bool Water::Update()
 {
 	return true;
+}
+
+void Water::SetHeightMap(Terrain::HeightMapType* terrainHeightMap)
+{
+	m_terrainHeightMap = terrainHeightMap;
 }
 
 

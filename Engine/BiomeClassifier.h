@@ -15,12 +15,12 @@ private:
 
 	};
 
-	BiomeType m_biomes[3];
+	BiomeType m_biomes[4];
 
 	BiomeType m_desert;
 	BiomeType m_forest;
 	BiomeType m_snow;
-
+	BiomeType m_water;
 
 	std::vector<float> ClassifyBasedOnDistance(std::vector<float> distances);
 	std::vector<float> RemoveDistanceFromUnclassifiedElements(std::vector<float> distances, int indexClassified);
@@ -29,7 +29,7 @@ private:
 public:
 	void Initialise();
 	float CalculateDistanceToBiome(float temp, float rainfall, BiomeType biome);
-	SimpleMath::Vector3  CalculateDistanceToAllBiomes(float temp, float rainfall);
+	SimpleMath::Vector4  CalculateDistanceToAllBiomes(float temp, float rainfall);
 
 };
 

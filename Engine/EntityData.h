@@ -10,10 +10,10 @@ public:
 	std::vector<ModelClass> GetModels();
 	void SetupModelBuffers(ID3D11Device*);
 	void ClearModelBuffers();
+;
 private:
 	int currentID = 0;
 	map<int, ModelClass> entities;
 
-	
 };
 

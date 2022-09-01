@@ -57,7 +57,7 @@ OutputType main(InputType input)
 
     // Calculate the position of the vertex against the world, view, and projection matrices.
     output.position = mul(input.position, worldMatrix);
-    worldPosition = mul(input.position, worldMatrix);
+    worldPosition = output.position;
 
     float4 _Time = float4(time / 20, time, time * 2, time * 3);
     float4 worldPos = input.position;

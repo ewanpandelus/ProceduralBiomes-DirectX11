@@ -196,6 +196,11 @@ private:
     Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>                        m_snowTexture;
 
 
+
+    //Water Biome 
+    ModelClass																m_waterSeaweedModel;
+
+   
     //RenderTextures
     RenderTexture* m_FirstRenderPass;
     RECT																	m_fullscreenRect;

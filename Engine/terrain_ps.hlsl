@@ -39,16 +39,14 @@ float4 main(InputType input) : SV_TARGET
     float4 noiseTex;
 
 
-    float4	snowColor;
+    float4 snowColor = float4(1,1,1,1);
+    float4 waterColor = float4(1, 0.8, 0.6, 1);
 
-    float4 desertCol1 = float4(0.95, 0.77, 0.5, 1);
-    float4 desertCol2 = float4(1, 0.8, 0.6,1);
     float4 desertCol;
 
 
 
-    float4 forestCol1 = float4(0.2, 0.67, 0.335, 1);
-    float4 forestCol2 = float4(0, 0.67, 0.032, 1);
+
     float4 forestCol;
 
 
@@ -78,22 +76,17 @@ float4 main(InputType input) : SV_TARGET
 
 
 
-  //  desertCol = lerp(desertCol1, desertColour, noiseTex.r);
-    //   desertCol = lerp(float4(1, 1, 1, 1), float4(0.7, 0.7, 0.9, 1), noiseTex.r);
-//    forestCol = lerp(forestCol1, forestColour, noiseTex.r);
-   
 
-   
-   //forestColor  = lerp(desertColor, float4(0, 1, 0, 1), .4);
-
-    snowColor = lerp(float4(1, 1, 1, 1), rockColor,slope);
-
+    snowColor = lerp(snowColor, rockColor,slope-0.2);
+    forestCol = lerp(forestColour, rockColor, slope+0.2);
+    waterColor = lerp(waterColor, rockColor, slope+0.4);
 
 
     desertCol = textureColor.r * desertColour;
-    forestCol = textureColor.g * forestColour;
+    forestCol = textureColor.g * forestCol;
     snowColor = textureColor.b * snowColor;
-    return color * saturate(desertCol + forestCol + snowColor);
+    waterColor = textureColor.a * waterColor;
+    return color * (desertCol + forestCol + snowColor + waterColor);
 
 
 }

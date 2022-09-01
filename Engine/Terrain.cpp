@@ -383,18 +383,25 @@ void Terrain::SetupVertex(unsigned long* indices, VertexType* vertices, int* cur
 }
 float Terrain::EvaluateNoiseBasedOnClimate(int index, float xOffset, float zOffset, int i, int j)
 {
-	SimpleMath::Vector3 climate = climateMap[index].climateClassification;
-	float amplitude = (climate.x * 0.3f) + (climate.y) + (climate.z * 2);
+	SimpleMath::Vector4 climate = climateMap[index].climateClassification;
+	float amplitude = (climate.x * 0.8) + climate.y + (climate.z * 2) + climate.w;
+
 	m_amplitude *= amplitude;
 	float perlinValue = 0;
 
 	perlinValue =  (1 - abs(perlinNoise.Noise((i+xOffset)  * m_frequency, (j+zOffset)  * m_frequency, 1)) - 0.5)*m_amplitude;
 
-
-
-	if (perlinValue < 0) perlinValue = 0;
+	if (climate.w > 0.5) {
+		return Lerp(perlinValue, -3, climate.w);
+	}
+	if (perlinValue < 1 && climate.w == 0)return 1;
 	return perlinValue;
 	
+}
+
+float Terrain::Lerp(float a, float b, float f)
+{
+	return (a * (1.0 - f)) + (b * f);
 }
 
 

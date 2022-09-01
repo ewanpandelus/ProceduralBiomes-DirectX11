@@ -56,6 +56,13 @@ void BiomeObjects::AddToObjects(int modelID, int biomeType)
 			m_snowObjectsLarge.push_back(modelID);
 		}
 		break;
+	case 3:
+		if (isSmall) {
+			m_waterObjectsSmall.push_back(modelID);
+		}
+		else {
+			m_waterObjectsLarge.push_back(modelID);
+		}
 	default:
 		return;
 	}
@@ -89,7 +96,6 @@ int BiomeObjects::GetRandomObjectFromBiome(int biomeType)
 		return m_forestObjectsLarge[rand() % listSize];
 		break;
 	case 2:
-
 		if (isSmall) {
 			//listSize = m_snowObjectsSmall.size();
 			return -1;// m_snowObjectsSmall[rand() % listSize];
@@ -97,37 +103,50 @@ int BiomeObjects::GetRandomObjectFromBiome(int biomeType)
 		listSize = m_snowObjectsLarge.size();
 		return m_snowObjectsLarge[rand() % listSize];
 		break;
+	case 3:
+		if (isSmall) {
+			return -1;
+		}
+		listSize = m_waterObjectsLarge.size();
+		return m_waterObjectsLarge[rand() % listSize];
+		break;
 	default:
 		return -1;
 	}
 }
 
-BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(SimpleMath::Vector3 position, SimpleMath::Vector3 climateClassification)
+BiomeObjects::BiomeObjectType BiomeObjects::AssignModelBasedOnClimate(SimpleMath::Vector3 position, SimpleMath::Vector4 climateClassification)
 {
-
 	int percentage = rand() % 101;
-	float desertPercent = climateClassification.x * 100;
-	float forestPercent = climateClassification.y * 100;
-	float snowPercent = climateClassification.z * 100;
-	if (desertPercent > 55 ) {
-		return SetupObject(GetRandomObjectFromBiome(0), position);
+	int biomeThresholds[4];
+	biomeThresholds[0] = 65;
+	biomeThresholds[1] = 65;
+	biomeThresholds[2] = 53;
+	biomeThresholds[3] = 80;
+
+
+	float biomePercentages[4];
+	biomePercentages[0] = climateClassification.x * 100;
+	biomePercentages[1] = climateClassification.y * 100;
+	biomePercentages[2] = climateClassification.z * 100;
+	biomePercentages[3] = climateClassification.w * 100;
+	float sumOfBiomePercentages = 0;
+	for (int i = 0; i < 4; i++) {
+		if (biomePercentages[i] > biomeThresholds[i]) {
+			return SetupObject(GetRandomObjectFromBiome(i), position);
+		}
 	}
-	if (forestPercent > 55) {
-		return SetupObject(GetRandomObjectFromBiome(1), position);
-	}
-	if (snowPercent > 50) {
-		return SetupObject(GetRandomObjectFromBiome(2), position);
-	}
-	if (percentage < desertPercent && desertPercent!=0) {
-		return SetupObject(GetRandomObjectFromBiome(0), position);
-	}
-	if ((percentage < desertPercent + forestPercent)) {
-		return SetupObject(GetRandomObjectFromBiome(1), position);
-	}
-	if (percentage <= (desertPercent + forestPercent + snowPercent + 0.01f)&&snowPercent!=0) {
-		return SetupObject(GetRandomObjectFromBiome(2), position);
+
+	for (int i = 0; i < 4; i++) {
+		sumOfBiomePercentages += biomePercentages[i];
+		if (i == 3) sumOfBiomePercentages += 0.01f; //Accounts for floating point errors;
+		if (percentage < sumOfBiomePercentages && biomePercentages[i] != 0) {
+			return SetupObject(GetRandomObjectFromBiome(i), position);
+		}
+
 	}
 	return SetupObject(GetRandomObjectFromBiome(1), position);
+
 }
 
 

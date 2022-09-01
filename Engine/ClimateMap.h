@@ -25,7 +25,7 @@ public:
 		float x, z;
 		float temperature;
 		float rainfall;
-		SimpleMath::Vector3 climateClassification;
+		SimpleMath::Vector4 climateClassification;
 	};
 
 
@@ -33,7 +33,7 @@ public:
 	ClimateMapType* GetClimateMap();
 	ClimateMapType GenerateClimateMapIndvidual();
 	Microsoft::WRL::ComPtr<ID3D11ShaderResourceView>  GenerateNoiseTexture(ID3D11Device* device);
-	uint32_t RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b);
+	uint32_t RGB_TO_UNSIGNED_INT_COLOUR(int r, int g, int b, int a);
 	ClimateMapType* GenerateClimateMap(int xOffset, int zOffset);
 	map<SimpleMath::Vector2, ClimateMapType*> GenerateClimateMaps(int positionalStep, SimpleMath::Vector2 playerPos);
 private:
@@ -41,7 +41,7 @@ private:
 	float m_maxTemp = -1000, m_minTemp = 1000;
 	float m_maxRainfall = -1000, m_minRainfall = 1000;
 
-	float m_temperatureAmplitude = 1, m_temperatureFrequency = 0.012, m_temperatureOffset = 51.282;
+	float m_temperatureAmplitude = 1, m_temperatureFrequency = 0.012, m_temperatureOffset = 43.062;
 	float m_rainfallAmplitude = 1, m_rainFallFrequency = 0.012, m_rainfallOffset = 36.4;
 	float m_positionalOffsetX = 0, m_positionalOffsetZ = 0;
 	BiomeClassifier m_biomeClassifier;

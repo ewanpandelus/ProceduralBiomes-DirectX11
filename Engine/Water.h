@@ -28,7 +28,7 @@ public:
 	bool GenerateHeightMap(ID3D11Device*);
 	bool Update();
 	HeightMapType* GetHeightMap();
-
+	void SetHeightMap(Terrain::HeightMapType*);
 
 private:
 	void Shutdown();
@@ -41,7 +41,7 @@ private:
 	int m_vertexCount, m_indexCount;
 	int m_scale = 1;
 	HeightMapType* m_heightMap;
-
+	Terrain::HeightMapType* m_terrainHeightMap;
 	//arrays for our generated objects Made by directX
 	std::vector<VertexPositionNormalTexture> preFabVertices;
 	std::vector<uint16_t> preFabIndices;
